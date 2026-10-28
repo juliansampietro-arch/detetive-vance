@@ -496,3 +496,6 @@ button.ghost:hover { color: var(--cyan); box-shadow: none; border-color: transpa
   .title-in > h1 { margin: .15em 0; }
   .title-in > .controls { margin-top: .6em; }
 }
+
+/* seleção pelo controle: bem visível na TV */
+button.pad-focus { border-color: #fff !important; color: #fff; box-shadow: 0 0 0 2px var(--cyan), 0 0 22px rgba(56, 246, 255, .6) !important; transform: scale(1.04); }

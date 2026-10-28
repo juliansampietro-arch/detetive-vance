@@ -815,7 +815,14 @@ function updatePrompt() {
 // botão de ação: interage com o alvo ou avança o texto da janela aberta
 let engineOn = false;
 function doAction() {
-  if (!game) return;
+  if (!game) {
+    // tela de título: A abre o botão destacado; na introdução, avança
+    if (Intro.isRunning()) { Intro.next(); return; }
+    const f = document.activeElement;
+    if (titleOn() && f && f.tagName === 'BUTTON' && $('title').contains(f)) f.click();
+    else if (titleOn()) focusMove(1);
+    return;
+  }
   if (game.modal) {
     if (game.modal === 'intro') { Intro.next(); return; }
     if (game.modal === 'card') { $('card').click(); return; }
@@ -1067,8 +1074,10 @@ window.addEventListener('resize', () => { if (game) { resizeView(game.zoom); upd
 
 // navegação por botões nas janelas (teclado / gamepad)
 function activePanel() {
-  return ['accuse', 'hack', 'palace', 'evidence', 'menu', 'gps', 'lang', 'dialogue', 'msg', 'call'].map($).find(el => !el.classList.contains('hidden')) || null;
+  return ['accuse', 'hack', 'palace', 'evidence', 'menu', 'gps', 'lang', 'dialogue', 'msg', 'call'].map($).find(el => !el.classList.contains('hidden')) || (titleOn() ? $('title') : null);
 }
+// tela de título (escolha do caso) aberta, sem a introdução por cima
+function titleOn() { return !$('title').classList.contains('hidden') && !Intro.isRunning(); }
 function focusMove(delta) {
   const panel = activePanel();
   if (!panel) return;
@@ -1103,7 +1112,7 @@ function pollGamepad() {
   if (b(14)) ax = -1; if (b(15)) ax = 1; if (b(12)) ay = -1; if (b(13)) ay = 1;
   // a tecla emulada pelo Edge do Xbox chegou primeiro: este aperto já foi tratado por ela
   if (performance.now() - (pad.lastKey || -1e9) < 250) { for (let i = 0; i < gp.buttons.length; i++) pad.prev[i] = b(i); pad.prev.up = pad.prev.down = true; pad.x = pad.y = 0; return; }
-  if (game && game.modal) {
+  if ((game && game.modal) || titleOn()) {
     pad.x = pad.y = 0;
     const up = (b(12) || b(14) || gp.axes[1] < -0.6 || gp.axes[0] < -0.6), down = (b(13) || b(15) || gp.axes[1] > 0.6 || gp.axes[0] > 0.6);
     if (up && !pad.prev.up) focusMove(-1);
@@ -1115,7 +1124,7 @@ function pollGamepad() {
   if (pressed(2)) toggleScanner();
   if (pressed(3) && game && !game.modal) openPalace();
   if (pressed(8) && game && !game.modal) openEvidence();
-  if (pressed(9)) game && game.modal === 'menu' ? closeModal() : openMenu();
+  if (pressed(9) && game) game.modal === 'menu' ? closeModal() : openMenu();
   if (gp.buttons.some(x => x.pressed) || Math.abs(gp.axes[0]) > 0.6 || Math.abs(gp.axes[1]) > 0.6) pad.lastPress = performance.now();
   for (let i = 0; i < gp.buttons.length; i++) pad.prev[i] = b(i);
 }
