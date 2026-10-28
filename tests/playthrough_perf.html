@@ -1,0 +1,50 @@
+<!doctype html><html><body>
+<iframe id="a" style="width:915px;height:412px"></iframe>
+<pre id="out"></pre>
+<script>
+// mede o tempo médio de update + render por quadro em cenas pesadas
+const log = [];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+(async () => {
+  for (const s of ['room=city&at=15,19', 'room=city&at=40,38', 'room=city&at=22,20&drive', 'room=delegacia&at=8,8', 'room=onsen&towel&at=5,5', 'room=suite']) {
+    const f = document.getElementById('a');
+    await new Promise(res => { f.onload = res; f.src = '/www/index.html?r=' + Math.random() + '#' + s + '&closemsg'; });
+    const w = f.contentWindow;
+    await sleep(300);
+    for (let i = 0; i < 20; i++) { w.update(1 / 60); w.render(); }
+    let tu = 0, tr = 0;
+    const N = 120;
+    for (let i = 0; i < N; i++) {
+      const a = performance.now(); w.update(1 / 60); const b = performance.now(); w.render(); const c = performance.now();
+      tu += b - a; tr += c - b;
+    }
+    log.push(`OK   ${s}: update ${(tu / N).toFixed(2)} ms · render ${(tr / N).toFixed(2)} ms`);
+    // custo de cada parte: desliga uma de cada vez
+    const parts = { luz: 'drawLighting', chao: 'drawFloor', paredes: 'drawWalls', chuva: 'drawRain', ordem: 'depthSort', vinheta: 'drawVignette', indicadores: 'drawIndicators' };
+    const out = [];
+    for (const [nome, fn] of Object.entries(parts)) {
+      const orig = w[fn];
+      w.eval(fn + ' = ' + (fn === 'depthSort' ? '(e => e)' : '(() => {})'));
+      let t2 = 0;
+      for (let i = 0; i < 60; i++) { const a = performance.now(); w.render(); t2 += performance.now() - a; }
+      w.eval(fn + ' = window.__orig'), 0;
+      w.__orig = orig; w.eval(fn + ' = window.__orig');
+      out.push(`${nome} −${(tr / N - t2 / 60).toFixed(1)}`);
+    }
+    if (w.CITY && s.includes('city')) {
+      const og = w.CITY.drawGround; w.CITY.drawGround = () => {};
+      let t2 = 0; for (let i = 0; i < 60; i++) { const a = performance.now(); w.render(); t2 += performance.now() - a; }
+      w.CITY.drawGround = og; out.push(`chão-cidade −${(tr / N - t2 / 60).toFixed(1)}`);
+      const ob = w.CITY.drawBuilding; w.CITY.drawBuilding = () => {};
+      t2 = 0; for (let i = 0; i < 60; i++) { const a = performance.now(); w.render(); t2 += performance.now() - a; }
+      w.CITY.drawBuilding = ob; out.push(`prédios −${(tr / N - t2 / 60).toFixed(1)}`);
+      const oc = w.drawHoverCar; w.eval('drawHoverCar = () => {}');
+      t2 = 0; for (let i = 0; i < 60; i++) { const a = performance.now(); w.render(); t2 += performance.now() - a; }
+      w.__orig = oc; w.eval('drawHoverCar = window.__orig'); out.push(`carros −${(tr / N - t2 / 60).toFixed(1)}`);
+    }
+    log.push('     ' + out.join(' · '));
+  }
+  document.getElementById('out').textContent = log.join('\n');
+  document.title = 'done';
+})();
+</script></body></html>

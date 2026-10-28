@@ -1,0 +1,11 @@
+node_modules/
+android/app/build/
+android/.gradle/
+android/build/
+*.apk
+desktop/node_modules/
+desktop/dist/
+desktop/www/
+*.exe
+*.7z
+.vscode/

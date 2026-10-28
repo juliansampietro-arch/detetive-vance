@@ -1,0 +1,25 @@
+{
+  "name": "hotel-alvorada-desktop",
+  "productName": "O Silêncio do Hotel Alvorada",
+  "version": "1.0.0",
+  "description": "O Silêncio do Hotel Alvorada — RPG de investigação cyberpunk noir",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "copy": "node -e \"const fs=require('fs');fs.rmSync('www',{recursive:true,force:true});fs.cpSync('../www','www',{recursive:true})\"",
+    "start": "npm run copy && electron .",
+    "exe": "npm run copy && electron-builder --win portable nsis"
+  },
+  "build": {
+    "appId": "br.alvorada.hotel",
+    "directories": { "output": "dist" },
+    "files": ["main.js", "www/**/*"],
+    "win": { "icon": "www/icons/icon-512.png" },
+    "portable": { "artifactName": "HotelAlvorada-portatil.exe" },
+    "nsis": { "artifactName": "HotelAlvorada-instalador.exe", "oneClick": false, "allowToChangeInstallationDirectory": true }
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  }
+}

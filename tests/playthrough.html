@@ -1,0 +1,850 @@
+<!doctype html><html><body>
+<iframe id="a" style="width:915px;height:412px"></iframe>
+<iframe id="b" style="width:915px;height:412px"></iframe>
+<pre id="out"></pre>
+<script>
+const log = [];
+const ok = (c, m) => { log.push((c ? 'OK   ' : 'FAIL ') + m); document.getElementById('out').textContent = log.join(' || '); };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const BASE = '/www/index.html';
+
+// let/const globais não viram propriedades de window: expõe via eval
+function expose(w) {
+  for (const n of ['game', 'VH', 'EV_KEYS', 'NPCS', 'DEDUCTIONS', 'hackState', 'Intro', 'CITY', 'Sound', 'ROOMS', 'DESTINATIONS', 'spriteCache', 'CAR_MODELS', 'LOOKS']) {
+    Object.defineProperty(w, n, { get: () => w.eval(n), configurable: true });
+  }
+  return w;
+}
+function load(id, url) {
+  return new Promise(res => { const f = document.getElementById(id); f.onload = () => res(expose(f.contentWindow)); f.src = url; });
+}
+
+async function mainPath(w) {
+  const errs = [];
+  w.addEventListener('error', e => errs.push(e.message));
+  const g = () => w.game;
+  const obj = key => g().roomData.objects.find(o => o.key === key);
+  const finish = () => { for (let i = 0; i < 50 && w.finishTyping(); i++); };
+  const key = (k, down) => w.document.dispatchEvent(new w.KeyboardEvent(down ? 'keydown' : 'keyup', { key: k }));
+  const hold = (ks, secs) => { ks.forEach(k => key(k, true)); for (let i = 0; i < secs / 0.05 && !g().modal; i++) w.update(0.05); ks.forEach(k => key(k, false)); w.update(0.05); };
+  // posiciona Vance num tile livre vizinho ao alvo, virado para ele, e aperta o botão de ação
+  const use = tg => {
+    const o = tg.obj, n = tg.npc;
+    const x0 = o ? o.x : n.x, y0 = o ? o.y : n.y, x1 = x0 + (o ? (o.w || 1) : 1) - 1, y1 = y0 + (o ? (o.d || 1) : 1) - 1;
+    let best = null;
+    for (let y = y0 - 1; y <= y1 + 1; y++) for (let x = x0 - 1; x <= x1 + 1; x++) {
+      if (w.blocked(x, y)) continue;
+      const inside = x >= x0 && x <= x1 && y >= y0 && y <= y1;
+      if (inside && (n || o.solid)) continue;
+      if (!best || inside) best = [x, y];
+    }
+    const p = g().player;
+    p.px = p.x = best[0]; p.py = p.y = best[1];
+    p.dir = [(x0 + x1) / 2 - best[0], (y0 + y1) / 2 - best[1]];
+    w.update(0.016);
+    const t = g().target;
+    const same = t && (o ? t.obj === o || (t.obj && t.obj.key === o.key) : t.npc === n);
+    if (!same) ok(false, 'alvo não selecionado para ' + (o ? o.key : n.id) + ' (selecionou ' + (t ? (t.obj ? t.obj.key : t.npc.id) : 'nada') + ')');
+    w.doAction(); finish();
+  };
+
+  w.closeModal();
+  // movimento com direcionais e colisão
+  const p = g().player, x0 = p.px, y0 = p.py;
+  hold(['ArrowRight'], 0.5);
+  ok(p.px > x0 && p.py < y0 && g().player.moving === false, 'seta direita move na diagonal do mapa (direita da tela)');
+  hold(['ArrowLeft', 'ArrowUp'], 4);
+  ok(w.free(p.px + 0.5, p.py + 0.5) && p.px + 0.5 >= 0.2, 'colisão: não atravessa a parede de vidro');
+  hold(['ArrowDown'], 4);
+  ok(w.free(p.px + 0.5, p.py + 0.5) && p.py + 0.5 <= g().roomData.h, 'colisão: não sai pela frente da sala');
+  for (let i = 0; i < 60; i++) { key('ArrowUp', true); key('ArrowRight', true); w.update(0.05); }
+  key('ArrowUp', false); key('ArrowRight', false);
+  ok(w.free(p.px + 0.5, p.py + 0.5), 'colisão com móveis mantém posição válida');
+  // cama (tiles x 1-2, y 2-4): empurrar contra ela de todos os lados nunca entra na área
+  const bedIn = () => { const cx = p.px + 0.5, cy = p.py + 0.5; return cx > 1 && cx < 3 && cy > 2 && cy < 5; };
+  let inside = false;
+  for (const [sx, sy, keys] of [[3, 3, ['ArrowLeft', 'ArrowUp']], [1, 5, ['ArrowUp', 'ArrowRight']], [0, 3, ['ArrowRight', 'ArrowDown']], [2, 1, ['ArrowDown', 'ArrowLeft']], [3, 5, ['ArrowUp']]]) {
+    p.px = p.x = sx; p.py = p.y = sy;
+    keys.forEach(k => key(k, true));
+    for (let i = 0; i < 60; i++) { w.update(0.05); if (bedIn()) inside = true; }
+    keys.forEach(k => key(k, false)); w.update(0.05);
+  }
+  ok(!inside, 'colisão: Vance não entra na cama por nenhum lado');
+  // clicar do outro lado da cama: o caminho contorna
+  p.px = p.x = 0; p.py = p.y = 3; w.update(0.05);
+  w.goTo({ tile: [3, 3] });
+  for (let i = 0; i < 300 && g().player.path.length; i++) { w.update(0.05); if (bedIn()) inside = true; }
+  ok(!inside && g().player.x === 3, 'clicar do outro lado: o caminho contorna a cama');
+  p.px = p.x = 4; p.py = p.y = 6; w.update(0.05);
+
+  // ATO I
+  // clicar para andar: vai até o corpo e examina ao chegar
+  w.goTo({ obj: obj('corpo') });
+  for (let i = 0; i < 300 && !g().modal; i++) w.update(0.05);
+  finish(); ok(w.has('e_corpo'), 'clicar no corpo: anda até ele e examina'); w.closeModal();
+  w.goTo({ tile: [8, 6] });
+  for (let i = 0; i < 300 && g().player.path.length; i++) w.update(0.05);
+  ok(g().player.x === 8 && g().player.y === 6, 'clicar no chão: anda até o tile');
+  use({ obj: obj('taca') }); ok(w.has('e_taca'), 'coletar taça'); w.closeModal();
+  use({ obj: obj('holomesa') }); ok(w.has('e_cronometro'), 'coletar cronômetro');
+  w.closeModal(); w.hackFile(); w.hackState.onSolve(); finish(); ok(w.has('e_arquivo'), 'hack do arquivo'); w.closeModal();
+  use({ obj: obj('duto') }); ok(!w.has('e_duto'), 'duto sem scanner não dá evidência'); w.closeModal();
+  w.toggleScanner(); ok(g().scanner, 'scanner liga');
+  use({ obj: obj('duto') }); ok(w.has('e_duto'), 'duto com scanner'); w.closeModal();
+  w.render();
+  use({ obj: obj('nanobots') }); ok(w.has('e_nanobots'), 'nanorrobôs'); w.closeModal();
+  use({ obj: obj('pegadas') }); ok(w.has('e_pegadas'), 'pegadas'); w.closeModal();
+  use({ obj: obj('painel') }); ok(w.has('e_trava'), 'trava'); w.closeModal();
+  // atravessar a porta andando
+  p.px = p.x = 2; p.py = p.y = 1;
+  hold(['ArrowUp', 'ArrowRight'], 1.5);
+  ok(g().roomId === 'suite' && g().target && g().target.obj.kind === 'exit' && /Próxima sala/.test(w.document.getElementById('prompt').textContent), 'ao chegar na porta, aparece o botão "Próxima sala" (sem trocar de sala sozinho)');
+  w.doAction();
+  ok(g().roomId === 'corridor', 'apertar "Próxima sala" leva ao corredor');
+  w.closeModal();
+  use({ obj: obj('servico') }); ok(w.has('e_porta_servico'), 'porta de serviço com scanner'); w.closeModal();
+  p.px = p.x = 10; p.py = p.y = 1;
+  hold(['ArrowUp', 'ArrowRight'], 1.5); w.doAction();
+  ok(g().roomId === 'corridor' && g().modal === 'msg', 'elevador bloqueado no ato I'); w.closeModal();
+  w.toggleScanner();
+  w.addDeduction('d_entrada'); await sleep(500); ok(g().act === 2, 'dedução d_entrada → ato II');
+  w.document.getElementById('card').click(); w.closeModal();
+  p.px = p.x = 10; p.py = p.y = 2;
+  hold(['ArrowUp', 'ArrowRight'], 1.5); w.doAction();
+  ok(g().roomId === 'lobby', 'elevador para o lobby'); w.closeModal();
+  use({ obj: obj('term_bar') }); ok(w.has('e_bar_log'), 'terminal do bar'); w.closeModal();
+  use({ obj: obj('term_recepcao') }); ok(g().modal === 'msg', 'terminal da recepção abre'); w.closeModal();
+  w.openHack('t', () => w.give('e_recepcao_log')); w.hackState.onSolve(); ok(w.has('e_recepcao_log'), 'hack da recepção'); w.closeModal();
+  use({ npc: g().roomData.npcs.find(n => n.id === 'victor') }); ok(g().modal === 'dialogue', 'botão de ação perto de Victor abre diálogo');
+  w.doAction(); ok(w.document.querySelector('#dlg-options button'), 'botão de ação completa o texto do diálogo');
+  w.closeModal();
+  w.addDeduction('d_trava'); await sleep(500); ok(g().act === 3, 'dedução d_trava → ato III');
+  w.document.getElementById('card').click(); w.closeModal();
+  w.enterRoom('corridor', [5, 1]);
+  use({ obj: obj('servico') }); ok(g().roomId === 'corridor' && g().flags.porta_emperrada, 'porta de serviço emperrada sem a credencial do hacker');
+  w.closeModal();
+  // atalho da missão C4mpt0n/Zeca (testada à parte): recebe a credencial mestra
+  w.give('e_credencial'); w.give('e_sabotagem'); g().flags.credencial = true; w.closeModal();
+  use({ obj: obj('servico') }); ok(g().roomId === 'tunnels', 'credencial mestra abre a porta de serviço no ato III');
+  w.toggleScanner();
+  use({ obj: obj('ferramenta') }); ok(w.has('e_ferramenta'), 'ferramenta com scanner'); w.closeModal();
+  use({ obj: obj('papeis') }); ok(w.has('e_papeis'), 'papéis'); w.closeModal();
+  use({ obj: obj('t03') }); ok(w.has('e_terminal_t03'), 'terminal T-03'); w.closeModal();
+  // emboscada: só começa depois de achar a arma E com o scanner desligado
+  for (let i = 0; i < 40 && !g().combat; i++) w.update(0.05);
+  ok(!g().combat && g().scanner, 'com o scanner ligado, a emboscada não acontece');
+  w.toggleScanner();
+  for (let i = 0; i < 40 && !g().combat; i++) w.update(0.05);
+  ok(!!g().combat, 'emboscada começa depois de achar a ferramenta, com o scanner desligado');
+  let enemyShots = 0, minDistToEnemy = 99, seenEnemy = false, frames = 0, playerBullets = 0;
+  const prevHp = () => g().combat ? g().combat.hp : 0;
+  while (g().combat && frames < 1200) {
+    const C = g().combat;
+    if (C.enemy.alpha > 0.5) seenEnemy = true;
+    if (frames % 6 === 0) { const before = C.shots; w.doAction(); if (C.shots > before) playerBullets++; }
+    const nb = C.bullets.filter(b => b.enemy).length;
+    for (const b of C.bullets.filter(b => !b.enemy)) minDistToEnemy = Math.min(minDistToEnemy, Math.hypot(b.x - C.enemy.x, b.y - C.enemy.y));
+    w.update(0.05); frames++;
+    if (g().combat) enemyShots = Math.max(enemyShots, g().combat.enemy.volleys);
+  }
+  ok(seenEnemy, 'atirador encapuzado aparece');
+  ok(playerBullets >= 5, 'Vance atira de volta (' + playerBullets + ' disparos)');
+  ok(minDistToEnemy > 0.4, 'nenhum tiro de Vance acerta o atirador (passagem mais próxima: ' + minDistToEnemy.toFixed(2) + ' tile)');
+  ok(enemyShots >= 1, 'atirador dispara contra Vance');
+  ok(!g().combat && g().flags.tiroteio && w.has('e_tiroteio'), 'cena termina sem game over e gera a pista da emboscada');
+  ok(g().modal === 'msg' && w.document.getElementById('msg-title').textContent === 'Emboscada', 'mensagem final da emboscada');
+  w.closeModal();
+  for (let i = 0; i < 40; i++) w.update(0.05);
+  ok(!g().combat, 'emboscada não se repete');
+  w.enterRoom('lobby', [9, 1]);
+  w.toggleScanner();
+  w.talk('victor'); finish(); w.closeModal();
+  w.talk('victor'); finish(); w.closeModal();
+  ok(w.has('e_luva') && w.has('e_polvora'), 'scanner em Victor depois da emboscada: prótese e resíduo de disparo');
+  w.addDeduction('d_atirador'); ok(w.has('d_atirador'), 'dedução do atirador encapuzado');
+  ok(errs.length === 0, 'sem erros JS no caminho principal ' + errs.join(' | '));
+}
+
+
+async function cityTests(w) {
+  const errs = [];
+  w.addEventListener('error', e => errs.push(e.message));
+  const g = () => w.game;
+  const finish = () => { for (let i = 0; i < 50 && w.finishTyping(); i++); };
+  const clickBtn = (txt) => { finish(); const b = [...w.document.querySelectorAll('#msg-options button')].find(b => b.textContent.includes(txt)); if (b) b.click(); return !!b; };
+  const obj = key => g().roomData.objects.find(o => o.key === key);
+  const run = secs => { for (let i = 0; i < secs / 0.05; i++) w.update(0.05); };
+  const key = (k, d) => w.document.dispatchEvent(new w.KeyboardEvent(d ? 'keydown' : 'keyup', { key: k }));
+  const tp = (x, y) => { const p = g().player; p.px = p.x = x; p.py = p.y = y; p.path = []; p.seat = null; w.update(0.016); };
+  w.closeModal();
+  const C = w.CITY;
+
+  // ---------- a cidade ----------
+  ok(C.N >= 60 && g().roomId === 'city', `cidade aberta e grande (${C.N}x${C.N} tiles, antes 32x32)`);
+  ok(w.ROOMS.city.objects.filter(o => o.key).length > 120, `objetos interativos na cidade: ${w.ROOMS.city.objects.filter(o => o.key).length}`);
+  const ctShops = C.shops.filter(s => C.inCT(s.tile[0], s.tile[1])).length;
+  const ctKinds = new Set(w.ROOMS.city.objects.filter(o => C.inCT(o.x || Math.floor(o.cx || 0), o.y || Math.floor(o.cy || 0))).map(o => o.kind));
+  ok(ctShops >= 10 && ['paifang', 'lantern_line', 'lion', 'incense', 'koi', 'stall', 'banner', 'mahjong'].every(k => ctKinds.has(k)), `Chinatown: ${ctShops} lojas e elementos chineses (${[...ctKinds].join(', ')})`);
+  let ctTiles = 0; for (let y = 0; y < C.N; y++) for (let x = 0; x < C.N; x++) if (C.inCT(x, y)) ctTiles++;
+  ok(ctTiles >= 300, `Chinatown ocupa ${ctTiles} tiles (antes: rua de 14x8 = 112)`);
+  const pcs = w.ROOMS.city.objects.filter(o => o.kind === 'police_car' && Math.hypot(o.cx - w.CITY.map(16, 17)[0], o.cy - w.CITY.map(16, 17)[1]) < 6);
+  ok(pcs.length >= 2, `viaturas da polícia na frente do hotel: ${pcs.length}`);
+
+  // pedestres andam, alguns com guarda-chuva (braço levantado segurando o cabo)
+  const walkers = w.ROOMS.city._walkers;
+  const pos0 = walkers.map(a => a.fx + ',' + a.fy);
+  run(8); w.render();
+  const moved = walkers.filter((a, i) => a.fx + ',' + a.fy !== pos0[i]).length;
+  ok(walkers.length >= 40 && moved >= walkers.length * 0.5, `${walkers.length} pedestres na cidade, ${moved} se moveram`);
+  ok(walkers.every(a => w.CITY.crowdOK(Math.round(a.fx), Math.round(a.fy))), 'pedestres ficam nas calçadas, faixas e praças');
+  const [hx, hy] = w.CITY.map(16, 19);
+  for (const a of walkers.slice(0, 12)) { a.x = a.fx = hx + (walkers.indexOf(a) % 3); a.y = a.fy = hy; }
+  w.render();
+  ok(Object.keys(w.spriteCache).some(k => /:u(stand|walk)/.test(k)), 'guarda-chuva usa a pose com o braço erguido segurando o cabo');
+
+  // conversar com um pedestre
+  const wk = walkers.find(a => a.umbrella);
+  const [wx2, wy2] = w.CITY.map(30, 19);
+  wk.x = wk.fx = wx2; wk.y = wk.fy = wy2; wk.path = []; wk.moving = false; wk.wait = 99;
+  tp(wx2 - 1, wy2); g().player.dir = [1, 0]; w.update(0.016);
+  ok(g().target && g().target.walker === wk, 'pedestre vira alvo de interação');
+  w.doAction(); finish();
+  ok(g().modal === 'msg' && w.document.getElementById('msg-title').textContent === wk.name, 'conversar com pedestre: "' + w.document.getElementById('msg-text').textContent.slice(0, 40) + '…"');
+  w.closeModal();
+
+  // interagir com tudo: cada objeto com nome responde
+  let silent = [];
+  const keep = { room: g().roomId };
+  for (const o of w.ROOMS.city.objects.filter(o => o.key && o.key !== 'exit' && o.key !== 'carro')) {
+    w.closeModal(); g().player.seat = null;
+    w.interact(o); finish();
+    // lojas com interior: Vance entra; volta para a rua antes do próximo objeto
+    const entered = g().roomId.startsWith('loja_');
+    const okk = g().modal === 'msg' || g().modal === 'dialogue' || g().player.seat || entered;
+    if (!okk) silent.push(o.key);
+    w.closeModal(); g().player.seat = null;
+    if (entered) w.leaveShop();
+  }
+  ok(silent.length === 0, 'todos os objetos da cidade respondem à interação' + (silent.length ? ' — mudos: ' + silent.join(', ') : ''));
+
+  // necessidades
+  const n0 = { ...g().needs };
+  run(10);
+  ok(g().needs.fome > n0.fome && g().needs.sede > n0.sede && g().needs.cansaco > n0.cansaco, 'fome, sede e cansaço sobem com o tempo');
+  g().needs.sede = 80;
+  w.interact(obj('maq_bebida'));
+  ok(clickBtn('Água filtrada'), 'máquina de bebidas oferece água');
+  ok(g().needs.sede <= 36, 'beber água reduz a sede (' + Math.round(g().needs.sede) + ')');
+  w.closeModal();
+  g().needs.fome = 99; ok(w.needSpeed() < 1, 'fome extrema deixa Vance mais lento'); g().needs.fome = 10;
+
+  // ---------- carro: mesma tela de quando anda a pé ----------
+  const zoom0 = g().zoom, VH0 = w.VH;
+  tp(...w.CITY.map(15, 17));
+  w.interact(w.playerCar());
+  ok(g().driving && g().car, 'entrar no carro');
+  ok(g().zoom === zoom0 && w.VH === VH0 && g().roomId === 'city', 'dirigindo, a câmera e o zoom são os mesmos de quando anda a pé');
+  ok(!w.document.getElementById('hud').classList.contains('hidden') && !w.document.getElementById('drive-ui'), 'HUD igual ao de andar a pé (sem tela especial de direção)');
+  run(0.5);
+  key('ArrowDown', true); run(4); key('ArrowDown', false); run(1);
+  const car = g().car;
+  ok(C.carOK(Math.floor(car.x), Math.floor(car.y)) && C.tile(Math.floor(car.x), Math.floor(car.y)) !== C.T.BLD, 'carro não atravessa prédios');
+  ok(Math.hypot(car.x - C.map(15.5, 19.5)[0], car.y - C.map(15.5, 19.5)[1]) > 1, 'o carro anda');
+  // estacionar em qualquer lugar
+  car.vx = car.vy = 0;
+  const px = car.x, py = car.y;
+  w.doAction();
+  const parked = w.playerCar();
+  ok(!g().driving && parked && Math.hypot(parked.cx - px, parked.cy - py) <= 7, `estacionou no meio-fio perto de onde estava (${px.toFixed(1)}, ${py.toFixed(1)} → ${parked && parked.cx.toFixed(1)}, ${parked && parked.cy.toFixed(1)})`);
+  ok(Math.hypot(g().player.px + 0.5 - parked.cx, g().player.py + 0.5 - parked.cy) < 4 && !w.blocked(g().player.x, g().player.y), 'Vance sai do carro a pé, ao lado dele');
+  ok(w.blocked(Math.floor(parked.cx), Math.floor(parked.cy)), 'o carro estacionado ocupa espaço (não dá para atravessar)');
+  w.interact(parked);
+  ok(g().driving, 'dá para voltar ao carro estacionado');
+  // botões do carro: Acelerar (segurar) e Estacionar
+  run(1.2);
+  const gas = w.document.getElementById('btn-gas'), park = w.document.getElementById('btn-park');
+  ok(!w.document.getElementById('drive-btns').classList.contains('hidden') && w.getComputedStyle(gas).display !== 'none', 'dirigindo, aparecem os botões Acelerar e Estacionar');
+  const g0 = [g().car.x, g().car.y];
+  run(1);
+  ok(Math.hypot(g().car.x - g0[0], g().car.y - g0[1]) < 0.3, 'sem acelerar, o carro fica parado');
+  gas.dispatchEvent(new w.PointerEvent('pointerdown', { pointerId: 7, bubbles: true }));
+  run(1.5);
+  ok(Math.hypot(g().car.x - g0[0], g().car.y - g0[1]) > 1, 'segurando Acelerar, o carro anda');
+  gas.dispatchEvent(new w.PointerEvent('pointerup', { pointerId: 7, bubbles: true }));
+  run(2);
+  ok(Math.hypot(g().car.vx, g().car.vy) < 1, 'soltando Acelerar, o carro freia');
+  park.dispatchEvent(new w.PointerEvent('pointerdown', { pointerId: 8, bubbles: true }));
+  run(0.2);
+  ok(!g().driving && w.playerCar() && w.document.getElementById('drive-btns').classList.contains('hidden'), 'Estacionar tira Vance do carro e esconde os botões');
+  w.interact(w.playerCar());
+  ok(g().driving, 'volta ao carro depois de estacionar pelo botão');
+  // teclado: Espaço acelera (sem estacionar), setas viram, seta para baixo freia
+  const drvWalkers = w.ROOMS.city._walkers.splice(0);   // pedestres atravessando no sinal atrapalhariam a medição do volante
+  run(1.2);
+  const kd = k => w.document.dispatchEvent(new w.KeyboardEvent('keydown', { key: k })), ku = k => w.document.dispatchEvent(new w.KeyboardEvent('keyup', { key: k }));
+  const k0 = [g().car.x, g().car.y];
+  kd(' '); run(1.2);
+  ok(g().driving && Math.hypot(g().car.x - k0[0], g().car.y - k0[1]) > 1, 'Espaço acelera o carro e não estaciona');
+  const a1 = g().car.ang;
+  key('ArrowRight', true); run(0.5); key('ArrowRight', false);
+  ok(Math.abs(g().car.ang - a1) > 0.03 || Math.hypot(g().car.vx, g().car.vy) < 0.5, 'seta para a direita vira o volante (' + (g().car.ang - a1).toFixed(2) + ' rad)');
+  ku(' ');
+  key('ArrowDown', true); run(1.5); key('ArrowDown', false);
+  ok(g().car.spd <= 0.5, 'seta para baixo freia e dá ré (' + g().car.spd.toFixed(2) + ')');
+  run(1);
+  // carro encaixado dentro de um prédio é destravado para o ponto livre mais próximo
+  const car2 = g().car, sx = car2.x, sy = car2.y;
+  let bx = null;
+  for (let r = 1; r < 6 && !bx; r++) for (const [dx, dy] of [[r, 0], [-r, 0], [0, r], [0, -r]]) if (!C.carOK(Math.floor(sx + dx), Math.floor(sy + dy))) { bx = [sx + dx, sy + dy]; break; }
+  if (bx) {
+    car2.x = bx[0]; car2.y = bx[1]; car2.vx = car2.vy = 0; car2.spd = 0;
+    run(0.2);
+    ok(w.carFree(car2.x, car2.y, car2.ang), 'carro preso num obstáculo é destravado sozinho');
+    kd(' '); run(1); ku(' ');
+    ok(Math.hypot(car2.x - bx[0], car2.y - bx[1]) > 0.5, 'depois de destravar, o carro volta a andar');
+  }
+
+  w.ROOMS.city._walkers.push(...drvWalkers);
+  // GPS
+  w.openGps(); finish();
+  const gpsNames = () => [...w.document.querySelectorAll('#gps-list .gps-item')].map(b => b.textContent);
+  ok(gpsNames().length === 3, 'GPS começa só com hotel, café e apartamento (' + gpsNames().length + ')');
+  w.closeModal();
+  const say = (npc, label) => { w.openDialogue(npc); finish(); const b = [...w.document.querySelectorAll('#dlg-options button')].find(x => x.textContent.includes(label)); if (b) b.click(); for (let i = 0; i < 12; i++) { finish(); const c = w.document.querySelector('#dlg-options [data-continue]'); if (!c) break; c.click(); } w.closeModal(); return !!b; };
+  w.talk('cruz'); finish(); w.closeModal();
+  w.openGps(); finish();
+  ok(gpsNames().some(n => n.includes('Delegacia')), 'depois de falar com um policial, a delegacia aparece no GPS');
+  w.closeModal();
+  ok(say('tomas', 'Para onde você vai'), 'Tomás fala da casa de banho');
+  w.openGps(); finish();
+  ok(gpsNames().some(n => n.includes('Chinatown')) && gpsNames().some(n => n.includes('Casa de Banho')), 'Chinatown e a casa de banho aparecem no GPS');
+  ok(!gpsNames().some(n => n.includes('Matsurika')), 'a Matsurika ainda não aparece');
+  w.closeModal();
+  ok(say('hana', 'Arthur Pendelton vinha'), 'Hana fala da Matsurika');
+  w.openGps(); finish();
+  ok(gpsNames().length === 7 && gpsNames().some(n => n.includes('Matsurika')), 'a Casa de Chá Matsurika aparece no GPS (7 lugares)');
+  [...w.document.querySelectorAll('#gps-list .gps-item')].find(b => b.textContent.includes('Chinatown')).click();
+  run(0.5);
+  const gps = g().gps;
+  ok(gps && gps.path && gps.path.length > 6, 'GPS calcula a rota até Chinatown (' + (gps && gps.path ? gps.path.length : 0) + ' trechos)');
+  ok(/vire|siga|retorno/i.test(w.document.getElementById('gps-line').textContent), 'instrução do GPS no HUD: "' + w.document.getElementById('gps-line').textContent.trim() + '"');
+  const parkedTraffic = C.traffic.splice(0), parkedWalkers = w.ROOMS.city._walkers.splice(0);   // sem trânsito nem pedestres: o teste só confere a rota
+  let guard = 0;
+  while (g().gps && g().gps.path && g().gps.path.length > 2 && guard++ < 300) {
+    const pth = g().gps.path, [nx, ny] = pth[Math.min(guard % 3 + 1, pth.length - 1)];   // casa colada no meio-fio empurra o carro: varia o passo
+    g().car.x = nx + 0.5; g().car.y = ny + 0.5; g().car.vx = 0.1; g().car.vy = 0; g().gps.timer = 0;
+    w.update(0.05);
+  }
+  ok(g().gps && /chegou/.test(g().gps.info.text), 'seguindo a rota, chega a Chinatown (' + guard + ' passos, rota ' + (g().gps && g().gps.path ? g().gps.path.length : 'nula') + ', ' + (g().gps && g().gps.info ? g().gps.info.text : 'sem gps') + ')');
+  C.traffic.push(...parkedTraffic); w.ROOMS.city._walkers.push(...parkedWalkers);
+  g().car.vx = g().car.vy = 0;
+  w.doAction();
+  ok(!g().driving && [1, 2, 3, 4, 5].some(k => C.inCT(g().player.x, g().player.y + k)), 'estaciona na entrada de Chinatown e desce a pé');
+
+  // GPS também a pé
+  w.setGps('banho'); run(0.5);
+  ok(g().gps.path && g().gps.path.length > 3, 'GPS funciona a pé (rota até a casa de banho)');
+
+  // ---------- semáforos ----------
+  {
+    const C2 = w.CITY, T2 = C2.T;
+    ok(w.ROOMS.city.objects.filter(o => o.kind === 'semaforo').length > 40, 'semáforos nas esquinas (' + w.ROOMS.city.objects.filter(o => o.kind === 'semaforo').length + ')');
+    let redRuns = 0, pedRuns = 0, crashes = 0, stops = 0;
+    const prevZ = new Map(), prevW = new Map();
+    for (let i = 0; i < 1200; i++) {
+      w.update(0.05);
+      for (const c of C2.traffic) {
+        const fx = Math.floor(c.x), fy = Math.floor(c.y), z = C2.zoneAt(fx, fy);
+        if (c.atRed) stops++;
+        if (z && prevZ.get(c) === false && C2.light(c.dy !== 0) === 'r') redRuns++;
+        prevZ.set(c, z);
+      }
+      for (let a = 0; a < C2.traffic.length; a++) for (let b = a + 1; b < C2.traffic.length; b++) { const p = C2.traffic[a], q = C2.traffic[b]; if (Math.hypot(p.x - q.x, p.y - q.y) < 0.6 && p.rise < 2 && q.rise < 2) crashes++; }
+      for (const wk of w.ROOMS.city._walkers || []) {
+        const was = prevW.get(wk);
+        if (was && (was[0] !== wk.x || was[1] !== wk.y) && !C2.pedOK(was[0], was[1], wk.x, wk.y)) pedRuns++;
+        prevW.set(wk, [wk.x, wk.y]);
+      }
+    }
+    ok(stops > 0, 'carros param no sinal vermelho');
+    ok(redRuns === 0, 'nenhum carro avança o sinal vermelho (' + redRuns + ')');
+    ok(pedRuns === 0, 'pedestres só entram na faixa com o boneco verde (' + pedRuns + ')');
+    ok(crashes === 0, 'carros não se sobrepõem (' + crashes + ' quadros com colisão)');
+  }
+
+  // ---------- Chinatown e casa de banho ----------
+  g().needs.fome = 90;
+  w.interact(obj('barraca_lamen')); clickBtn('Lámen'); w.closeModal();
+  ok(g().needs.fome <= 20, 'lámen do Sr. Wen mata a fome');
+  w.interact(obj('loja_dimsum')); ok(clickBtn('Char siu bao'), 'loja de dim sum vende comida'); w.closeModal();
+  w.interact(w.ROOMS.city.objects.find(o => o.to === 'bathhouse'));
+  ok(g().roomId === 'bathhouse', 'entrar na Casa de Banho Lótus (recepção)');
+  w.interact(g().roomData.objects.find(o => o.to === 'locker'));
+  ok(g().roomId === 'locker', 'recepção → vestiário');
+  w.interact(g().roomData.objects.find(o => o.to === 'lavagem')); finish();
+  ok(g().roomId === 'locker' && g().modal === 'msg', 'sem toalha, não passa do vestiário');
+  w.closeModal();
+  w.interact(obj('armario')); clickBtn('Trocar'); run(1.6);
+  ok(g().outfit === 'towel', 'no vestiário, troca a roupa por uma toalha na cintura');
+  w.render();
+  ok(Object.keys(w.spriteCache).some(k => k.startsWith('vance_towel:')), 'Vance aparece de toalha');
+  w.interact(g().roomData.objects.find(o => o.to === 'bathhouse')); finish();
+  ok(g().roomId === 'locker', 'de toalha, não sai para a recepção'); w.closeModal();
+  w.interact(g().roomData.objects.find(o => o.to === 'lavagem'));
+  const lav = g().roomData;
+  ok(g().roomId === 'lavagem' && lav.objects.filter(o => o.key === 'banquinho').length >= 6, 'sala de lavagem coletiva, com postos de banho');
+  const lavLooks = lav._walkers.map(a => a.look);
+  ok(lavLooks.some(l => /_f/.test(l)) && lavLooks.some(l => /_m/.test(l)), `lavagem mista (${lavLooks.join(', ')})`);
+  w.interact(lav.objects.find(o => o.to === 'onsen'));
+  ok(g().roomId === 'onsen', 'lavagem → onsen');
+  const room = g().roomData;
+  ok(room.objects.some(o => o.kind === 'onsen' && !o.cold) && room.objects.some(o => o.cold) && room.objects.filter(o => o.key === 'banquinho').length >= 3, 'onsen com piscina quente, banho frio e postos de lavagem');
+  const bathers = room._walkers.filter(a => w.waterAt(room, a.x, a.y));
+  const looks = bathers.map(a => a.look);
+  ok(bathers.length >= 3 && looks.some(l => /_f/.test(l)) && looks.some(l => /_m/.test(l)), `onsen misto: homens e mulheres na água (${looks.join(', ')})`);
+  const dry = room._walkers.filter(a => /_f/.test(a.look) && !w.waterAt(room, a.x, a.y));
+  ok(dry.length >= 2, `mulheres também fora d'água (${dry.length})`);
+  ok(room._walkers.concat(w.ROOMS.lavagem._walkers).every(a => w.LOOKS[a.look].towel), 'todas as banhistas de toalha');
+  ok(!w.ROOMS.onsen.wallN.includes('K'), 'sem letreiro em cruz na parede do onsen');
+  ok(room.npcs.some(n => n.id === 'goro' && w.waterAt(room, n.x, n.y)), 'Goro está dentro da água');
+  tp(2, 2);
+  g().needs.cansaco = 80;
+  w.goTo({ tile: [5, 5] });
+  for (let i = 0; i < 300 && g().player.path.length; i++) w.update(0.05);
+  ok(g().player.x === 5 && g().player.y === 5 && g().player.inWater, 'Vance entra na água andando');
+  // anda dentro d'água (se um banhista estiver no caminho, tenta outra direção)
+  let swam = false;
+  for (const k of ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp']) {
+    const sx0 = g().player.px, sy0 = g().player.py;
+    key(k, true); run(0.5); key(k, false); w.update(0.05);
+    if (g().player.inWater && Math.hypot(g().player.px - sx0, g().player.py - sy0) > 0.3) { swam = true; break; }
+  }
+  ok(swam, 'e se movimenta dentro dela');
+  const c0 = g().needs.cansaco; run(4);
+  ok(g().needs.cansaco < c0 - 5, `água quente tira o cansaço (${Math.round(c0)} → ${Math.round(g().needs.cansaco)})`);
+  w.interact(room.objects.find(o => o.to === 'sauna'));
+  ok(g().roomId === 'sauna', 'onsen → sauna');
+  w.interact(obj('banco_sauna')); finish();
+  ok(g().player.seat && g().player.seat.pose === 'sit', 'senta no banco da sauna');
+  w.closeModal(); w.doAction();
+  ok(!g().player.seat, 'levanta do banco');
+  w.enterRoom('locker', [3, 1]);
+  w.interact(obj('armario')); clickBtn('Vestir'); run(1.3);
+  ok(g().outfit === null, 'veste as roupas de novo no vestiário');
+  ok(!!g().combat && g().combat.ambush.flag === 'tiroteio2', 'segunda emboscada: o atirador ataca no vestiário');
+  for (let i = 0; i < 1200 && g().combat; i++) { if (i % 6 === 0) w.doAction(); w.update(0.05); }
+  ok(!g().combat && g().flags.tiroteio2 && w.has('e_emboscada2'), 'a segunda emboscada termina e vira pista');
+  finish(); w.closeModal();
+  w.interact(obj('armario')); clickBtn('Trocar'); run(1.3); w.interact(obj('armario')); clickBtn('Vestir'); run(1.3);
+  ok(!g().combat, 'a segunda emboscada não se repete');
+  w.interact(g().roomData.objects.find(o => o.to === 'bathhouse'));
+  ok(g().roomId === 'bathhouse', 'vestido, volta para a recepção');
+
+  // ---------- bordel: a chantagem ----------
+  w.enterRoom('city', w.CITY.map(49, 38));
+  w.interact(w.ROOMS.city.objects.find(o => o.to === 'bordel'));
+  ok(g().roomId === 'bordel' && g().roomData.npcs.some(n => n.id === 'nozomi') && g().roomData.npcs.some(n => n.id === 'jade'), 'Casa de Chá Matsurika, com a anfitriã Nozomi e a Kyomi no salão');
+  ok(w.NPCS.jade.name === 'Kyomi' && w.NPCS.su.name === 'Sue', 'nomes: Kyomi e Sue');
+  const corr = g().roomData.objects.find(o => o.to === 'bordel_quarto');
+  w.interact(corr); ok(g().roomId === 'bordel', 'sem se passar por cliente, a Nozomi barra o corredor dos quartos'); w.closeModal();
+  const pick = t => { finish(); const b = [...w.document.querySelectorAll('#dlg-options button')].find(b => b.textContent.includes(t)); if (b) b.click(); return !!b; };
+  w.openDialogue('nozomi'); finish(); pick('Quero uma sala'); for (let i = 0; i < 10 && pick('Continuar'); i++);
+  w.closeModal();
+  ok(g().flags.itoko_cliente, 'Vance se apresenta como cliente');
+  w.interact(corr); ok(g().roomId === 'bordel_quarto' && g().roomData.npcs.some(n => n.id === 'su'), 'como cliente, entra na sala de chá 3, onde está a Sue');
+  w.openDialogue('su'); finish();
+  pick('Arthur Pendelton vinha'); for (let i = 0; i < 10 && pick('Continuar'); i++);
+  pick('Alguém mais perguntou'); pick('Gentil'); for (let i = 0; i < 12 && pick('Continuar'); i++);
+  ok(w.has('e_bordel') && w.has('e_fotos'), 'Sue revela que Rossi comprou o segredo e entrega as fotos da chantagem');
+  w.closeModal();
+  ok(w.DEDUCTIONS.some(d => d.id === 'd_chantagem') && w.NPCS.victor.topics.some(t => t.id === 'vi_fotos'), 'nova dedução "A chantagem" e confronto com Victor');
+
+  // ---------- desmaio: necessidade no limite leva Vance para a cama de casa ----------
+  w.enterRoom('city', w.CITY.map(16, 19)); g().needs.sede = 100; w.updateNeeds(0.01);
+  ok(g().roomId === 'home' && g().player.seat && g().player.seat.pose === 'lie' && g().needs.sede < 100, 'sede no limite: Vance desmaia e acorda deitado na cama do apartamento');
+  w.document.getElementById('card').onclick(); w.closeModal();
+  w.standUp();
+
+  // ---------- casa: dormir deitado, sentar, cozinhar, tomar banho ----------
+  w.enterRoom('home', [5, 4]);
+  ok(['home', 'home_kitchen', 'home_bath'].every(r => w.ROOMS[r]), 'apartamento com sala, cozinha e banheiro');
+  const clock0 = g().clock;
+  g().needs.cansaco = 95;
+  w.interact(obj('cama_casa')); clickBtn('Dormir');
+  ok(g().player.seat && g().player.seat.pose === 'lie', 'Vance se deita na cama');
+  run(2);
+  ok(g().needs.cansaco === 0 && g().clock > clock0 + 2000, 'dormir zera o cansaço e avança 6 horas');
+  w.document.getElementById('card').click(); w.closeModal(); run(0.1);
+  key('ArrowLeft', true); run(0.3); key('ArrowLeft', false); run(0.3);
+  ok(!g().player.seat && !w.blocked(g().player.x, g().player.y), 'ao andar, levanta da cama');
+  w.interact(obj('sofa_casa')); finish();
+  ok(g().player.seat && g().player.seat.pose === 'sit' && g().player.seat.obj.key === 'sofa_casa', 'senta no sofá de verdade');
+  w.closeModal(); w.doAction();
+  ok(!g().player.seat, 'levanta do sofá');
+  w.enterRoom('home_kitchen', [3, 1]);
+  g().needs.fome = 80;
+  w.interact(obj('fogao')); clickBtn('Omelete');
+  ok(g().busy && g().busy.kind === 'cook' && obj('fogao').on, 'cozinhando no fogão (panela no fogo)');
+  run(4); finish();
+  ok(!g().busy && !obj('fogao').on && g().needs.fome <= 36 && g().modal === 'msg', 'comida pronta mata a fome');
+  w.closeModal();
+  w.enterRoom('home_bath', [4, 1]);
+  g().needs.cansaco = 60;
+  w.interact(obj('chuveiro')); clickBtn('Tomar banho');
+  ok(g().busy && g().busy.kind === 'shower' && g().player.seat && obj('chuveiro').on, 'Vance entra no chuveiro');
+  w.render();
+  run(5); finish();
+  ok(!g().busy && !g().player.seat && g().needs.cansaco <= 36, 'banho tomado: cansaço menor');
+  w.closeModal();
+
+  // ---------- delegacia maior, com policiais circulando ----------
+  w.enterRoom('delegacia', [2, 1]);
+  const dg = g().roomData;
+  ok(dg.w * dg.h >= 250 && dg.objects.filter(o => o.kind === 'partition').length >= 8, `delegacia ${dg.w}x${dg.h} com salas separadas por divisórias`);
+  ok(dg.npcs.length === 3 && dg._walkers.length >= 4, 'capitã, perito, recepção e policiais');
+  const cp0 = dg._walkers.map(a => a.x + ',' + a.y);
+  tp(2, 1); run(15);
+  ok(dg._walkers.filter((a, i) => a.x + ',' + a.y !== cp0[i]).length >= 3, 'policiais circulam pela delegacia');
+
+  // ---------- hotel: pessoas andando, perícia ----------
+  w.enterRoom('lobby', [1, 6]);
+  const lb = g().roomData;
+  const lp0 = lb.npcs.map(n => n.x + ',' + n.y), lseen = new Set();
+  for (let i = 0; i < 500; i++) { w.update(0.05); lb.npcs.forEach((n, k) => { if (n.x + ',' + n.y !== lp0[k]) lseen.add(n.id); }); }
+  const lmoved = [...lseen];
+  ok(lmoved.includes('victor') && lmoved.includes('helena'), 'Victor e Helena andam pelo lobby');
+  ok(!lmoved.includes('evelyn') && !lmoved.includes('iris'), 'Evelyn (no bar) e a IRIS ficam no lugar');
+  w.enterRoom('corridor', [1, 1]);
+  const t0 = g().roomData.npcs.find(n => n.id === 'tomas'), tpos = t0.x + ',' + t0.y;
+  run(25);
+  ok(t0.x + ',' + t0.y !== tpos, 'Tomás anda pelo corredor');
+  w.enterRoom('suite', [9, 7]);
+  const cops = g().roomData.npcs.filter(n => n.spots);
+  const sp0 = cops.map(n => n.x + ',' + n.y);
+  run(20);
+  ok(cops.length >= 2 && cops.some((n, i) => n.x + ',' + n.y !== sp0[i]), 'peritos trabalham na suíte, indo de um ponto a outro');
+  ok(g().roomData.objects.filter(o => o.kind === 'marker').length >= 3, 'marcadores amarelos da perícia na cena do crime');
+
+  // ---------- carros no estilo spinner ----------
+  ok(w.CAR_MODELS.spinner.length >= 6 && w.CAR_MODELS.coupe.length >= 5, 'carros novos montados em peças 3D (spinner, cupê, sedã)');
+
+  w.enterRoom('city', w.CITY.map(15, 17)); w.render();
+  ok(errs.length === 0, 'sem erros JS na cidade ' + errs.join(' | '));
+}
+
+async function gatherTest(w) {
+  const errs = [];
+  w.addEventListener('error', e => errs.push(e.message));
+  const g = () => w.game;
+  const finish = () => { for (let i = 0; i < 50 && w.finishTyping(); i++); };
+  w.closeModal();
+  w.openPalace();
+  const btn = w.document.getElementById('btn-accuse');
+  ok(!btn.classList.contains('hidden'), 'botão de acusar no Palácio (ato III)');
+  btn.click(); finish();
+  ok(g().modal === 'msg' && /Reunir todos no lobby\?/.test(w.document.getElementById('msg-text').textContent), 'acusar pergunta: "Reunir todos no lobby?"');
+  [...w.document.querySelectorAll('#msg-options button')].find(b => b.textContent.includes('Sim')).click(); finish();
+  const lb = g().roomData;
+  ok(g().roomId === 'lobby' && g().gathering && ['victor', 'evelyn', 'helena', 'tomas'].every(id => lb.npcs.some(n => n.id === id)), 'todos os suspeitos reunidos no lobby');
+  const near = lb.npcs.filter(n => ['victor', 'evelyn', 'helena', 'tomas'].includes(n.id)).every(n => Math.hypot(n.x - 8, n.y - 8) < 4);
+  ok(near, 'suspeitos em volta do detetive');
+  for (let i = 0; i < 100; i++) w.update(0.05);
+  ok(lb.npcs.filter(n => n.id === "victor")[0].x === 6, 'durante a reunião, ninguém sai andando');
+  [...w.document.querySelectorAll('#msg-options button')].find(b => b.textContent.includes('acusação')).click();
+  ok(g().modal === 'accuse' && !w.document.getElementById('accuse').classList.contains('hidden'), 'a acusação acontece no lobby, na frente de todos');
+  w.closeModal();
+  w.enterRoom('corridor', [1, 1]);
+  ok(!w.ROOMS.lobby.npcs.some(n => n.temp) && !g().gathering, 'ao sair do lobby, cada um volta ao seu lugar');
+  ok(errs.length === 0, 'sem erros JS na reunião ' + errs.join(' | '));
+}
+
+
+async function audioTests(w) {
+  const S = w.Sound;
+  S.init(); S.setMusic('title');
+  const measure = async ms => { let sum = 0, n = 0; const end = Date.now() + ms; while (Date.now() < end) { sum += S.musicLevel(); n++; await sleep(40); } return sum / n; };
+  await sleep(3500);                    // espera a trilha entrar (fade de 3 s)
+  S.setMusicVolume(1); await sleep(300);
+  const high = await measure(2500);
+  S.setMusicVolume(0.3 / 2.4); await sleep(300);   // equivale ao volume antigo
+  const old = await measure(2500);
+  if (S.musicOn()) S.toggleMusic(); await sleep(1200);
+  const off = await measure(800);
+  S.toggleMusic(); S.setMusicVolume(0.7);
+  ok(high > 0.01, 'música toca (nível RMS a 100%: ' + high.toFixed(4) + ')');
+  ok(high > old * 4, 'barra em 100% é bem mais alta que o volume antigo (' + (high / Math.max(old, 1e-6)).toFixed(1) + 'x)');
+  ok(off < high * 0.05, 'desligar a música silencia a trilha (' + off.toFixed(5) + ')');
+  const sl = w.document.getElementById('title-music-vol');
+  sl.value = 40; sl.dispatchEvent(new w.Event('input'));
+  ok(Math.abs(S.musicVolume() - 0.4) < 0.01 && w.document.getElementById('menu-music-vol').value === '40', 'barra de volume da música ajusta o volume e sincroniza menu e título');
+  ok(w.localStorage.getItem('alvorada_music_vol') === '0.4', 'volume da música fica salvo');
+  sl.value = 70; sl.dispatchEvent(new w.Event('input'));
+  // efeitos novos: tiros, miado, vozes e motor, sem erros
+  const errs = []; w.addEventListener('error', e => errs.push(e.message));
+  ['gunshot', 'enemyShot', 'meow'].forEach(n => S.play(n));
+  [105, 200, 290].forEach(p => S.voice(p));
+  S.engine(true, 0); S.engine(true, 1); await sleep(300); S.engine(false); await sleep(600);
+  ok(!errs.length, 'efeitos de tiro, miado, vozes e motor tocam sem erro' + (errs.length ? ': ' + errs[0] : ''));
+  // volume de pico de cada efeito (o tique de digitação antigo é a referência mínima audível)
+  // amostra em laço ocupado (sem setTimeout, que atrasa na página de teste e perde sons de 0,1 s)
+  const peak = async fn => { await sleep(400); fn(); let m = 0; const end = performance.now() + 300; while (performance.now() < end) m = Math.max(m, S.sfxPeak()); return m; };
+  const lv = { type: await peak(() => S.play('type')), voz: await peak(() => S.voice(110)), vozAguda: await peak(() => S.voice(260)), miado: await peak(() => S.play('meow')), tiro: await peak(() => S.play('gunshot')), motor: await peak(() => { S.engine(true, 0.6); setTimeout(() => S.engine(true, 0.6), 200); }) };
+  S.engine(false);
+  log.push('INFO picos: ' + Object.entries(lv).map(([k, v]) => k + '=' + v.toFixed(4)).join(' '));
+  ok(lv.voz > 0.04 && lv.vozAguda > 0.04, 'a voz do diálogo é audível');
+  ok(lv.miado > 0.04, 'o miado do Byte é audível');
+  // pausa → Configurações
+  const d = w.document, hid = id => d.getElementById(id).classList.contains('hidden');
+  w.closeModal(); w.openMenu();
+  ok(!hid('menu-main') && hid('menu-config'), 'a pausa abre na tela principal');
+  d.getElementById('menu-settings').click();
+  ok(hid('menu-main') && !hid('menu-config') && !hid('menu-voice-vol') && !hid('menu-lang'), 'Configurações mostram volumes, música e idioma');
+  const vv = d.getElementById('menu-voice-vol'); vv.value = 35; vv.dispatchEvent(new w.Event('input'));
+  const fx = d.getElementById('menu-sfx-vol'); fx.value = 60; fx.dispatchEvent(new w.Event('input'));
+  ok(Math.abs(S.voiceVolume() - 0.35) < 0.01 && w.localStorage.getItem('alvorada_voice_vol') === '0.35' && Math.abs(S.sfxVolume() - 0.6) < 0.01, 'barras de vozes e efeitos ajustam e salvam o volume');
+  const mb = d.getElementById('menu-music').textContent; d.getElementById('menu-music').click();
+  ok(d.getElementById('menu-music').textContent !== mb, 'botão liga/desliga a música');
+  d.getElementById('menu-music').click();
+  w.goBack();
+  ok(w.game.modal === 'menu' && !hid('menu-main'), 'voltar sai das Configurações para a pausa');
+  S.setVoiceVolume(0.8); S.setSfxVolume(1); w.closeModal();
+}
+
+async function dialogues(w) {
+  const errs = [];
+  w.addEventListener('error', e => errs.push(e.message));
+  const g = w.game;
+  // cada caso tem suas evidências: os personagens do caso 2 são testados com o caso 2 aberto
+  const ecoKeys = new Set([...Object.keys(w.eval('CASES').eco.EVIDENCE), ...w.eval('CASES').eco.DEDUCTIONS.map(d => d.id)]);
+  const isEco = id => w.eval('CASES').eco.SUSPECTS.includes(id) || w.NPCS[id].topics.some(t => (t.requires || []).some(r => ecoKeys.has(r)));
+  const fillAll = () => { w.EV_KEYS.forEach(k => { if (!w.has(k)) g.evidence.push(k); }); w.DEDUCTIONS.forEach(d => { if (!w.has(d.id)) g.deductions.push(d.id); }); };
+  fillAll();
+  const opts = () => [...w.document.querySelectorAll('#dlg-options button')];
+  const finish = () => { for (let i = 0; i < 50 && w.finishTyping(); i++); };
+  let topicsRun = 0, choicesSeen = 0, presented = 0;
+  const order = Object.keys(w.NPCS).filter(id => !isEco(id)).concat(['@eco'], Object.keys(w.NPCS).filter(isEco));
+  for (const id of order) {
+    if (id === '@eco') { w.closeModal(); w.applyCase('eco'); g.caseId = 'eco'; fillAll(); continue; }
+    const npc = w.NPCS[id];
+    for (const pick of [0, 1]) {
+      // libera flags/seen para todos os tópicos ficarem disponíveis
+      npc.topics.forEach(t => (t.requiresSeen || []).forEach(s => g.seen.add(s)));
+      ['victor_shoes', 'evelyn_uisque', 'tomas_trust', 'helena_open', 'tiroteio', 'porta_emperrada', 'peca_ok'].forEach(f => g.flags[f] = true);
+      for (const tp of npc.topics) {
+        w.closeModal(); w.openDialogue(id); finish();
+        const btn = opts().find(b => b.textContent.includes(tp.label));
+        if (!btn) { ok(false, `tópico indisponível ${id}/${tp.id}`); continue; }
+        btn.click();
+        for (let step = 0; step < 80; step++) {
+          finish();
+          const bs = opts();
+          const choice = bs.filter(b => b.classList.contains('choice'));
+          if (choice.length) { choicesSeen++; choice[Math.min(pick, choice.length - 1)].click(); continue; }
+          const cont = bs.find(b => b.dataset.continue);
+          if (cont) { cont.click(); continue; }
+          break;
+        }
+        topicsRun++;
+        ok(opts().some(b => b.textContent.includes('Encerrar')), `fim do tópico ${id}/${tp.id} (escolha ${pick}) volta ao menu`);
+      }
+    }
+    for (const ev of w.EV_KEYS) {
+      w.closeModal(); w.openDialogue(id); finish();
+      w.presentEvidence(id, ev);
+      for (let step = 0; step < 20; step++) { finish(); const c = opts().find(b => b.dataset.continue); if (!c) break; c.click(); }
+      presented++;
+    }
+  }
+  w.closeModal(); w.applyCase('alvorada'); g.caseId = 'alvorada';
+  ok(true, `tópicos executados: ${topicsRun}, escolhas: ${choicesSeen}, apresentações: ${presented}`);
+  ok(g.flags.tomas_ally || g.flags.tomas_detail, 'flags de escolhas foram marcadas');
+  ok(errs.length === 0, 'sem erros JS nos diálogos ' + errs.join(' | '));
+
+  // finais
+  const endings = [];
+  const cases = [['evelyn', 'ninguem', 'FINAL ERRADO'], ['tomas', 'ninguem', 'FINAL ERRADO'], ['helena', 'victor', 'FINAL INCOMPLETO'],
+                 ['victor', 'helena', 'FINAL PERFEITO'], ['victor', 'ninguem', 'Justiça Parcial'], ['victor', 'evelyn', 'Justiça Parcial']];
+  for (const [k, s, expect] of cases) {
+    w.resolveCase(k, s);
+    const txt = w.document.getElementById('ending').textContent;
+    ok(txt.includes(expect), `final ${k}+${s} → ${expect}`);
+    w.document.getElementById('ending').classList.add('hidden');
+  }
+  g.deductions = g.deductions.filter(d => d !== 'd_arma');
+  w.resolveCase('victor', 'helena');
+  ok(w.document.getElementById('ending').textContent.includes('Caso Arquivado'), 'Victor sem a arma → Caso Arquivado');
+}
+
+
+// idiomas: abre o jogo em cada língua e procura texto que ficou em português
+async function langTests() {
+  const LANG_CHECK = { en: ['Open the case', 'Evidence'], es: ['Abrir el caso', 'Evidencia'], de: ['Fall öffnen', 'Beweis'], fr: ['Ouvrir', 'Preuve'], it: ['Apri', 'Prov'], ko: ['사건', '증거'] };
+  for (const lang of Object.keys(LANG_CHECK)) {
+    localStorage.setItem('alvorada_lang', lang);
+    const w = await load('a', BASE + '?r=l' + lang);
+    await sleep(500);
+    const errs = [];
+    w.addEventListener('error', e => errs.push(e.message));
+    if (!w.I18N_DATA) { ok(false, `${lang}: tradução não carregou`); continue; }
+    const title = w.document.getElementById('btn-start').textContent, hud = w.document.getElementById('btn-ev').textContent;
+    const [a, b] = LANG_CHECK[lang];
+    ok(!/Novo caso|Abrir o caso/.test(title) && hud.includes(b), `${lang}: tela de título e HUD traduzidos ("${title.trim()}", "${hud.trim()}")`);
+    w.document.getElementById('btn-start').click(); await sleep(200);
+    w.Intro.skip(); w.document.getElementById('card').click(); w.finishTyping();
+    const msg = w.document.getElementById('msg-text').textContent;
+    ok(msg && !/Meia-noite|Suíte 404\. A chuva/.test(msg), `${lang}: mensagem inicial traduzida ("${msg.slice(0, 50)}…")`);
+    w.closeModal();
+    w.openDialogue('tomas'); w.finishTyping();
+    const dlg = w.document.getElementById('dlg-text').textContent, opt = w.document.querySelector('#dlg-options button').textContent;
+    ok(!/camareiro|Juro pela minha mãe/.test(dlg) && !/O que você fez/.test(opt), `${lang}: diálogo traduzido ("${dlg.slice(0, 45)}…" / "${opt.slice(0, 30)}")`);
+    w.closeModal();
+    w.enterRoom('city', w.eval('CITY').map(40, 36));
+    ok(!/Rua Lótus/.test(w.document.getElementById('act-label').textContent) || lang === 'pt', `${lang}: nome do lugar traduzido ("${w.document.getElementById('act-label').textContent}")`);
+    // nenhum texto-fonte com tradução disponível pode aparecer cru nos dados
+    const keys = w.I18N_KEYS, data = w.I18N_DATA, translated = new Set(Object.entries(data).filter(([id, t]) => t !== keys[id]).map(([id]) => keys[id]));
+    const raw = w.eval('I18N.collect()').filter(s => translated.has(s));
+    ok(raw.length === 0, `${lang}: todos os textos dos dados aparecem traduzidos` + (raw.length ? ' — crus: ' + raw.slice(0, 5).join(' | ') : ''));
+    ok(errs.length === 0, `${lang}: sem erros JS ` + errs.join(' | '));
+  }
+  localStorage.removeItem('alvorada_lang');
+}
+
+
+// comércios: entrar, pegar itens, mochila, equipamento, penhores, sair, salvar
+async function shopTest(w) {
+  const GEAR = w.eval('GEAR'), BAG_MAX = w.eval('BAG_MAX');
+  const g = () => w.game;
+  const finish = () => { for (let i = 0; i < 50 && w.finishTyping(); i++); };
+  const btns = () => [...w.document.querySelectorAll('#msg-options button')];
+  const click = txt => { finish(); const b = btns().find(x => x.textContent.includes(txt)); if (b) b.click(); finish(); return !!b; };
+  const fronts = w.ROOMS.city.objects.filter(o => w.shopOf(o));
+  const types = new Set(fronts.map(o => w.shopOf(o).type));
+  ok(types.size >= 8, 'a cidade tem lojas de vários tipos com interior (' + [...types].join(', ') + ')');
+  for (const t of types) { const r = w.ROOMS['loja_' + t]; ok(r && r.objects.some(o => o.key === 'balcao_loja') && r.objects.some(o => o.shopExit), 'interior da loja ' + t + ' tem balcão e saída'); }
+  const food = fronts.find(o => w.shopOf(o).type === 'lanchonete');
+  w.enterRoom('city', [food.x, food.y + 1]); w.closeModal();
+  const back = [g().player.x, g().player.y];
+  w.interact(food); w.closeModal();
+  ok(g().roomId === 'loja_lanchonete' && g().roomData.name === food.name, 'entrar na lanchonete pela fachada (' + food.name + ')');
+  w.interact(g().roomData.objects.find(o => o.key === 'balcao_loja'));
+  const first = w.shopOf(food).stock[0], firstName = w.T(w.itemInfo(first).name);
+  ok(g().modal === 'msg' && click(firstName), 'o balcão lista os itens da loja');
+  ok(g().bag[first] === 1, 'o item vai para a mochila, de graça');
+  for (let i = 0; i < 7; i++) { w.closeModal(); w.openShop(); click(firstName); }
+  ok(g().bag[first] === BAG_MAX, 'cada item tem limite na mochila (' + g().bag[first] + ')');
+  w.closeModal();
+  g().needs.fome = 80;
+  w.openBag(); ok(g().modal === 'msg' && click(firstName), 'a mochila lista o item para usar');
+  ok(g().bag[first] === BAG_MAX - 1 && g().needs.fome < 80, 'usar da mochila alivia a fome e gasta o item');
+  w.closeModal();
+  w.interact(g().roomData.objects.find(o => o.shopExit));
+  ok(g().roomId === 'city' && g().player.x === back[0] && g().player.y === back[1], 'sair da loja volta para a calçada em frente');
+  // equipamento: tênis deixam Vance mais rápido
+  const nyke = fronts.find(o => w.shopOf(o).stock.includes('tenis'));
+  if (nyke) {
+    w.interact(nyke); w.closeModal(); w.openShop(); click(w.T(GEAR.tenis.name)); w.closeModal();
+    ok(g().bag.tenis === 1 && w.gearSpeed() > 1, 'tênis na mochila deixam Vance mais rápido');
+    w.leaveShop();
+  }
+  g().bag.relogio = 1; w.updateNeedsHud();
+  ok(/\d+%/.test(w.document.querySelector('#need-fome').parentElement.parentElement.dataset.num), 'relógio mostra as necessidades em números');
+  delete g().bag.relogio; w.updateNeedsHud();
+  // penhores: troca um item por outro
+  const pawn = fronts.find(o => w.shopOf(o).type === 'penhores');
+  if (pawn) {
+    w.interact(pawn); w.closeModal(); w.openShop();
+    ok(click(firstName) && click(w.T(GEAR.isqueiro.name)) && g().bag.isqueiro === 1 && g().bag[first] === BAG_MAX - 2, 'no penhores, Vance troca um item da mochila por outro');
+    w.closeModal(); w.leaveShop();
+  }
+}
+
+// missão do Ato III: porta emperrada → Bao → cabine → C4mpt0n → ferro-velho do Zeca → credencial mestra
+async function questTest(w) {
+  const g = () => w.game;
+  const finish = () => { for (let i = 0; i < 50 && w.finishTyping(); i++); };
+  const say = (npc, label) => { w.closeModal(); w.openDialogue(npc); finish(); const b = [...w.document.querySelectorAll('#dlg-options button')].find(x => x.textContent.includes(label)); if (b) b.click(); for (let i = 0; i < 40; i++) { finish(); const c = w.document.querySelector('#dlg-options [data-continue]'); if (!c) break; c.click(); } w.closeModal(); return !!b; };
+  const objIn = key => g().roomData.objects.find(o => o.key === key);
+  const gps = () => { w.openGps(); finish(); const n = [...w.document.querySelectorAll('#gps-list .gps-item')].map(b => b.textContent); w.closeModal(); return n; };
+  w.closeModal();
+  w.enterRoom('corridor', [5, 1]);
+  w.interact(objIn('servico')); w.closeModal();
+  ok(g().roomId === 'corridor' && g().flags.porta_emperrada, 'missão: a porta de serviço emperra no ato III');
+  ok(!say('bao', 'Trouxe o núcleo') && say('bao', 'abrir qualquer porta') && g().flags.tel_campton, 'missão: Bao indica o C4mpt0n');
+  w.enterRoom('city', w.eval('CITY').map(15, 17));
+  w.interact(g().roomData.objects.find(o => o.key === 'orelhao')); w.closeModal();
+  ok(g().flags.ligou_campton && gps().some(n => n.includes('C4mpt0n')), 'missão: a ligação da cabine põe o C4mpt0n no GPS');
+  w.enterRoom('hacker', [1, 1]);
+  ok(!say('campton', 'Trouxe o núcleo'), 'missão: sem a peça, não há tópico de entrega');
+  const dlgOk = say('campton', 'porta de serviço');
+  ok(dlgOk && g().flags.missao_peca, 'missão: C4mpt0n pede o núcleo K-9 (' + dlgOk + ', ' + g().flags.missao_peca + ')');
+  ok(w.gpsKnown('ferrovelho'), 'missão: o ferro-velho entra no GPS');
+  w.enterRoom('ferrovelho', [2, 1]);
+  ok(say('zeca', 'núcleo de sincronia'), 'missão: Zeca libera a sucata');
+  const piles = g().roomData.objects.filter(o => o.key === 'sucata');
+  ok(piles.length >= 3, `ferro-velho tem montes de sucata (${piles.length})`);
+  for (const p of piles.slice(0, 3)) {
+    w.interact(p);
+    for (let i = 0; i < 80 && g().busy; i++) w.update(0.05);
+    w.closeModal();
+  }
+  ok(g().flags.peca_ok, 'missão: o núcleo K-9 aparece no terceiro monte');
+  w.enterRoom('hacker', [1, 1]);
+  ok(say('campton', 'Trouxe o núcleo') && g().flags.credencial && w.has('e_credencial') && w.has('e_sabotagem'), 'missão: C4mpt0n entrega a credencial mestra e o log da sabotagem');
+  w.enterRoom('corridor', [5, 1]);
+  w.interact(objIn('servico'));
+  ok(g().roomId === 'tunnels', 'missão: com a credencial, a porta leva aos túneis');
+}
+
+async function saveLoad(w) {
+  w.localStorage.removeItem('alvorada_save_v1');
+  w.document.getElementById('btn-start').click();
+  await sleep(300);
+  ok(w.Intro.isRunning() && w.game.modal === 'intro', 'introdução animada toca ao abrir um caso novo');
+  w.Intro.next(); ok(w.Intro.isRunning(), 'toque avança para a próxima cena');
+  w.Intro.skip(); ok(!w.Intro.isRunning() && w.game.modal === 'card', 'pular introdução vai para o cartão do Ato I');
+  w.document.getElementById('card').click(); w.closeModal();
+  w.give('e_corpo'); w.give('e_taca'); w.game.flags.teste = true; w.game.seen.add('t_ronda');
+  w.enterRoom('corridor', [3, 1]);
+  const s = JSON.parse(w.localStorage.getItem('alvorada_save_v1'));
+  ok(s && s.roomId === 'corridor' && s.evidence.length === 2, 'save automático gravado ao trocar de sala');
+  w.document.getElementById('menu-title').click();
+  ok(!w.document.getElementById('btn-continue').classList.contains('hidden'), 'botão Continuar aparece no título');
+  w.document.getElementById('btn-continue').click();
+  ok(w.game.roomId === 'corridor' && w.has('e_taca') && w.game.flags.teste && w.game.seen.has('t_ronda'), 'continuar restaura sala, evidências, flags e tópicos');
+  w.enterRoom('city', w.eval('CITY').map(15, 17));
+  const pc = w.playerCar(); pc.cx = 28.5; pc.cy = 22.5; pc.ang = Math.PI / 2; w.invalidateGrid(w.ROOMS.city); w.saveGame();
+  w.document.getElementById('menu-title').click(); w.document.getElementById('btn-continue').click();
+  ok(w.game.roomId === 'city' && Math.abs(w.playerCar().cx - 28.5) < 0.01 && Math.abs(w.playerCar().cy - 22.5) < 0.01, 'ao retomar, o carro está onde foi estacionado');
+  w.setZoom(160); ok(w.VH === 160, 'zoom muda a resolução interna');
+  // salvar dentro de uma loja e continuar
+  const front = w.ROOMS.city.objects.find(o => w.shopOf(o));
+  w.interact(front); w.closeModal(); w.game.bag.agua = 2; w.saveGame();
+  w.document.getElementById('menu-title').click(); w.document.getElementById('btn-continue').click(); w.closeModal();
+  ok(w.game.roomId.startsWith('loja_') && w.game.roomData.name === front.name && w.game.bag.agua === 2, 'continuar o jogo dentro de uma loja mantém a loja e a mochila');
+  w.interact(w.game.roomData.objects.find(o => o.shopExit));
+  ok(w.game.roomId === 'city', 'depois de continuar, a saída da loja leva de volta à rua');
+}
+
+(async () => { log.push('start');
+  try {
+    const w1 = await load('a', BASE + '#room=suite'); await sleep(300);
+    await mainPath(w1);
+    const w2 = await load('a', BASE + '?r=2#room=lobby&act=3'); await sleep(300);
+    await dialogues(w2);
+    const w4 = await load('a', BASE + '?r=3#room=city&act=2&at=15,17'); await sleep(300);
+    await cityTests(w4);
+    const w5 = await load('a', BASE + '?r=5#room=suite&act=3'); await sleep(300);
+    await gatherTest(w5);
+    const w6 = await load('a', BASE + '?r=6#room=corridor&act=3'); await sleep(300);
+    await questTest(w6);
+    const w7 = await load('a', BASE + '?r=7#room=city&act=2&at=15,17'); await sleep(300);
+    await shopTest(w7);
+    const w3 = await load('b', BASE); await sleep(300);
+    await saveLoad(w3);
+    await audioTests(w3);
+    await langTests();
+  } catch (e) { log.push('EXCEPTION ' + e.message + '\n' + e.stack); }
+  document.getElementById('out').textContent = log.join('\n');
+  document.title = 'done';
+})();
+</script></body></html>

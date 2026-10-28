@@ -1,0 +1,8 @@
+{
+  "appId": "br.ind.we.hotelalvorada",
+  "appName": "Hotel Alvorada",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#05030c"
+  }
+}

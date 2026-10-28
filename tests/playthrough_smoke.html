@@ -1,0 +1,32 @@
+<!doctype html><html><body>
+<iframe id="a" style="width:915px;height:412px"></iframe>
+<pre id="out"></pre>
+<script>
+// carrega cada sala/cena pelo atalho de depuração, roda alguns segundos de jogo e coleta erros
+const log = [];
+const ok = (c, m) => { log.push((c ? 'OK   ' : 'FAIL ') + m); };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const SCENES = [
+  'room=city', 'room=city&at=40,36', 'room=city&at=35,18&drive', 'room=city&at=20,20&gps=chinatown',
+  'room=suite', 'room=corridor', 'room=lobby&act=3', 'room=lobby&act=3&gather', 'room=tunnels&act=3',
+  'room=home', 'room=home_kitchen&cook=1', 'room=home_bath&shower=1', 'room=delegacia', 'room=cafe',
+  'room=bathhouse', 'room=locker&towel', 'room=onsen&towel&at=5,5', 'room=sauna&towel', 'room=home&lie=cama_casa',
+  'room=home&sit=sofa_casa', 'room=city&ui=gps', 'room=lavagem&towel&at=4,4', 'room=bordel&at=4,2',
+];
+(async () => {
+  for (const s of SCENES) {
+    const f = document.getElementById('a');
+    const errs = [];
+    await new Promise(res => { f.onload = res; f.src = '/www/index.html?r=' + Math.random() + '#' + s; });
+    const w = f.contentWindow;
+    w.addEventListener('error', e => errs.push(e.message + ' @' + e.lineno));
+    await sleep(250);
+    try {
+      for (let i = 0; i < 90; i++) { w.update(1 / 30); w.render(); }
+    } catch (e) { errs.push('EXC ' + e.message + ' ' + (e.stack || '').split('\n')[1]); }
+    ok(errs.length === 0, s + (errs.length ? ' → ' + errs.join(' | ') : ''));
+  }
+  document.getElementById('out').textContent = log.join('\n');
+  document.title = 'done';
+})();
+</script></body></html>

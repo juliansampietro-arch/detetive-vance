@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#05030c">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>O Silêncio do Hotel Alvorada</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game">
+    <canvas id="screen" width="480" height="270"></canvas>
+
+    <div id="hud">
+      <div id="hud-left">
+        <div id="act-label"></div>
+        <div id="objective"></div>
+        <div id="gps-line" class="hidden"></div>
+        <div id="needs">
+          <div class="need"><span>FOME</span><div class="bar"><i id="need-fome"></i></div></div>
+          <div class="need"><span>SEDE</span><div class="bar"><i id="need-sede"></i></div></div>
+          <div class="need"><span>CANSAÇO</span><div class="bar"><i id="need-cansaco"></i></div></div>
+        </div>
+      </div>
+      <div id="hud-right">
+        <span id="clock">00:47</span>
+        <button id="btn-gps" aria-label="GPS"><span class="ico">⌖</span><span class="lbl">GPS</span><kbd>G</kbd></button>
+        <button id="btn-scan"><span class="ico">◉</span><span class="lbl">Scanner</span><kbd>Q</kbd></button>
+        <button id="btn-ev"><span class="ico">▤</span><span class="lbl">Evidências</span><kbd>I</kbd></button>
+        <button id="btn-bag" aria-label="Mochila"><span class="ico">🎒</span><span class="lbl">Mochila</span><kbd>B</kbd></button>
+        <button id="btn-palace"><span class="ico">✦</span><span class="lbl">Pistas</span><kbd>M</kbd></button>
+        <button id="btn-menu" aria-label="Menu"><span class="ico">☰</span></button>
+      </div>
+    </div>
+
+    <div id="save-ind">● salvo</div>
+    <div id="prompt"></div>
+
+    <div id="combat-hud" class="hidden"><span>RESISTÊNCIA</span><div id="combat-hp"></div></div>
+
+    <!-- controles de toque: direcional à esquerda, ação à direita -->
+    <div id="touch">
+      <div id="joy-zone"><div id="joy"><div class="joy-arrows"><i></i><i></i><i></i><i></i></div><div id="joy-knob"></div></div></div>
+      <button id="btn-action" aria-label="Ação"><span>A</span><small id="btn-action-lbl"></small></button>
+    </div>
+    <!-- direção do carro: segurar para acelerar, tocar para estacionar (toque, mouse e teclado) -->
+    <div id="drive-btns" class="hidden">
+      <button id="btn-park"><span>P</span><small>Estacionar</small></button>
+      <button id="btn-gas"><span>▲</span><small>Acelerar</small></button>
+    </div>
+    <div id="toast"></div>
+
+    <!-- mensagem -->
+    <div id="msg" class="panel hidden">
+      <div id="msg-title" class="panel-title"></div>
+      <div id="msg-text" class="panel-text"></div>
+      <div id="msg-options" class="options"></div>
+    </div>
+
+    <!-- chamada: um retrato de cada lado, destaque em quem fala -->
+    <div id="call" class="panel hidden">
+      <div id="call-title" class="panel-title"></div>
+      <div class="call-stage">
+        <div id="call-l" class="call-side"><canvas width="120" height="180"></canvas><span></span></div>
+        <div class="call-mid">
+          <div id="call-speaker"></div>
+          <div id="call-text" class="panel-text"></div>
+        </div>
+        <div id="call-r" class="call-side holo"><canvas width="120" height="180"></canvas><span></span></div>
+      </div>
+      <div id="call-options" class="options"></div>
+    </div>
+
+    <!-- diálogo -->
+    <div id="dialogue" class="panel hidden">
+      <canvas id="dlg-portrait" width="120" height="180"></canvas>
+      <div class="dlg-body">
+        <div class="dlg-head"><span id="dlg-name"></span><span id="dlg-role"></span></div>
+        <div id="dlg-speaker"></div>
+        <div id="dlg-text" class="panel-text"></div>
+        <div id="dlg-options" class="options"></div>
+      </div>
+    </div>
+
+    <!-- evidências -->
+    <div id="evidence" class="modal hidden">
+      <div class="modal-head"><span>EVIDÊNCIAS <small id="ev-count"></small></span><button data-close>✕</button></div>
+      <div class="ev-wrap">
+        <div id="ev-list"></div>
+        <div id="ev-detail"></div>
+      </div>
+    </div>
+
+    <!-- palácio da memória -->
+    <div id="palace" class="modal hidden">
+      <div class="modal-head"><span>PISTAS <small id="palace-stats"></small></span>
+        <span><button id="btn-accuse" class="danger hidden">⚖ Acusar</button><button data-close>✕</button></span></div>
+      <div class="palace-wrap">
+        <svg id="palace-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet"></svg>
+        <div id="palace-info"></div>
+      </div>
+    </div>
+
+    <!-- hack -->
+    <div id="hack" class="modal hidden">
+      <div class="modal-head"><span id="hack-title"></span><button data-close>✕</button></div>
+      <div class="hack-wrap">
+        <canvas id="hack-canvas" width="400" height="400"></canvas>
+        <div id="hack-status"></div>
+      </div>
+    </div>
+
+    <!-- acusação -->
+    <div id="accuse" class="modal hidden">
+      <div class="modal-head"><span>ACUSAÇÃO FORMAL</span><button id="accuse-back">← Voltar</button></div>
+      <div id="accuse-q"></div>
+      <div id="accuse-grid"></div>
+    </div>
+
+    <!-- GPS -->
+    <div id="gps" class="modal small hidden">
+      <div class="modal-head"><span>GPS — DESTINOS</span><button data-close>✕</button></div>
+      <div class="gps-cols">
+        <canvas id="minimap" width="420" height="300"></canvas>
+        <div id="gps-list" class="menu-body"></div>
+      </div>
+    </div>
+
+    <!-- idioma -->
+    <div id="lang" class="modal small hidden">
+      <div class="modal-head"><span>🌐 IDIOMA · LANGUAGE</span><button data-close>✕</button></div>
+      <div id="lang-list" class="menu-body"></div>
+    </div>
+
+    <!-- menu de pausa -->
+    <div id="menu" class="modal small hidden">
+      <div class="modal-head"><span id="menu-head">PAUSA</span><button data-close>✕</button></div>
+      <div class="menu-body" id="menu-main">
+        <button id="menu-resume">▶ Retomar</button>
+        <button id="menu-settings">⚙ Configurações</button>
+        <button id="menu-title">⏏ Salvar e voltar ao título</button>
+        <p class="muted">O progresso é salvo automaticamente.</p>
+      </div>
+      <div class="menu-body hidden" id="menu-config">
+        <div class="menu-group">Som</div>
+        <button id="menu-sound"></button>
+        <button id="menu-music"></button>
+        <div class="menu-slider">
+          <label for="menu-music-vol">♫ Volume da música <b id="menu-music-vol-val"></b></label>
+          <input type="range" id="menu-music-vol" min="0" max="100" step="1">
+        </div>
+        <div class="menu-slider">
+          <label for="menu-sfx-vol">💥 Volume dos efeitos <b id="menu-sfx-vol-val"></b></label>
+          <input type="range" id="menu-sfx-vol" min="0" max="100" step="1">
+        </div>
+        <div class="menu-slider">
+          <label for="menu-voice-vol">💬 Volume das vozes <b id="menu-voice-vol-val"></b></label>
+          <input type="range" id="menu-voice-vol" min="0" max="100" step="1">
+        </div>
+        <div class="menu-group">Idioma e tela</div>
+        <button id="menu-lang"></button>
+        <div class="menu-row"><button id="menu-zout">－</button><span id="menu-zoom"></span><button id="menu-zin">＋</button></div>
+        <button id="menu-full">⛶ Tela cheia</button>
+        <button id="menu-back">← Voltar</button>
+      </div>
+    </div>
+
+    <div id="intro" class="screen hidden">
+      <canvas id="intro-canvas"></canvas>
+      <div id="intro-caption"></div>
+      <button id="intro-skip">Pular ▸▸</button>
+    </div>
+    <div id="card" class="screen hidden"></div>
+    <div id="ending" class="screen hidden"></div>
+
+    <!-- título -->
+    <div id="title" class="screen">
+      <canvas id="title-rain" width="480" height="270"></canvas>
+      <div class="title-in">
+        <div class="title-pre">NEO-SAMPA · 2085</div>
+        <h1>DETETIVE<br><span>GABRIEL VANCE</span></h1>
+        <p class="title-tag">Escolha o caso</p>
+        <div id="case-list"></div>
+        <div class="title-btns">
+          <button id="btn-lang" class="ghost"></button>
+          <div class="menu-slider title-vol">
+            <label for="title-music-vol">♫ Volume da música <b id="title-music-vol-val"></b></label>
+            <input type="range" id="title-music-vol" min="0" max="100" step="1">
+          </div>
+        </div>
+        <div class="controls">🎧 Melhor com fones de ouvido · controle Bluetooth compatível</div>
+        <div class="title-credit">Enredo e personagens desenvolvidos por Julian Sampietro<br>Jogo desenvolvido utilizando Claude Code</div>
+      </div>
+    </div>
+
+    <div id="rotate">
+      <div class="rot-icon">⟳</div>
+      <p>Gire o celular para jogar na horizontal</p>
+    </div>
+  </div>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/dialogues.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/npcs_city.js"></script>
+  <script src="js/eco.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/props.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/intro.js"></script>
+  <script src="js/city.js"></script>
+  <script src="js/shops.js"></script>
+  <script src="js/cases.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

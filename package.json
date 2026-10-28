@@ -1,0 +1,21 @@
+{
+  "name": "hotel-alvorada",
+  "version": "1.0.0",
+  "private": true,
+  "description": "O Silêncio do Hotel Alvorada — RPG de investigação cyberpunk noir",
+  "scripts": {
+    "serve": "npx --yes http-server www -p 8080 -c-1",
+    "sync": "npx cap sync android",
+    "android": "npx cap sync android && npx cap open android",
+    "apk": "npx cap sync android && cd android && gradlew.bat assembleDebug",
+    "exe": "cd desktop && npm run exe"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/core": "^7.6.9"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.6.9"
+  }
+}
