@@ -1076,7 +1076,9 @@ function focusMove(delta) {
   if (!bs.length) return;
   const i = bs.indexOf(document.activeElement);
   const n = bs[(i < 0 ? (delta > 0 ? 0 : bs.length - 1) : (i + delta + bs.length) % bs.length)];
-  n.focus();
+  document.querySelectorAll('.pad-focus').forEach(b => b.classList.remove('pad-focus'));
+  n.classList.add('pad-focus');   // destaque visível também com controle (o :focus-visible só aparece com teclado)
+  n.focus({ focusVisible: true });
   n.scrollIntoView({ block: 'nearest' });
 }
 
@@ -1099,9 +1101,11 @@ function pollGamepad() {
   if (!pad.audioTried && gp.buttons.some(x => x.pressed)) { pad.audioTried = true; Sound.init(); }
   let ax = Math.abs(gp.axes[0]) > 0.2 ? gp.axes[0] : 0, ay = Math.abs(gp.axes[1]) > 0.2 ? gp.axes[1] : 0;
   if (b(14)) ax = -1; if (b(15)) ax = 1; if (b(12)) ay = -1; if (b(13)) ay = 1;
+  // a tecla emulada pelo Edge do Xbox chegou primeiro: este aperto já foi tratado por ela
+  if (performance.now() - (pad.lastKey || -1e9) < 250) { for (let i = 0; i < gp.buttons.length; i++) pad.prev[i] = b(i); pad.prev.up = pad.prev.down = true; pad.x = pad.y = 0; return; }
   if (game && game.modal) {
     pad.x = pad.y = 0;
-    const up = (b(12) || gp.axes[1] < -0.6), down = (b(13) || gp.axes[1] > 0.6);
+    const up = (b(12) || b(14) || gp.axes[1] < -0.6 || gp.axes[0] < -0.6), down = (b(13) || b(15) || gp.axes[1] > 0.6 || gp.axes[0] > 0.6);
     if (up && !pad.prev.up) focusMove(-1);
     if (down && !pad.prev.down) focusMove(1);
     pad.prev.up = up; pad.prev.down = down;
@@ -1112,6 +1116,7 @@ function pollGamepad() {
   if (pressed(3) && game && !game.modal) openPalace();
   if (pressed(8) && game && !game.modal) openEvidence();
   if (pressed(9)) game && game.modal === 'menu' ? closeModal() : openMenu();
+  if (gp.buttons.some(x => x.pressed) || Math.abs(gp.axes[0]) > 0.6 || Math.abs(gp.axes[1]) > 0.6) pad.lastPress = performance.now();
   for (let i = 0; i < gp.buttons.length; i++) pad.prev[i] = b(i);
 }
 
@@ -1876,6 +1881,9 @@ document.addEventListener('keydown', ev => {
   const k = ev.key.toLowerCase();
   if (Intro.isRunning()) { if (k === 'escape') Intro.skip(); else if (k === 'enter' || k === ' ' || k === 'e') Intro.next(); return; }
   if (!game) return;
+  // o Edge do Xbox também transforma o controle em teclas (setas, Enter, Esc): ignora o eco para não contar duas vezes
+  if (performance.now() - (pad.lastPress || -1e9) < 250 && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter', 'escape', ' ', 'gamepada', 'gamepadb'].includes(k)) { ev.preventDefault(); return; }
+  if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter', 'escape', ' '].includes(k)) pad.lastKey = performance.now();
   if (k === 'escape') { goBack(); return; }
   // dirigindo, o Espaço é o acelerador (tratado em city.js), não a tecla de ação
   if (k === ' ' && game.driving && !game.modal) { ev.preventDefault(); return; }

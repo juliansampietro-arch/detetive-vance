@@ -64,7 +64,7 @@ button {
   min-height: 2.3em;
   transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
 }
-button:hover, button:focus-visible { border-color: var(--cyan); color: #fff; box-shadow: 0 0 0 1px var(--cyan), 0 0 14px rgba(56, 246, 255, .35); outline: none; }
+button:hover, button:focus-visible, button.pad-focus { border-color: var(--cyan); color: #fff; box-shadow: 0 0 0 1px var(--cyan), 0 0 14px rgba(56, 246, 255, .35); outline: none; }
 button:active { transform: translateY(1px); }
 
 .hidden { display: none !important; }
