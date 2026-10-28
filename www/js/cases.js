@@ -21,11 +21,10 @@ function refillArr(arr, src) { arr.length = 0; arr.push(...src); }
 let ecoCityObjs = null;
 function ecoCityObjects() {
   if (ecoCityObjs) return ecoCityObjs;
-  const at = (x, y) => CITY.map(x, y);
-  const [tx, ty] = at(15, 17), [sx, sy] = at(18, 17);
+  const at = (x, y) => CITIES.city.map(x, y);
+  const [tx, ty] = at(15, 17);
   ecoCityObjs = [
     { kind: 'tape', x: Math.floor(tx), y: Math.floor(ty), w: 2, d: 1, axis: 'x' },
-    { kind: 'tram_stop', x: Math.floor(sx), y: Math.floor(sy), solid: true, key: 'estacao_aerotrem', name: 'Estação do aerotrem — Linha Neo-Sampa' },
   ];
   return ecoCityObjs;
 }

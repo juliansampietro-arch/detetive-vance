@@ -26,7 +26,28 @@ Object.assign(LOOKS, {
   bixiga2:   { coat: '#2a3a4a', coatDark: '#1a2632', skin: '#a8785a', hair: '#1a1410', legs: '#1a1a20', implant: '#7dff6b', long: true, shirt: '#e8d8a8', hairStyle: 'long' },
   minhoca1:  { coat: '#4a4030', coatDark: '#2e281e', skin: '#9a6a4a', hair: '#1a1410', legs: '#2a2418', implant: '#ff8a3d', armL: '#7a7a6a', shirt: '#3a3020', hairStyle: 'hood' },
   minhoca2:  { coat: '#3a2a3a', coatDark: '#261a26', skin: '#d8b090', hair: '#7a2a8a', legs: '#1a141a', implant: '#b04cff', long: true, shirt: '#2a1a2a', hairStyle: 'long' },
+  morador1:  { coat: '#4a4030', coatDark: '#2e2818', skin: '#8a5a3a', hair: '#3a3a3a', legs: '#3a3428', implant: '#6a6a5a', shirt: '#5a2a2a', hairStyle: 'hood', beard: true },
+  morador2:  { coat: '#5a3a4a', coatDark: '#3a2430', skin: '#c49070', hair: '#6a6a6a', legs: '#2a2a2a', implant: '#6a6a5a', long: true, shirt: '#3a4a3a', hairStyle: 'long' },
+  morador3:  { coat: '#3a4a3a', coatDark: '#26301e', skin: '#6a4028', hair: '#1a1410', legs: '#3a3020', implant: '#ffb347', shirt: '#8a6a2a', hairStyle: 'modern', cap: '#8a2a2a', beard: true },
+  paciente1: { coat: '#9ab8c8', coatDark: '#6a8898', skin: '#c49070', hair: '#2a2420', legs: '#9ab8c8', implant: '#7dff6b', shirt: '#b8d4e0', hairStyle: 'modern' },
+  paciente2: { coat: '#9ab8c8', coatDark: '#6a8898', skin: '#8a5a3a', hair: '#1a1410', legs: '#9ab8c8', implant: '#7dff6b', long: true, shirt: '#b8d4e0', hairStyle: 'bun' },
+  hacker1:   { coat: '#1a1a1a', coatDark: '#0e0e0e', skin: '#14141a', hair: '#0a0a0e', legs: '#1a1a20', implant: '#7dff6b', shirt: '#2a3a2a', hairStyle: 'hood', goggles: '#7dff6b' },
+  hacker2:   { coat: '#2a1a2a', coatDark: '#1a0e1a', skin: '#c89a78', hair: '#7dff6b', legs: '#1a1a20', implant: '#38f6ff', shirt: '#1a2a1a', hairStyle: 'modern', goggles: '#38f6ff' },
+  caio:      { coat: '#d8e0e4', coatDark: '#9aa8b0', skin: '#a8785a', hair: '#3a2a1a', legs: '#2a2e3a', implant: '#7dff6b', shirt: '#3a4a3a', hairStyle: 'slick', beard: true, goggles: '#7dff6b' },
+  cida:      { coat: '#6a3a2a', coatDark: '#4a2418', skin: '#7a4a2a', hair: '#c8c8c8', legs: '#3a2a2a', implant: '#ffb347', long: true, shirt: '#c8a020', hairStyle: 'bun' },
 });
+
+// robôs e androides usam o corpo mecânico (robotBody, em engine.js)
+Object.assign(LOOKS, {
+  robo_carga: { coat: '#c8901a', coatDark: '#8a6010', skin: '#5a5a62', hair: '#3a3a42', legs: '#3a3a42', implant: '#ff6a2a', goggles: '#ffd23f', robot: 'heavy' },
+  robo_limpeza: { coat: '#3a6a8a', coatDark: '#24485e', skin: '#6a6a72', hair: '#3a3a42', legs: '#3a3a42', implant: '#7dff6b', goggles: '#38f6ff', robot: 'heavy' },
+  enfermeiro_bot: { coat: '#e8eef2', coatDark: '#aab8c4', skin: '#8a8e96', hair: '#c8c8d0', legs: '#c8c8d0', implant: '#7dff6b', goggles: '#7dff6b', robot: 'android' },
+});
+Object.assign(LOOKS.rig7, { robot: 'heavy' });
+Object.assign(LOOKS.guarda_sint, { robot: 'heavy', coat: '#2a2e3a', coatDark: '#1a1e28', skin: '#4a5060' });
+Object.assign(LOOKS.irma7, { robot: 'android', skin: '#9a9aa8', veil: '#e8e8f0' });
+Object.assign(LOOKS.unidade7, { robot: 'android' });
+Object.assign(LOOKS.lumi, { robot: 'android' });
 
 // ------------------------------------------------------------
 // Salas de Neo-Sampa
@@ -39,7 +60,7 @@ Object.assign(ROOMS, {
     lights: [{ x: 6, y: 1, z: 36, r: 90, color: '#e8f4ff' }, { x: 11.5, y: 0.6, z: 30, r: 50, color: '#ff3355', flicker: true },
       { x: 2.5, y: 0.6, z: 30, r: 50, color: '#38f6ff' }, { x: 3, y: 7, z: 30, r: 70, color: '#b04cff' }, { x: 11, y: 7, z: 30, r: 70, color: '#38f6ff' }],
     objects: [
-      { kind: 'exit', x: 2, y: 0, key: 'aerotrem', name: 'Elevador expresso → Estação do aerotrem' },
+      { kind: 'exit', x: 2, y: 0, key: 'exit', to: 'city_paulista', at: [25, 29], name: 'Elevador expresso → Térreo (Av. Paulista)' },
       { kind: 'exit', x: 11, y: 0, key: 'exit', to: 'ns_lab', at: [2, 1], name: 'Porta blindada → Laboratório cinético' },
       { kind: 'desk', x: 4, y: 2, w: 4, d: 1, solid: true, key: 'balcao_synapse', name: 'Recepção da Synapse Corp', info: 'Mármore holográfico que muda de veio a cada minuto. O logo da Synapse gira em cima: um neurônio estilizado com uma coroa.' },
       { kind: 'terminal', x: 8, y: 2, solid: true, key: 'term_synapse', name: 'Terminal de acessos internos', screen: '#38f6ff' },
@@ -52,7 +73,10 @@ Object.assign(ROOMS, {
       { kind: 'plant', x: 13, y: 9, solid: true, key: 'planta', name: 'Planta holográfica' },
     ],
     npcs: [{ id: 'lyra', x: 5, y: 5 }, { id: 'maya', x: 11, y: 8 }, { id: 'agora', x: 7, y: 4 }],
-    walkers: [{ look: 'synth1', name: 'Executivo da Synapse', lines: 'synapse', x: 4, y: 4 }, { look: 'synth2', name: 'Executiva da Synapse', lines: 'synapse', x: 8, y: 8 }],
+    walkers: [{ look: 'synth1', name: 'Executivo da Synapse', lines: 'synapse', x: 4, y: 4 }, { look: 'synth2', name: 'Executiva da Synapse', lines: 'synapse', x: 8, y: 8 },
+      { look: 'synth2', name: 'Assessora de imprensa', lines: 'synapse', x: 6, y: 7 }, { look: 'synth1', name: 'Advogado da Synapse', lines: 'synapse', x: 10, y: 3 },
+      { look: 'guarda_sint', name: 'Segurança sintético', lines: 'seguranca', x: 12, y: 2 }, { look: 'guarda_sint', name: 'Segurança sintético', lines: 'seguranca', x: 3, y: 2 },
+      { look: 'robo_limpeza', name: 'Robô de limpeza', lines: 'robo', x: 9, y: 8 }],
   },
   ns_lab: {
     name: 'Laboratório de Testes Cinéticos', w: 10, h: 8, floor: 'office', dark: 0.66,
@@ -70,34 +94,67 @@ Object.assign(ROOMS, {
       { kind: 'server_rack', x: 9, y: 2, solid: true, key: 'racks_lab', name: 'Rack isolado', info: 'Servidores sem nenhuma conexão externa. "Gaiola de Faraday nível 9", diz a etiqueta. Nada entra, nada sai.' },
       { kind: 'lab_bench', x: 1, y: 5, w: 2, solid: true, key: 'bancada_lab', name: 'Bancada de testes', info: 'Pentes de memória vazios, um ferro de solda frio e um copo de café sintético com marca de batom prateado.' },
       { kind: 'cryo_tank', x: 0, y: 2, solid: true, key: 'tanque_lab', name: 'Tanque de resfriamento', info: 'Gel de resfriamento para interfaces neurais. Mantém a porta neural a 4 graus durante os testes.' },
+      { kind: 'floodlight', x: 8, y: 7, solid: true, key: 'refletor', name: 'Refletor da perícia', info: 'Luz forense branca e dura. Deixa tudo com cara de necrotério.' },
+      { kind: 'forensic_kit', x: 0, y: 7, solid: true, key: 'kit_pericia', name: 'Maleta da perícia', info: 'Pinças, sacos de evidência e um scanner de DNA. A perícia da Synapse chegou antes da polícia.' },
+      { kind: 'marker', x: 6, y: 4, ox: 0.4, oy: 0.6, n: 1 }, { kind: 'marker', x: 4, y: 4, ox: 0.6, oy: 0.4, n: 2 }, { kind: 'marker', x: 6, y: 5, ox: 0.3, oy: 0.3, n: 3 },
     ],
     npcs: [{ id: 'rig7', x: 8, y: 5 }],
+    walkers: [{ look: 'cop1', name: 'Perito da polícia', lines: 'pericia', x: 2, y: 4 }, { look: 'cop3', name: 'Perita da Synapse', lines: 'pericia', x: 7, y: 6 }],
   },
   ns_minhocao: {
-    name: 'Baixo Minhocão — Subnível 4', w: 16, h: 12, floor: 'concrete', dark: 0.5, outdoor: true,
+    name: 'Baixo Minhocão — Subnível 4', w: 30, h: 16, floor: 'concrete', dark: 0.62, outdoor: true,
     neon: '#ff8a3d', wallColor: ['#1e1a18', '#161210'],
-    wallN: 'PPE.N...H..N.PPP', wallW: 'P...H...P..P',
-    lights: [{ x: 2.5, y: 0.6, z: 30, r: 60, color: '#ffb347' }, { x: 4, y: 3.5, z: 26, r: 70, color: '#ff4fd8' }, { x: 8, y: 3.5, z: 26, r: 70, color: '#38f6ff' },
-      { x: 12, y: 3.5, z: 26, r: 60, color: '#ffd23f' }, { x: 11.5, y: 8.5, z: 24, r: 80, color: '#ff8a3d' }, { x: 4, y: 9, z: 12, r: 60, color: '#ff6a2a' }],
+    wallN: 'PPE.N..PP.H..PPP.N...PP..H.PPP', wallW: 'P...H...P..P..P.',
+    lights: [{ x: 2.5, y: 0.6, z: 30, r: 60, color: '#ffb347' }, { x: 4, y: 6.5, z: 26, r: 70, color: '#ff4fd8' }, { x: 9, y: 6.5, z: 26, r: 70, color: '#38f6ff' },
+      { x: 15, y: 6.5, z: 26, r: 60, color: '#ffd23f' }, { x: 23, y: 8.5, z: 24, r: 80, color: '#ff8a3d' }, { x: 5, y: 11.5, z: 12, r: 60, color: '#ff6a2a' },
+      { x: 18, y: 11.5, z: 12, r: 60, color: '#ff6a2a' }, { x: 28, y: 10.5, z: 12, r: 50, color: '#ff6a2a' }, { x: 12, y: 4.5, z: 60, r: 70, color: '#ffb347', flicker: true }],
     objects: [
       { kind: 'exit', x: 2, y: 0, key: 'aerotrem', name: 'Escada → Estação do aerotrem' },
-      { kind: 'stall', x: 3, y: 3, w: 2, d: 1, solid: true, goods: 'tech', col: '#1a6a8a', sign: 'CHIPS', key: 'banca_chips', name: 'Banca de chips', info: 'Chips de memória em potes de conserva. Um cartaz escrito à mão: "100% ROUBADO, 0% RASTREÁVEL".', light: { z: 26, r: 40, color: '#38f6ff' } },
-      { kind: 'stall', x: 7, y: 3, w: 2, d: 1, solid: true, goods: 'tech', col: '#8a1a5a', sign: 'CIBORGUE', key: 'banca_ciborgue', name: 'Banca de próteses', info: 'Braços, olhos e joelhos de modelos que saíram de linha antes de você nascer. Garantia: "até virar a esquina".', light: { z: 26, r: 40, color: '#ff4fd8' } },
-      { kind: 'stall', x: 12, y: 3, w: 2, d: 1, solid: true, goods: 'dumpling', col: '#c8902a', sign: 'PASTEL', key: 'banca_pastel', name: 'Pastelaria do Subnível', info: 'Pastel de "carne" frito em óleo de repulsor. O cheiro é melhor do que deveria ser.', light: { z: 26, r: 50, color: '#ffb347' } },
-      { kind: 'lantern_line', x: 1, y: 2, w: 14, d: 1, axis: 'x', col: '#ff4fd8' },
-      { kind: 'lantern_line', x: 1, y: 6, w: 14, d: 1, axis: 'x', col: '#38f6ff' },
-      { kind: 'counter', x: 10, y: 8, w: 3, d: 1, solid: true, key: 'oficina_tico', name: 'Bancada da oficina do Tico', info: 'Placas-mãe abertas, um braço robótico pela metade e um ferro de solda que nunca esfria. Na parede: "CONSERTO ROBÔ, ANDROIDE E CORAÇÃO PARTIDO".' },
-      { kind: 'scrap', x: 13, y: 9, w: 2, d: 2, solid: true, key: 'entulho', name: 'Sucata da oficina', info: 'Carcaças de robôs de limpeza. Uma delas tem o mesmo modelo de chassi do RIG-7.' },
-      { kind: 'tires', x: 15, y: 7, solid: true, n: 4, key: 'pneus', name: 'Pilha de pneus', info: 'Pneus de carro voador usados como cadeira, mesa e, uma vez, como berço.' },
-      { kind: 'barrel', x: 4, y: 9, solid: true, fire: true, key: 'tambor', name: 'Tambor com fogo', info: 'Gente se esquenta em volta e fala baixo. Lá em cima, a chuva ácida escorre pelas bordas do viaduto.' },
-      { kind: 'container', x: 0, y: 9, w: 3, d: 1, solid: true, col: '#2a5a6a', key: 'barraco', name: 'Barraco de lata', info: 'Uma casa feita de contêiner, com varanda de grade e uma antena parabólica apontada para o nada.' },
-      { kind: 'container', x: 6, y: 10, w: 1, d: 2, solid: true, col: '#6a3a2a', key: 'barraco', name: 'Barraco de lata', info: 'Uma casa feita de contêiner, com varanda de grade e uma antena parabólica apontada para o nada.' },
-      { kind: 'trash', x: 9, y: 5, solid: true, key: 'lixo_minhocao', name: 'Lixeira transbordando', info: 'Embalagens de pastel, chips queimados e um panfleto: "SYNAPSE PAGA BEM POR VOLUNTÁRIOS. SÓ UM CHIPZINHO."' },
-      { kind: 'puddle', x: 6, y: 7 }, { kind: 'puddle', x: 10, y: 6 }, { kind: 'puddle', x: 2, y: 5 },
+      // o viaduto: duas fileiras de pilares e as vigas do tabuleiro lá em cima
+      ...[5, 11, 17, 23, 29].flatMap(x => [4, 12].map(y => ({ kind: 'pillar', x, y, solid: true, key: 'pilar', name: 'Pilar do viaduto', info: 'Concreto de 2030, rachado e pichado. Lá em cima, a via expressa da Zona Alta passa sem nunca olhar para baixo.' }))),
+      { kind: 'beam', x: 5, y: 4, w: 25, d: 1 }, { kind: 'beam', x: 5, y: 12, w: 25, d: 1 },
+      // feira de chips e ciborgues
+      { kind: 'stall', x: 3, y: 6, w: 2, d: 1, solid: true, goods: 'tech', col: '#1a6a8a', sign: 'CHIPS', key: 'banca_chips', name: 'Banca de chips', info: 'Chips de memória em potes de conserva. Um cartaz escrito à mão: "100% ROUBADO, 0% RASTREÁVEL".', light: { z: 26, r: 40, color: '#38f6ff' } },
+      { kind: 'stall', x: 8, y: 6, w: 2, d: 1, solid: true, goods: 'tech', col: '#8a1a5a', sign: 'CIBORGUE', key: 'banca_ciborgue', name: 'Banca de próteses', info: 'Braços, olhos e joelhos de modelos que saíram de linha antes de você nascer. Garantia: "até virar a esquina".', light: { z: 26, r: 40, color: '#ff4fd8' } },
+      { kind: 'stall', x: 14, y: 6, w: 2, d: 1, solid: true, goods: 'dumpling', col: '#c8902a', sign: 'PASTEL', key: 'banca_pastel', name: 'Pastelaria do Subnível', info: 'Pastel de "carne" frito em óleo de repulsor. O cheiro é melhor do que deveria ser.', light: { z: 26, r: 50, color: '#ffb347' } },
+      { kind: 'lantern_line', x: 1, y: 2, w: 28, d: 1, axis: 'x', col: '#ff4fd8' },
+      { kind: 'lantern_line', x: 1, y: 8, w: 18, d: 1, axis: 'x', col: '#38f6ff' },
+      // oficina do Tico
+      { kind: 'counter', x: 21, y: 8, w: 3, d: 1, solid: true, key: 'oficina_tico', name: 'Bancada da oficina do Tico', info: 'Placas-mãe abertas, um braço robótico pela metade e um ferro de solda que nunca esfria. Na parede: "CONSERTO ROBÔ, ANDROIDE E CORAÇÃO PARTIDO".' },
+      { kind: 'scrap', x: 24, y: 9, w: 2, d: 2, solid: true, key: 'entulho', name: 'Sucata da oficina', info: 'Carcaças de robôs de limpeza. Uma delas tem o mesmo modelo de chassi do RIG-7.' },
+      { kind: 'tires', x: 27, y: 6, solid: true, n: 5, key: 'pneus', name: 'Pilha de pneus', info: 'Pneus de carro voador usados como cadeira, mesa e, uma vez, como berço.' },
+      // carros abandonados
+      { kind: 'car', cx: 8.5, cy: 14.2, ang: 0.25, solid: true, key: 'carro_abandonado', name: 'Carro abandonado', info: 'Um sedã sem repulsores, sem rodas e sem portas. Tem cortina na janela de trás: alguém mora aqui.', livery: { main: '#4a3a2a', second: '#2a2018', under: '#141008', metal: '#3a3028', glass: '#1a1a1a', accent: '#6a4a2a', model: 'sedan' } },
+      { kind: 'car', cx: 15.5, cy: 9.6, ang: 1.35, solid: true, key: 'carro_abandonado', name: 'Carro abandonado', info: 'Um cupê que caiu da via expressa em 2071. Ninguém veio buscar. Virou horta: tem tomate brotando no capô.', livery: { main: '#3a4a3a', second: '#24301e', under: '#141810', metal: '#3a3a30', glass: '#1a2018', accent: '#5a6a3a', model: 'coupe' } },
+      { kind: 'car', cx: 26.5, cy: 14, ang: -0.4, solid: true, key: 'carro_abandonado', name: 'Táxi abandonado', info: 'Um táxi voador de 2060, amarelo desbotado. O taxímetro ainda marca uma corrida de 40 créditos que ninguém pagou.', livery: { main: '#8a7a2a', second: '#3a3418', under: '#18160a', metal: '#3a3a30', glass: '#1a1a14', accent: '#a89a3a', model: 'sedan' } },
+      { kind: 'car', cx: 20.5, cy: 14.4, ang: 0.05, solid: true, key: 'carro_abandonado', name: 'Carro queimado', info: 'Só sobrou a carcaça preta. Os moradores usam o porta-malas como armário.', livery: { main: '#1e1a18', second: '#141210', under: '#0a0a08', metal: '#2a2420', glass: '#0a0a0a', accent: '#3a2a20', model: 'coupe' } },
+      // moradores de rua: barracas, colchões, fogueiras e barracos
+      { kind: 'tent', x: 1, y: 9, solid: true, key: 'barraca_lona', name: 'Barraca de lona', info: 'Lona azul, cordas amarradas no pilar e um par de botas na porta. Lá dentro, alguém ronca.' },
+      { kind: 'tent', x: 3, y: 10, solid: true, key: 'barraca_lona', name: 'Barraca de lona', info: 'Uma barraca de camping de luxo, de antes da crise. Agora é a casa de uma família de quatro.' },
+      { kind: 'tent', x: 12, y: 14, solid: true, key: 'barraca_lona', name: 'Barraca de lona', info: 'Pendurado na entrada, um sino de vento feito de chips queimados.' },
+      { kind: 'tent', x: 13, y: 10, solid: true, key: 'barraca_lona', name: 'Barraca de lona', info: 'Uma placa de papelão: "AQUI MORA O SEU JOÃO. BATA PALMAS."' },
+      { kind: 'mattress', x: 1, y: 13, w: 2, d: 1, key: 'colchao', name: 'Colchão na calçada', info: 'Um colchão e um cobertor xadrez, protegidos da chuva pelo viaduto. É o melhor teto da cidade.' },
+      { kind: 'mattress', x: 6, y: 9, w: 2, d: 1, col: '#2a4a5a', key: 'colchao', name: 'Papelão e cobertor', info: 'Caixas de papelão abertas e um cobertor térmico de alumínio, que brilha com o neon.' },
+      { kind: 'mattress', x: 18, y: 9, w: 1, d: 2, col: '#4a3a1a', key: 'colchao', name: 'Colchão na calçada', info: 'Um colchão com uma foto colada na parede do pilar: uma família na praia, num tempo em que havia praia.' },
+      { kind: 'barrel', x: 5, y: 10, solid: true, fire: true, key: 'tambor', name: 'Tambor com fogo', info: 'Gente se esquenta em volta e fala baixo. Lá em cima, a chuva ácida escorre pelas bordas do viaduto.' },
+      { kind: 'barrel', x: 18, y: 12, solid: true, fire: true, key: 'tambor', name: 'Tambor com fogo', info: 'Uma panela de feijão esquenta em cima do tambor. Quem passa ganha uma concha.' },
+      { kind: 'barrel', x: 28, y: 10, solid: true, fire: true, key: 'tambor', name: 'Tambor com fogo', info: 'Fogo de pneu velho. A fumaça preta sobe e some no escuro do viaduto.' },
+      { kind: 'container', x: 0, y: 14, w: 1, d: 2, solid: true, col: '#2a5a6a', key: 'barraco', name: 'Barraco de lata', info: 'Uma casa feita de contêiner, com varanda de grade e uma antena parabólica apontada para o nada.' },
+      { kind: 'container', x: 26, y: 1, w: 3, d: 1, solid: true, col: '#6a3a2a', key: 'barraco', name: 'Barraco de lata', info: 'Dois andares de contêiner empilhado, com uma escada de corda e vasos de planta na janela.' },
+      { kind: 'cart', x: 7, y: 11, solid: true, key: 'carrinho_compras', name: 'Carrinho de supermercado', info: 'Cheio de latinhas, fios de cobre e um ursinho de pelúcia molhado. Tudo o que alguém tem.' },
+      { kind: 'cart', x: 24, y: 13, solid: true, key: 'carrinho_compras', name: 'Carrinho de supermercado', info: 'Carregado de placas de circuito para vender no ferro-velho.' },
+      { kind: 'trash', x: 10, y: 8, solid: true, key: 'lixo_minhocao', name: 'Lixeira transbordando', info: 'Embalagens de pastel, chips queimados e um panfleto: "SYNAPSE PAGA BEM POR VOLUNTÁRIOS. SÓ UM CHIPZINHO."' },
+      { kind: 'trash', x: 20, y: 5, solid: true, key: 'lixo_minhocao2', name: 'Pilha de lixo', info: 'Sacos de lixo da Zona Alta, jogados da via expressa. Às vezes cai coisa boa.' },
+      { kind: 'scrap', x: 9, y: 1, w: 2, d: 1, solid: true, key: 'entulho2', name: 'Entulho', info: 'Grades, canos e o letreiro de uma loja de 2040: "VÍDEO LOCADORA".' },
+      ...[[6, 7], [12, 7], [2, 12], [16, 13], [22, 11], [25, 7], [11, 3], [19, 3]].map(([x, y]) => ({ kind: 'puddle', x, y })),
     ],
-    npcs: [{ id: 'tico', x: 11, y: 7 }],
-    walkers: [{ look: 'minhoca1', name: 'Morador do Minhocão', lines: 'minhocao', x: 5, y: 5 }, { look: 'minhoca2', name: 'Moradora do Minhocão', lines: 'minhocao', x: 9, y: 7 },
-      { look: 'ped3', name: 'Comprador de chips', lines: 'minhocao', x: 3, y: 5 }],
+    npcs: [{ id: 'tico', x: 22, y: 7 }, { id: 'cida', x: 6, y: 12 }],
+    walkers: [
+      { look: 'morador1', name: 'Morador do viaduto', lines: 'morador', x: 4, y: 12 }, { look: 'morador2', name: 'Moradora do viaduto', lines: 'morador', x: 19, y: 11 },
+      { look: 'morador3', name: 'Catador de latinhas', lines: 'morador', x: 25, y: 12 }, { look: 'minhoca1', name: 'Morador do Minhocão', lines: 'minhocao', x: 7, y: 8 },
+      { look: 'minhoca2', name: 'Moradora do Minhocão', lines: 'minhocao', x: 13, y: 8 }, { look: 'ped3', name: 'Comprador de chips', lines: 'minhocao', x: 4, y: 7 },
+      { look: 'morador1', name: 'Vendedor de pastel', lines: 'minhocao', x: 16, y: 7 }, { look: 'robo_carga', name: 'Robô de carga abandonado', lines: 'robo', x: 27, y: 8 },
+    ],
   },
   ns_zetubo: {
     name: 'Bar do Zé do Tubo — Bixiga', w: 12, h: 9, floor: 'tiles', dark: 0.5,
@@ -106,7 +163,7 @@ Object.assign(ROOMS, {
     lights: [{ x: 6.5, y: 1.5, z: 30, r: 70, color: '#ffd8a0' }, { x: 9.5, y: 0.5, z: 30, r: 45, color: '#ffd23f' },
       { x: 3, y: 6, z: 28, r: 60, color: '#ffb347' }, { x: 9, y: 6.5, z: 28, r: 60, color: '#ff8a3d' }],
     objects: [
-      { kind: 'exit', x: 2, y: 0, key: 'aerotrem', name: 'Porta → Rua (estação do aerotrem)' },
+      { kind: 'exit', x: 2, y: 0, key: 'exit', to: 'city_bixiga', at: [15, 26], name: 'Porta → Rua (Bixiga)' },
       { kind: 'bar', x: 5, y: 2, w: 4, d: 1, solid: true, key: 'balcao_ze', name: 'Balcão do Zé' },
       { kind: 'terminal', x: 10, y: 2, solid: true, key: 'term_bixiga', name: 'Terminal público do Bixiga', screen: '#ffd23f' },
       { kind: 'stool', x: 5, y: 3, solid: true }, { kind: 'stool', x: 7, y: 3, solid: true },
@@ -114,11 +171,15 @@ Object.assign(ROOMS, {
       { kind: 'table', x: 4, y: 7, solid: true, key: 'mesa_ze', name: 'Mesa de fórmica', info: 'Uma tábua de truco holográfico esquecida. O placar diz que alguém perdeu a casa.' },
       { kind: 'table', x: 8, y: 6, solid: true, key: 'mesa_ze', name: 'Mesa de fórmica', info: 'Copo americano com café pela metade, ainda morno. Alguém saiu às pressas.' },
       { kind: 'tv', x: 0, y: 4, solid: true, key: 'tv_ze', name: 'TV de tubo', info: 'Uma TV de tubo de verdade, ligada num jogo do Corinthians de 2027. O Zé jura que não é reprise.' },
+      ...[[2, 6], [3, 5], [4, 6], [5, 7], [8, 7], [9, 6]].map(([x, y]) => ({ kind: 'stool', x, y, solid: true })),
+      { kind: 'bookshelf', x: 0, y: 1, solid: true, key: 'estante_ze', name: 'Estante de discos', info: 'Discos de vinil de verdade: Cartola, Adoniran, Racionais. O Zé não deixa ninguém tocar.' },
       { kind: 'manhole', x: 10, y: 7, key: 'alcapao', name: 'Alçapão do porão' },
       { kind: 'plant', x: 11, y: 8, solid: true, key: 'planta_ze', name: 'Espada-de-são-jorge', info: 'Uma espada-de-são-jorge de verdade, num vaso de lata de óleo. Contra mau-olhado e vírus de rede.' },
     ],
     npcs: [{ id: 'ze', x: 6, y: 1 }],
-    walkers: [{ look: 'bixiga1', name: 'Freguês do Zé', lines: 'bixiga', x: 3, y: 6, seat: false }, { look: 'bixiga2', name: 'Hacker de meia-pataca', lines: 'bixiga', x: 9, y: 5 }],
+    walkers: [{ look: 'bixiga1', name: 'Freguês do Zé', lines: 'bixiga', x: 3, y: 6, seat: false }, { look: 'bixiga2', name: 'Hacker de meia-pataca', lines: 'bixiga', x: 9, y: 5 },
+      { look: 'ped6', name: 'Seu Juca, do truco', lines: 'bixiga', x: 3, y: 4 }, { look: 'minhoca2', name: 'Cantora de samba', lines: 'bixiga', x: 6, y: 6 },
+      { look: 'ped3', name: 'Taxista de folga', lines: 'bixiga', x: 9, y: 7 }],
   },
   ns_base: {
     name: 'Base dos Desconectados', w: 10, h: 8, floor: 'concrete', dark: 0.74,
@@ -133,8 +194,12 @@ Object.assign(ROOMS, {
       { kind: 'cot', x: 0, y: 5, solid: true, key: 'catre_zero', name: 'Catre', info: 'Um colchão no chão e um cobertor de alumínio térmico. Revolução não paga aluguel.' },
       { kind: 'crate', x: 7, y: 6, solid: true, key: 'caixote_zero', name: 'Caixote de máscaras', info: 'Máscaras de LED iguais à do Zero, ainda na caixa. "Somos todos ninguém", diz o folheto dentro.' },
       { kind: 'trash', x: 0, y: 2, solid: true, key: 'lixo_hacker', name: 'Lixeira', info: 'Latas de energético e placas fritas. Muitas.' },
+      { kind: 'server_rack', x: 8, y: 3, solid: true, key: 'servidores_zero', name: 'Servidores roubados', info: 'Etiquetas de patrimônio da Synapse Corp, raspadas pela metade.' },
+      { kind: 'monitor_desk', x: 1, y: 3, w: 2, solid: true, key: 'mesa_hackers', name: 'Bancada dos hackers', info: 'Teclados mecânicos, latas de energético e um cartaz: "A REDE É NOSSA, A NUVEM É DELES".' },
+      { kind: 'mattress', x: 3, y: 6, w: 2, d: 1, col: '#2a3a2a', key: 'colchao', name: 'Colchão', info: 'Alguém dorme aqui entre um ataque e outro. Tem um bichinho de pelúcia em forma de servidor.' },
     ],
     npcs: [{ id: 'zero', x: 5, y: 4 }],
+    walkers: [{ look: 'hacker1', name: 'Hacker dos Desconectados', lines: 'base', x: 2, y: 4 }, { look: 'hacker2', name: 'Hacker dos Desconectados', lines: 'base', x: 6, y: 6 }],
   },
   ns_clube: {
     name: 'Clube 14 Bis — A Província dos Drones', w: 14, h: 10, floor: 'tiles', dark: 0.72,
@@ -144,7 +209,7 @@ Object.assign(ROOMS, {
     lights: [{ x: 6.5, y: 1.4, z: 30, r: 90, color: '#ff4fd8', flicker: true }, { x: 4, y: 4.5, z: 30, r: 70, color: '#38f6ff', flicker: true },
       { x: 9, y: 4.5, z: 30, r: 70, color: '#ffd23f', flicker: true }, { x: 2, y: 8, z: 22, r: 60, color: '#b04cff' }, { x: 11.5, y: 7, z: 26, r: 60, color: '#ff3355' }],
     objects: [
-      { kind: 'exit', x: 2, y: 0, key: 'aerotrem', name: 'Escada → Rua (estação do aerotrem)' },
+      { kind: 'exit', x: 2, y: 0, key: 'exit', to: 'city_bixiga', at: [35, 16], name: 'Escada → Rua (Bixiga)' },
       { kind: 'dj_booth', x: 5, y: 1, w: 3, solid: true, key: 'dj', name: 'Cabine do DJ', info: 'O DJ é um drone com quatro braços e fones de ouvido. Toca forró industrial a 180 batidas por minuto.' },
       { kind: 'speaker', x: 1, y: 1, solid: true, key: 'caixa_som', name: 'Caixa de som', info: 'O grave é tão forte que as gotas de chuva no casaco de Vance tremem.' },
       { kind: 'speaker', x: 10, y: 1, solid: true, key: 'caixa_som', name: 'Caixa de som', info: 'O grave é tão forte que as gotas de chuva no casaco de Vance tremem.' },
@@ -155,26 +220,51 @@ Object.assign(ROOMS, {
     ],
     npcs: [{ id: 'dante', x: 3, y: 8 }],
     walkers: [{ look: 'raver1', name: 'Frequentador do 14 Bis', lines: 'clube', x: 5, y: 4 }, { look: 'raver2', name: 'Frequentadora do 14 Bis', lines: 'clube', x: 7, y: 5 },
-      { look: 'raver3', name: 'Dançarina do 14 Bis', lines: 'clube', x: 8, y: 3 }, { look: 'synth1', name: 'Executivo disfarçado', lines: 'clube', x: 11, y: 8 }],
+      { look: 'raver3', name: 'Dançarina do 14 Bis', lines: 'clube', x: 8, y: 3 }, { look: 'synth1', name: 'Executivo disfarçado', lines: 'clube', x: 11, y: 8 },
+      { look: 'raver1', name: 'Frequentador do 14 Bis', lines: 'clube', x: 6, y: 5 }, { look: 'raver2', name: 'Frequentadora do 14 Bis', lines: 'clube', x: 4, y: 4 },
+      { look: 'raver3', name: 'Dançarina do 14 Bis', lines: 'clube', x: 9, y: 5 }, { look: 'synth2', name: 'Herdeira da Zona Alta', lines: 'clube', x: 12, y: 8 },
+      { look: 'robo_carga', name: 'Segurança robô do clube', lines: 'clube_seg', x: 3, y: 2 }],
   },
   ns_clinica: {
-    name: 'Clínica Subterrânea Santa Rita — Lado Sombra', w: 12, h: 9, floor: 'tiles', dark: 0.64,
+    name: 'Clínica Subterrânea Santa Rita — Lado Sombra', w: 16, h: 11, floor: 'tiles', dark: 0.6,
     neon: '#7dff6b', wallColor: ['#18201c', '#101612'],
-    wallN: '..D...V..P..', wallW: 'P...H...P',
-    lights: [{ x: 8, y: 1.5, z: 26, r: 80, color: '#7dff6b' }, { x: 2, y: 5, z: 30, r: 60, color: '#e8fff0' }, { x: 6, y: 6, z: 20, r: 50, color: '#38f6ff', flicker: true }],
+    wallN: '..D...V..P....H.', wallW: 'P...H...P..',
+    lights: [{ x: 10.5, y: 1.5, z: 26, r: 90, color: '#7dff6b' }, { x: 2.5, y: 4.5, z: 30, r: 70, color: '#e8fff0' }, { x: 2.5, y: 7.5, z: 30, r: 60, color: '#e8fff0', flicker: true },
+      { x: 8, y: 7, z: 20, r: 50, color: '#38f6ff', flicker: true }, { x: 13.5, y: 9, z: 14, r: 40, color: '#ffb347' }],
     objects: [
       { kind: 'exit', x: 2, y: 0, key: 'aerotrem', name: 'Porta → Beco (estação do aerotrem)' },
-      { kind: 'cryo_tank', x: 7, y: 1, solid: true, key: 'tanque', name: 'Tanque criogênico', info: 'Um paciente flutua no gel azul, de olhos fechados. A placa diz: "REABILITAÇÃO NEURAL — CICLO 14 DE 40".' },
-      { kind: 'cryo_tank', x: 8, y: 1, solid: true, key: 'tanque', name: 'Tanque criogênico', info: 'Vazio. O gel ainda borbulha, como se esperasse alguém.' },
-      { kind: 'cryo_tank', x: 9, y: 1, solid: true, key: 'tanque', name: 'Tanque criogênico', info: 'Um paciente flutua no gel azul. Na nuca, o mesmo modelo de chip das cobaias do Minhocão.' },
-      { kind: 'cot', x: 0, y: 4, solid: true, key: 'maca', name: 'Maca', info: 'Lençóis limpos e uma pulseira de paciente sem nome: "DOADOR 0447 — MINHOCÃO".' },
-      { kind: 'cot', x: 0, y: 6, solid: true, key: 'maca', name: 'Maca', info: 'Lençóis limpos e uma pulseira de paciente sem nome: "DOADOR 0451 — MINHOCÃO".' },
-      { kind: 'lab_bench', x: 4, y: 5, w: 2, solid: true, key: 'bancada_clinica', name: 'Estação de compilação neural' },
-      { kind: 'terminal', x: 10, y: 4, solid: true, key: 'term_clinica', name: 'Prontuários da clínica', screen: '#7dff6b' },
-      { kind: 'trash', x: 11, y: 8, solid: true, key: 'lixo_bio', name: 'Descarte biotecnológico' },
-      { kind: 'puddle', x: 6, y: 3 },
+      // tanques de resfriamento
+      { kind: 'cryo_tank', x: 9, y: 1, solid: true, key: 'tanque', name: 'Tanque criogênico', info: 'Um paciente flutua no gel azul, de olhos fechados. A placa diz: "REABILITAÇÃO NEURAL — CICLO 14 DE 40".' },
+      { kind: 'cryo_tank', x: 10, y: 1, solid: true, key: 'tanque', name: 'Tanque criogênico', info: 'Vazio. O gel ainda borbulha, como se esperasse alguém.' },
+      { kind: 'cryo_tank', x: 11, y: 1, solid: true, key: 'tanque', name: 'Tanque criogênico', info: 'Um paciente flutua no gel azul. Na nuca, o mesmo modelo de chip das cobaias do Minhocão.' },
+      { kind: 'cryo_tank', x: 12, y: 1, solid: true, key: 'tanque', name: 'Tanque criogênico', info: 'O painel pisca em amarelo: "RESFRIAMENTO INSTÁVEL". Alguém colou um esparadrapo em cima do aviso.' },
+      // enfermaria: leitos com pacientes, cortinas e soro
+      { kind: 'patient_bed', x: 1, y: 3, w: 1, d: 2, solid: true, look: 'paciente1', sleep: true, key: 'leito', name: 'Leito 1', info: 'Doador 0447, Minhocão. Dorme agarrado a uma foto. Ao lado, um bilhete: "Ele não lembra o próprio nome, mas lembra da filha."' },
+      { kind: 'patient_bed', x: 1, y: 7, w: 1, d: 2, solid: true, look: 'paciente2', key: 'leito', name: 'Leito 2', info: 'Doadora 0451. Está acordada, olhando o teto. Repete baixinho um número de telefone que não existe mais.' },
+      { kind: 'patient_bed', x: 4, y: 3, w: 1, d: 2, solid: true, look: 'paciente2', sleep: true, key: 'leito', name: 'Leito 3', info: 'Doadora 0452. O monitor marca sono profundo. O chip na nuca dela está desligado com um clipe de papel.' },
+      { kind: 'patient_bed', x: 4, y: 7, w: 1, d: 2, solid: true, look: 'paciente1', key: 'leito', name: 'Leito 4', info: 'Doador 0455. Sorri quando Vance passa. Pergunta se ele é o filho dele. Não é.' },
+      { kind: 'partition', x: 2, y: 3, d: 2, axis: 'y', solid: true }, { kind: 'partition', x: 2, y: 7, d: 2, axis: 'y', solid: true },
+      { kind: 'iv_stand', x: 0, y: 3, solid: true }, { kind: 'iv_stand', x: 0, y: 7, solid: true }, { kind: 'iv_stand', x: 5, y: 3, solid: true }, { kind: 'iv_stand', x: 5, y: 7, solid: true },
+      // sala de procedimentos
+      { kind: 'lab_bench', x: 7, y: 5, w: 2, solid: true, key: 'bancada_clinica', name: 'Estação de compilação neural' },
+      { kind: 'terminal', x: 14, y: 4, solid: true, key: 'term_clinica', name: 'Prontuários da clínica', screen: '#7dff6b' },
+      { kind: 'bookshelf', x: 15, y: 1, solid: true, key: 'armario_remedios', name: 'Armário de remédios', info: 'Frascos sem rótulo, seringas reaproveitadas e uma caixa de estabilizadores neurais com o logo da Synapse riscado.' },
+      { kind: 'forensic_kit', x: 13, y: 1, solid: true, key: 'maleta_cirurgia', name: 'Maleta cirúrgica', info: 'Instrumentos de neurocirurgia de altíssima qualidade. Ninguém compra isto com dinheiro de clínica clandestina.' },
+      { kind: 'trash', x: 15, y: 10, solid: true, key: 'lixo_bio', name: 'Descarte biotecnológico' },
+      // recepção e sala de espera
+      { kind: 'shrine', x: 13, y: 9, solid: true, key: 'altar_rita', name: 'Altar de Santa Rita', info: 'Santa Rita de Cássia, padroeira das causas impossíveis. Velas de LED, fitas e pulseiras de pacientes que foram embora.' },
+      ...[9, 10, 11].map(x => ({ kind: 'chair', x, y: 9, solid: true, key: 'cadeira_espera', name: 'Cadeira de espera', seat: true })),
+      { kind: 'table', x: 10, y: 10, solid: true, key: 'mesa_espera', name: 'Mesinha', info: 'Revistas de 2070 e um pote de balas. As balas são estabilizadores de humor. Melhor não.' },
+      { kind: 'plant', x: 7, y: 10, solid: true, key: 'planta_clinica', name: 'Samambaia', info: 'Uma samambaia de verdade, regada com o soro que sobra.' },
+      { kind: 'puddle', x: 6, y: 2 }, { kind: 'puddle', x: 12, y: 6 },
     ],
-    npcs: [{ id: 'irma7', x: 6, y: 2 }],
+    npcs: [{ id: 'irma7', x: 7, y: 3 }, { id: 'caio', x: 10, y: 6 }],
+    walkers: [
+      { look: 'enfermeiro_bot', name: 'Enfermeiro robô', lines: 'clinica_bot', x: 6, y: 6 },
+      { look: 'paciente1', name: 'Paciente em recuperação', lines: 'paciente', x: 8, y: 8 },
+      { look: 'paciente2', name: 'Paciente em recuperação', lines: 'paciente', x: 13, y: 7 },
+      { look: 'minhoca2', name: 'Parente de paciente', lines: 'parente', x: 11, y: 8 },
+    ],
   },
   ns_nucleo: {
     name: 'Núcleo de Processamento — Synapse Corp', w: 14, h: 10, floor: 'office', dark: 0.72,
@@ -191,20 +281,80 @@ Object.assign(ROOMS, {
       { kind: 'crate', x: 1, y: 6, solid: true, key: 'caixa_nucleo', name: 'Caixa de peças', info: 'Peças de reposição para servidores. Ninguém repõe nada aqui desde 2079.' },
       { kind: 'crate', x: 10, y: 5, solid: true, key: 'caixa_nucleo', name: 'Caixa de peças', info: 'Peças de reposição para servidores. Ninguém repõe nada aqui desde 2079.' },
     ],
+    walkers: [{ look: 'robo_limpeza', name: 'Robô de manutenção', lines: 'robo', x: 3, y: 8 }, { look: 'robo_limpeza', name: 'Robô de manutenção', lines: 'robo', x: 11, y: 4 }],
   },
 });
 
 Object.assign(EXTRA_LINES, {
+  paulista: ['Daqui de baixo a torre parece não ter fim. Dizem que lá em cima o ar tem cheiro de hortelã.', 'Entrega para o 220º andar? Pela portaria leva meia hora. Pelo drone, trinta segundos.', 'Vim só tirar foto da fonte. Água de verdade, olha só.', 'Viu a notícia? Morreu um engenheiro lá em cima. As ações subiram. Vai entender.', 'O aerotrem para ali na esquina. Pontual como a Synapse: nunca atrasa, nunca espera.'],
+  morador: ['Debaixo do viaduto não chove ácido. É o melhor endereço da cidade, moço.', 'Tô aqui desde que a Synapse comprou o prédio onde eu morava. Era pra ser só um mês.', 'Tem um pouco de feijão no tambor ali. Pega, que ninguém passa fome aqui embaixo.', 'Lá em cima eles chamam a gente de "paisagem". Aqui embaixo a gente chama eles de "teto".', 'Meu carro caiu da via expressa em 2071. Fiquei com ele. Virou casa.', 'Polícia aqui só desce pra tirar barraca. Você veio tirar barraca?', 'A Dona Cida sabe de tudo que acontece no Minhocão. Pergunta pra ela.', 'Vendi meu chip de memória pra comer. Agora não lembro o que eu comi.'],
+  robo: ['*BIP.* LIMPANDO. LIMPANDO. LIMPANDO.', 'UNIDADE SEM PROPRIETÁRIO. AGUARDANDO INSTRUÇÕES DESDE 2079.', '*BZZT.* CARGA: 12%. PROCURANDO TOMADA.', 'POR FAVOR, AFASTE-SE DA ÁREA DE TRABALHO.', '*BIP-BOP.* ESTE ROBÔ NÃO TEM AUTORIZAÇÃO PARA CONVERSAR.'],
+  seguranca: ['Circulação restrita a pessoal autorizado.', 'Detetive Vance: acesso concedido pela diretoria. Comportamento monitorado.', 'Não toque nas obras de arte holográficas.', 'Este andar é vigiado por 340 câmeras. Sorria.'],
+  pericia: ['A perícia da Synapse chegou antes da gente. Isso nunca é bom sinal.', 'Nenhuma digital, nenhum fio de cabelo. Esse laboratório é mais limpo que centro cirúrgico.', 'O corpo caiu da cadeira depois da morte, não antes. Dá pra ver pelo cabo.', 'Detetive, tudo que a gente acha aqui o jurídico da Synapse quer ver primeiro.'],
+  base: ['A rede é nossa. A nuvem é deles.', 'Não toca no teclado do Zero. Sério, não toca.', 'A gente não mata ninguém, tira. A gente só derruba servidor.', 'Tô há três dias sem dormir. Mas derrubei o firewall da Synapse duas vezes.'],
+  paciente: ['Você é meu filho? Não? Desculpa. Eu esqueço.', 'A Irmã-7 canta pra gente dormir. Ela canta mal, mas canta.', 'Eu era soldador. Agora não lembro como segura o maçarico.', 'O doutor Caio diz que eu vou lembrar do meu nome até o Natal.'],
+  parente: ['Meu marido se ofereceu pro teste da Synapse. Mil créditos. Voltou sem lembrar do casamento.', 'Venho aqui todo dia. Um dia ele vai me reconhecer.', 'A doutora Lin é uma santa, moço. Ela cuida deles de graça.'],
+  clinica_bot: ['PACIENTE, POR FAVOR, VOLTE AO LEITO.', '*BIP.* SORO: 40%. TROCA EM 22 MINUTOS.', 'BEM-VINDO À SANTA RITA. FALE BAIXO. OS PACIENTES ESTÃO SONHANDO.', 'MEDICAÇÃO DISTRIBUÍDA. DOR REDUZIDA EM 30%. SAUDADE: SEM ALTERAÇÃO.'],
+  clube_seg: ['*BIP.* NOME NA LISTA: CONFIRMADO.', 'PROIBIDO DANÇAR COM IMPLANTE DE COMBATE ATIVO.', 'O CAMAROTE É SÓ PARA CONVIDADOS DO SENHOR ROSSI.'],
   synapse: ['A Synapse não comenta assuntos em andamento. Nem os encerrados.', 'Eu trabalhava com o Kaelen. Ele almoçava sozinho. Agora eu entendo por quê.', 'Dizem que a Dra. Lin não dorme há três dias. Dizem que ela nunca dormiu.', 'A diretora Lyra subiu de cargo duas vezes este ano. Ninguém sobe duas vezes sem pisar em alguém.', 'O ar aqui custa mais que o meu salário. Eu respiro devagar.'],
   minhocao: ['Polícia aqui embaixo? Só quando cai um corpo lá de cima.', 'A Synapse paga mil créditos por um voluntário. Meu primo foi. Voltou sem lembrar o nome da mãe.', 'Chip, detetive? Tenho um que faz você esquecer as dívidas. E o nome.', 'Lá em cima chove ácido. Aqui embaixo chove o ácido que escorre lá de cima.', 'O Tico conserta qualquer coisa. Já consertou até o meu casamento. Durou uma semana.'],
   bixiga: ['O café do Zé é coado em pano de verdade. O pano é de 2040, mas é de verdade.', 'O pão com mortadela molecular é a única coisa nesta cidade que tem gosto do passado.', 'Vi um mascarado de LED usando o terminal ontem. Ou foi um anúncio. Difícil saber hoje em dia.', 'Detetive no Bixiga? Alguém vai sair na holo-TV hoje.', 'O Zé guarda segredo melhor que cofre. E cobra menos.'],
-  clube: ['O QUÊ? NÃO TÔ OUVINDO, DETETIVE!', 'Lavagem de dinheiro? Aqui? Que absurdo. Aceita cripto?', 'O Corretor tá no camarote. Ele sempre tá no camarote.', 'Se você não tem implante de audição, sai daqui com zumbido até 2090.', 'Os drones do DJ dançam melhor que todo mundo aqui. Inclusive eu.'],
+  clube: ['O QUÊ? NÃO TÔ OUVINDO, DETETIVE!', 'Hoje o DJ é um drone de quatro braços. Semana passada era um polvo cibernético.', 'Lavagem de dinheiro? Aqui? Que absurdo. Aceita cripto?', 'O Corretor tá no camarote. Ele sempre tá no camarote.', 'Se você não tem implante de audição, sai daqui com zumbido até 2090.', 'Os drones do DJ dançam melhor que todo mundo aqui. Inclusive eu.'],
 });
 
 // ------------------------------------------------------------
 // Personagens e diálogos
 // ------------------------------------------------------------
 Object.assign(NPCS, {
+  cida: {
+    name: 'Dona Cida', role: 'Moradora do Minhocão', look: 'cida',
+    scan: { text: 'Nenhum implante. Pulmões cansados de fumaça de pneu. Uma pulseira de paciente antiga no pulso: "DOADORA 0102 — SYNAPSE".' },
+    intro: 'Boa noite, moço. Cida. Moro aqui embaixo faz quinze anos, desde que a via expressa virou teto. Senta perto do fogo, que a noite é comprida.',
+    again: ['Fala, moço.', 'Esquenta a mão aí no fogo.', 'O que foi agora?'],
+    topics: [
+      { id: 'ci_minhocao', label: 'Como é viver debaixo do viaduto?', lines: [
+        ['N', 'Lá em cima passa carro voador o dia inteiro. Aqui embaixo passa gente. A gente se ajuda: quem tem feijão divide, quem tem lona empresta.'],
+        ['N', 'A polícia desce de vez em quando pra tirar barraca. A gente monta de novo no dia seguinte.'],
+      ] },
+      { id: 'ci_synapse', label: 'Essa pulseira no seu pulso...', lines: [
+        ['N', '*Ela esconde o pulso na manga.* Fui voluntária. Mil créditos, há dez anos. Primeira leva de chip.'],
+        ['N', 'Eu tive sorte: só esqueci uns anos. Tem gente que esqueceu tudo. Esses vão pra clínica lá do Lado Sombra.'],
+        ['I', 'A Synapse testa os chips aqui embaixo e cuida das sobras lá do outro lado da cidade.'],
+      ] },
+      { id: 'ci_tico', label: 'Você conhece o Tico?', lines: [
+        ['N', 'O Tico? Menino bom. Conserta o rádio de todo mundo de graça. Ultimamente anda com crédito novo no bolso.'],
+        ['N', 'Crédito novo aqui embaixo, moço, sempre vem de lá de cima.'],
+      ] },
+    ],
+    present: {},
+    presentDefault: ['Isso aí eu não conheço, moço.', 'Aqui embaixo a gente não vê essas coisas.', 'Pergunta pro Tico, ele entende de máquina.'],
+  },
+  caio: {
+    name: 'Dr. Caio Mendes', role: 'Médico renegado da Santa Rita', look: 'caio',
+    scan: { text: 'Licença médica cassada em 2079, segundo o registro público. Óculos de diagnóstico de modelo militar. Mãos firmes, olhos de quem não dorme.' },
+    intro: 'Doutor Caio. Ou só Caio, desde que o conselho me cassou. Aqui ninguém pergunta pela licença: perguntam se a dor vai passar. Em que posso ajudar, detetive?',
+    again: ['Detetive.', 'Seja rápido, tenho um paciente em crise.', 'Mais perguntas?'],
+    topics: [
+      { id: 'ca_clinica', label: 'O que é a Santa Rita?', lines: [
+        ['N', 'Uma clínica de reabilitação neural para quem a cidade jogou fora. Gente que vendeu a cabeça para teste de chip e voltou vazia.'],
+        ['N', 'A gente tenta religar as memórias. Às vezes volta o nome. Às vezes volta o rosto de um filho. Às vezes não volta nada.'],
+      ] },
+      { id: 'ca_maya', label: 'A Dra. Lin trabalha aqui?', lines: [
+        ['N', 'Ela financia metade da clínica. Traz equipamento que nenhum de nós conseguiria comprar.'],
+        ['N', 'Ela diz que é para consertar o que a Synapse quebrou. Eu acho que é culpa. As duas coisas podem ser verdade.'],
+        ['N', 'Ontem ela passou a noite na estação de compilação. Nem tirou o jaleco.'],
+      ] },
+      { id: 'ca_cassado', label: 'Por que cassaram sua licença?', lines: [
+        ['N', 'Eu atendi um doador da Synapse sem autorização da empresa. O chip dele era propriedade intelectual. A cabeça dele, pelo jeito, também.'],
+        ['I', 'Em Neo-Sampa, até a memória tem dono.'],
+      ] },
+    ],
+    present: {
+      e_codigo_letal: [['N', '*Ele empalidece.* Isso não é reabilitação. Isso é o contrário. Quem escreveu isso sabe onde fica cada neurônio para desligar.']],
+      e_maya_saida: [['N', 'Ela chegou aqui às 22:41, sim. E não dormiu. Eu passei pela estação de compilação três vezes: ela não tirou os olhos da tela.']],
+    },
+    presentDefault: ['Isso é assunto de polícia, não de médico.', 'Não reconheço.', 'Pergunte à Irmã-7. Ela registra tudo.'],
+  },
   lyra: {
     name: 'Lyra Vance', role: 'Diretora executiva da Synapse Corp', look: 'lyra',
     scan: { text: 'Implantes oculares simétricos de alta patente. As fibras ópticas do terno estão vermelhas: estresse alto. Batimentos acelerados toda vez que alguém diz "registros".' },
@@ -368,7 +518,7 @@ Object.assign(NPCS, {
         ['N', 'Um sujeito de chapéu holográfico, dente de cromo. Todo mundo chama de Corretor. Ele bate ponto no Clube 14 Bis.'],
         ['N', 'E o código da rotina veio pronto, doutor. Num pente de memória. Eu só instalei.'],
         { give: 'e_oficina' },
-        { tram: 'ns_clube' },
+        { tram: 'ns_zetubo' },
       ] },
       { id: 'ti_cobaias', label: 'O que você sabe dos testes de chips?', lines: [
         ['N', 'A Synapse manda recrutador aqui toda semana. Mil créditos por voluntário. O povo vai.'],
@@ -622,11 +772,11 @@ const ECO = {
   },
   // destinos do aerotrem: sala de chegada e o nome na lista
   TRAM: {
-    setor4: { name: 'Setor 4 (Av. Corporativa)', room: 'city' },
-    ns_hall: { name: 'Neo-Sampa Tower — Setor Paulista', room: 'ns_hall', at: [2, 1] },
+    setor4: { name: 'Sector 4 (Av. Alvorada)', room: 'city', at: [16, 18] },
+    setor7: { name: 'Sector 7 — Distrito Industrial', room: 'city7', at: [25, 28] },
+    ns_hall: { name: 'Setor Paulista — Neo-Sampa Tower', room: 'city_paulista', at: [45, 23] },
     ns_minhocao: { name: 'Baixo Minhocão — Subnível 4', room: 'ns_minhocao', at: [2, 1] },
-    ns_zetubo: { name: 'Bixiga — Bar do Zé do Tubo', room: 'ns_zetubo', at: [2, 1] },
-    ns_clube: { name: 'Clube 14 Bis — A Província dos Drones', room: 'ns_clube', at: [2, 1] },
+    ns_zetubo: { name: 'Bixiga (Bar do Zé, Clube 14 Bis)', room: 'city_bixiga', at: [25, 28] },
     ns_clinica: { name: 'Lado Sombra — Clínica Santa Rita', room: 'ns_clinica', at: [2, 1] },
     ns_nucleo: { name: 'Neo-Sampa Tower — Núcleo de Processamento', room: 'ns_nucleo', at: [2, 1] },
   },
@@ -651,7 +801,8 @@ function tramUnlock(id) {
   toast(`<span class="k">AEROTREM</span> ${T('Nova parada: {0}', T(ECO.TRAM[id].name))}`, 'ev');
   saveGame();
 }
-function tramKnown(id) { return id === 'setor4' || id === 'ns_hall' || !!game.flags['tram_' + id]; }
+// Sector 4 e Sector 7 estão sempre na linha; os distritos de Neo-Sampa só existem no caso 2
+function tramKnown(id) { return id === 'setor4' || id === 'setor7' || (game.caseId === 'eco' && (id === 'ns_hall' || !!game.flags['tram_' + id])); }
 
 // a estação: lista as paradas liberadas
 function openTram() {
@@ -662,7 +813,15 @@ function openTram() {
 function tramTravel(id) {
   const d = ECO.TRAM[id];
   Sound.play('door');
-  if (d.room === 'city') { const [x, y] = CITY.map(16.5, 18); enterRoom('city', [Math.floor(x), Math.floor(y)]); }
+  if (ROOMS[d.room].city) {
+    const [x, y] = ROOMS[d.room].cityObj.map(...d.at);
+    enterRoom(d.room, [Math.floor(x), Math.floor(y)]);
+    // a parada pode ter um poste ou uma banca em cima: desce no chão livre mais próximo
+    const p = game.player;
+    for (let r = 1; r < 5 && blocked(p.x, p.y); r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++)
+      if (blocked(p.x, p.y) && !blocked(Math.floor(x) + dx, Math.floor(y) + dy)) { p.x = p.px = Math.floor(x) + dx; p.y = p.py = Math.floor(y) + dy; }
+    updateCamera(game.roomData, p.px + 0.5, p.py + 0.5, 0, true);
+  }
   else enterRoom(d.room, d.at);
   toast(`<span class="k">AEROTREM</span> ${T(d.name)}`, 'room');
   if (id === 'ns_nucleo' && !game.flags.wipe_on && !has('e_log_nucleo')) { game.flags.wipe_on = true; game.flags.wipe = ECO.WIPE; saveGame(); }
@@ -746,7 +905,6 @@ function ecoResolve(killer, second) {
 function ecoInteract(o) {
   const S = game.scanner;
   switch (o.key) {
-    case 'aerotrem': case 'estacao_aerotrem': return openTram();
     case 'hotel_fechado': return message('Hotel Grand Alvorada', 'A porta está lacrada com fita da perícia: "CENA DE CRIME — CASO PENDELTON". As viaturas continuam na frente, com o giroflex ligado.\n\nO caso Alvorada ainda está no tribunal. Hoje, o trabalho de Vance é em Neo-Sampa.');
     case 'kaelen':
       if (S && give('e_porta_neural')) return message('Porta neural — scanner', 'O scanner amplia a interface da nuca de Kaelen: micro-arranhões frescos de um conector Kessler, de pente de memória físico.\n\nAlguém plugou um dispositivo direto na cabeça dele, e depois o tirou.\n\nO quarto não estava fechado para coisas que andam.');
@@ -840,6 +998,55 @@ function ecoProp(o, t, w, d, cx, cy) {
       ctx.fillStyle = '#26262e'; ctx.beginPath(); ctx.ellipse(sx, sy, 2.4 * k, 3 * k, 0, 0, Math.PI * 2); ctx.fill();
       const [s2x, s2y] = iso(o.x + 0.85, cy, 16);
       ctx.beginPath(); ctx.ellipse(s2x, s2y, 1.6 * k, 2 * k, 0, 0, Math.PI * 2); ctx.fill();
+      return true;
+    }
+    case 'pillar': {         // pilar de concreto do viaduto, pichado, com marcas de infiltração
+      box(o.x + 0.12, o.y + 0.12, 0.76, 0.76, 74, '#4a4a4e', 0, '#3a3a3e');
+      const [sx, sy] = iso(o.x + 0.88, cy, 0), [lx, ly] = iso(o.x + 0.5, o.y + 0.88, 0);
+      const tags = [['#ff4fd8', 'VIVE'], ['#7dff6b', 'Z€RO'], ['#ffd23f', 'SP'], ['#38f6ff', 'FOME'], ['#ff6a2a', 'Ñ ESQUEÇA']];
+      const [tc, tx2] = tags[(o.x * 7 + o.y) % tags.length];
+      ctx.save(); ctx.font = '700 4px "Chakra Petch", sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = rgba(tc, 0.75);
+      ctx.fillText(T(tx2), lx, ly - 12); ctx.restore();
+      ctx.fillStyle = 'rgba(20,30,20,0.35)'; ctx.fillRect(sx - 1.5, sy - 70, 1, 50);   // escorrido de infiltração
+      for (let k = 0; k < 2; k++) { const f = ((t * 0.9 + k * 0.5 + o.x * 0.17) % 1); ctx.fillStyle = 'rgba(160,200,255,0.6)'; ctx.fillRect(sx - 1.3, sy - 70 + f * 66, 0.6, 1.5); }   // goteira
+      return true;
+    }
+    case 'beam': {           // viga do viaduto lá em cima, de pilar a pilar (o tabuleiro da via expressa)
+      box(o.x, o.y + 0.05, w, 0.9, 7, '#38383c', 66, '#2a2a2e');
+      const [ax, ay] = iso(o.x, o.y + 0.95, 66), [bx, by] = iso(o.x + w, o.y + 0.95, 66);
+      line([[ax, ay], [bx, by]], 'rgba(255,210,63,0.35)', 0.5);
+      for (let u = 1; u < w; u += 3) { const [lx, ly] = iso(o.x + u, o.y + 0.95, 66); ctx.fillStyle = Math.sin(t * 2 + u) > 0.6 ? '#ff6a2a' : '#5a3a20'; ctx.fillRect(lx - 0.6, ly + 0.5, 1.2, 1.2); }   // luminárias de serviço
+      return true;
+    }
+    case 'tent': {           // barraca de lona de morador de rua
+      const col = o.col || ['#2a5a8a', '#6a2a2a', '#3a6a3a', '#8a6a2a'][(o.x + o.y) % 4];
+      const A = iso(o.x + 0.08, o.y + 0.9, 0), B = iso(o.x + 0.92, o.y + 0.9, 0), C = iso(o.x + 0.92, o.y + 0.1, 0), D = iso(o.x + 0.08, o.y + 0.1, 0), Tp = iso(o.x + 0.5, o.y + 0.9, 11), Tb = iso(o.x + 0.5, o.y + 0.1, 11);
+      poly(ctx, [D, Tb, Tp, A], shade(col, 0.7)); poly(ctx, [Tb, C, B, Tp], col);
+      poly(ctx, [A, Tp, B], shade(col, 0.45));
+      const [mx, my] = iso(o.x + 0.5, o.y + 0.9, 3); ctx.fillStyle = '#0a0a0e'; ctx.beginPath(); ctx.moveTo(mx - 2, my + 2); ctx.lineTo(mx, my - 4); ctx.lineTo(mx + 2, my + 2); ctx.fill();
+      return true;
+    }
+    case 'mattress': {       // colchão velho ou papelão, com cobertor
+      box(o.x + 0.1, o.y + 0.15, w - 0.2, d - 0.3, 1.5, '#7a6a4a', 0, '#8a7a5a');
+      box(o.x + 0.15, o.y + 0.5, w - 0.3, d - 0.65, 1, o.col || '#5a2a3a', 1.5, shade(o.col || '#5a2a3a', 1.2));
+      return true;
+    }
+    case 'patient_bed': {    // leito de clínica com o paciente deitado e monitor ao lado
+      box(o.x + 0.1, o.y + 0.1, w - 0.2, d - 0.2, 5, '#c8ccd4', 0, '#e8ecf0');
+      drawLying(o.x + w / 2, o.y + 0.28, 6.2, o.look || 'paciente1', t, { len: 1.6, zzz: !!o.sleep, pose: 'sleep' });
+      box(o.x + 0.15, o.y + 0.75, w - 0.3, d - 0.95, 1.4, '#9ab8c8', 6, '#b8d4e0');   // lençol
+      const [mx, my] = iso(o.x + 0.1, o.y + 0.25, 14);
+      ctx.fillStyle = '#0a1410'; ctx.fillRect(mx - 3, my - 2, 6, 4);
+      ctx.strokeStyle = '#7dff6b'; ctx.lineWidth = 0.4; ctx.beginPath();
+      for (let k = 0; k <= 10; k++) { const ph = (t * 1.6 + k / 10) % 1, yy = my + (ph > 0.45 && ph < 0.55 ? -1.5 : 0.5); k ? ctx.lineTo(mx - 2.6 + k * 0.52, yy) : ctx.moveTo(mx - 2.6, yy); }
+      ctx.stroke();
+      return true;
+    }
+    case 'iv_stand': {       // suporte de soro
+      const [bx, by] = iso(cx, cy, 0);
+      line([[bx, by], [bx, by - 20]], '#8a8e96', 0.5); line([[bx - 2, by], [bx + 2, by]], '#8a8e96', 0.5);
+      ctx.fillStyle = 'rgba(200,240,255,0.7)'; ctx.fillRect(bx - 1.2, by - 20, 2.4, 4);
+      line([[bx, by - 16], [bx + 3, by - 8]], 'rgba(200,240,255,0.5)', 0.3);
       return true;
     }
     case 'tram_stop': {      // ponto do aerotrem: totem com o mapa da linha e um letreiro holográfico

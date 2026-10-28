@@ -4,7 +4,7 @@
 
 const Intro = (() => {
   const W = 640, H = 360;            // espaço virtual das cenas
-  let cv, c, raf = 0, idx = 0, sceneStart = 0, done = null, running = false;
+  let cv, c, raf = 0, idx = 0, sceneStart = 0, done = null, running = false, fullText = false;
 
   const ease = x => x < 0 ? 0 : x > 1 ? 1 : x * x * (3 - 2 * x);
   const lerp = (a, b, k) => a + (b - a) * k;
@@ -368,21 +368,26 @@ const Intro = (() => {
     const ph = photo(setId === 'alvorada' ? `img/intro/${idx + 1}.jpg` : `img/intro/${setId}_${idx + 1}.jpg`);
     if (ph) { c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.imageSmoothingEnabled = true; drawCover(c, ph, cv.width, cv.height, 1 + 0.08 * Math.min(1, t / s.dur)); c.restore(); }
     else s.draw(t, Math.min(1, t / s.dur));
-    // transição pelo preto
-    const fade = Math.max(1 - t / 0.7, 1 - (s.dur - t) / 0.7, 0);
+    // entrada pelo preto (a cena fica parada no fim até o jogador avançar)
+    const fade = Math.max(1 - t / 0.7, 0);
     if (fade > 0) { c.fillStyle = `rgba(0,0,0,${Math.min(1, fade)})`; c.fillRect(-W, -H, W * 3, H * 3); }
     // vinheta
     const v = c.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, W * 0.7);
     v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)');
     c.fillStyle = v; c.fillRect(0, 0, W, H);
     // legenda digitada
-    const chars = Math.floor(Math.max(0, t - 0.6) * 38);
-    $('intro-caption').textContent = T(s.text).slice(0, chars);
-    if (t >= s.dur) next();
+    const txt = T(s.text), chars = fullText ? txt.length : Math.floor(Math.max(0, t - 0.6) * 38);
+    $('intro-caption').textContent = txt.slice(0, chars);
+    const ready = chars >= txt.length;
+    if (ready) fullText = true;
+    $('intro-next').textContent = ready ? '▶ ' + T('toque para continuar') : '';
     raf = requestAnimationFrame(frame);
   }
 
+  // toque / tecla: primeiro completa a legenda; com ela completa, vai para a próxima cena
   function next() {
+    if (!fullText) { fullText = true; return; }
+    fullText = false;
     idx++;
     if (idx >= SCENES.length) return finish();
     sceneStart = performance.now();
@@ -399,7 +404,7 @@ const Intro = (() => {
   function play(onDone, startIdx = 0, offset = 0, set = 'alvorada') {
     setId = SETS[set] ? set : 'alvorada'; SCENES = SETS[setId];
     cv = $('intro-canvas'); c = cv.getContext('2d');
-    done = onDone; idx = startIdx; running = true;
+    done = onDone; idx = startIdx; running = true; fullText = false;
     sceneStart = performance.now() - offset * 1000;
     show('intro');
     Sound.setMusic('intro');

@@ -686,10 +686,11 @@ async function langTests() {
     const errs = [];
     w.addEventListener('error', e => errs.push(e.message));
     if (!w.I18N_DATA) { ok(false, `${lang}: tradução não carregou`); continue; }
-    const title = w.document.getElementById('btn-start').textContent, hud = w.document.getElementById('btn-ev').textContent;
+    w.localStorage.removeItem('alvorada_save_v1'); w.renderCaseList();
+    const title = w.document.querySelector('#case-list .case-card button').textContent, hud = w.document.getElementById('btn-ev').textContent;
     const [a, b] = LANG_CHECK[lang];
     ok(!/Novo caso|Abrir o caso/.test(title) && hud.includes(b), `${lang}: tela de título e HUD traduzidos ("${title.trim()}", "${hud.trim()}")`);
-    w.document.getElementById('btn-start').click(); await sleep(200);
+    w.document.querySelector('#case-list .case-card button').click(); await sleep(200);
     w.Intro.skip(); w.document.getElementById('card').click(); w.finishTyping();
     const msg = w.document.getElementById('msg-text').textContent;
     ok(msg && !/Meia-noite|Suíte 404\. A chuva/.test(msg), `${lang}: mensagem inicial traduzida ("${msg.slice(0, 50)}…")`);
@@ -795,9 +796,10 @@ async function questTest(w) {
   ok(g().roomId === 'tunnels', 'missão: com a credencial, a porta leva aos túneis');
 }
 
+const caseBtn = (w, re, k = 0) => { w.renderCaseList && w.renderCaseList(); const c = w.document.querySelectorAll('#case-list .case-card')[k]; return c && [...c.querySelectorAll('button')].find(b => re.test(b.textContent)); };   // botões do caso k na tela de título
 async function saveLoad(w) {
   w.localStorage.removeItem('alvorada_save_v1');
-  w.document.getElementById('btn-start').click();
+  caseBtn(w, /./).click();
   await sleep(300);
   ok(w.Intro.isRunning() && w.game.modal === 'intro', 'introdução animada toca ao abrir um caso novo');
   w.Intro.next(); ok(w.Intro.isRunning(), 'toque avança para a próxima cena');
@@ -808,18 +810,18 @@ async function saveLoad(w) {
   const s = JSON.parse(w.localStorage.getItem('alvorada_save_v1'));
   ok(s && s.roomId === 'corridor' && s.evidence.length === 2, 'save automático gravado ao trocar de sala');
   w.document.getElementById('menu-title').click();
-  ok(!w.document.getElementById('btn-continue').classList.contains('hidden'), 'botão Continuar aparece no título');
-  w.document.getElementById('btn-continue').click();
+  ok(!!caseBtn(w, /Continuar/), 'botão Continuar aparece no título');
+  caseBtn(w, /Continuar/).click();
   ok(w.game.roomId === 'corridor' && w.has('e_taca') && w.game.flags.teste && w.game.seen.has('t_ronda'), 'continuar restaura sala, evidências, flags e tópicos');
   w.enterRoom('city', w.eval('CITY').map(15, 17));
   const pc = w.playerCar(); pc.cx = 28.5; pc.cy = 22.5; pc.ang = Math.PI / 2; w.invalidateGrid(w.ROOMS.city); w.saveGame();
-  w.document.getElementById('menu-title').click(); w.document.getElementById('btn-continue').click();
+  w.document.getElementById('menu-title').click(); caseBtn(w, /Continuar/).click();
   ok(w.game.roomId === 'city' && Math.abs(w.playerCar().cx - 28.5) < 0.01 && Math.abs(w.playerCar().cy - 22.5) < 0.01, 'ao retomar, o carro está onde foi estacionado');
   w.setZoom(160); ok(w.VH === 160, 'zoom muda a resolução interna');
   // salvar dentro de uma loja e continuar
   const front = w.ROOMS.city.objects.find(o => w.shopOf(o));
   w.interact(front); w.closeModal(); w.game.bag.agua = 2; w.saveGame();
-  w.document.getElementById('menu-title').click(); w.document.getElementById('btn-continue').click(); w.closeModal();
+  w.document.getElementById('menu-title').click(); caseBtn(w, /Continuar/).click(); w.closeModal();
   ok(w.game.roomId.startsWith('loja_') && w.game.roomData.name === front.name && w.game.bag.agua === 2, 'continuar o jogo dentro de uma loja mantém a loja e a mochila');
   w.interact(w.game.roomData.objects.find(o => o.shopExit));
   ok(w.game.roomId === 'city', 'depois de continuar, a saída da loja leva de volta à rua');

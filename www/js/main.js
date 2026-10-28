@@ -150,7 +150,7 @@ function continueGame(caseId = 'alvorada') {
   if (!ROOMS[room]) { room = caseId === 'eco' ? 'ns_hall' : 'suite'; at = caseId === 'eco' ? [2, 1] : [4, 6]; }
   if (room.startsWith('loja_') && !applyShopCtx()) { room = 'city'; at = CITY.map(15, 17); }
   enterRoom(room, at, true);
-  if (blocked(game.player.x, game.player.y)) enterRoom(room, room === 'city' ? CITY.map(15, 17) : [2, 1], true);
+  if (blocked(game.player.x, game.player.y)) enterRoom(room, ROOMS[room].city ? ROOMS[room].cityObj.map(...(ROOMS[room].spawn || [15, 17])) : [2, 1], true);
   if (room === 'city' && s.driving) { const c = playerCar(); game.player.px = c.cx - 0.5; game.player.py = c.cy - 0.5; enterCar(c); }
   if (s.gps && DESTINATIONS[s.gps]) game.gps = { dest: s.gps, path: null, timer: 0, info: null };
   updateHud();
@@ -159,6 +159,7 @@ function continueGame(caseId = 'alvorada') {
 
 function enterRoom(id, at, silent) {
   const from = game.roomId;
+  if (ROOMS[id] && ROOMS[id].city) activateCity(id);
   if (from === 'lobby' && id !== 'lobby') endGathering();
   game.roomId = id;
   game.roomData = ROOMS[id];
@@ -169,12 +170,12 @@ function enterRoom(id, at, silent) {
   if (!silent) game.inputLock = true;
   roomAgents(game.roomData);
   updateCamera(game.roomData, p.px + 0.5, p.py + 0.5, 0, true);
-  document.body.classList.toggle('in-city', id === 'city');
+  document.body.classList.toggle('in-city', !!ROOMS[id].city);
   game.place = '';
-  Sound.setRoom(id === 'city' && CITY.inCT(p.x, p.y) ? 'chinatown' : id);
+  Sound.setRoom(ROOMS[id].city ? (CITY.inCT(p.x, p.y) ? 'chinatown' : 'city') : id);
   if (!silent) {
     Sound.play((from === 'lobby' && id === 'corridor') || (from === 'corridor' && id === 'lobby') ? 'elevator' : 'door');
-    toast(`<b>${id === 'city' ? CITY.placeName(p.x, p.y) : game.roomData.name}</b>`, 'room');
+    toast(`<b>${ROOMS[id].city ? CITY.placeName(p.x, p.y) : game.roomData.name}</b>`, 'room');
     saveGame();
   }
   updateHud();
@@ -397,7 +398,7 @@ function objective() {
   return 'Revise as deduções e faça a acusação em Pistas.';
 }
 
-function placeLabel() { return game.roomId === 'city' ? CITY.placeName(game.player.x, game.player.y) : game.roomData ? game.roomData.name : ''; }
+function placeLabel() { return inCity() ? CITY.placeName(game.player.x, game.player.y) : game.roomData ? game.roomData.name : ''; }
 
 function updateHud() {
   if (!game) return;
@@ -409,7 +410,7 @@ function updateHud() {
 }
 
 function updateGpsLine() {
-  const el = $('gps-line'), info = game.gps && game.roomId === 'city' && game.gps.info;
+  const el = $('gps-line'), info = game.gps && inCity() && game.gps.info;
   el.classList.toggle('hidden', !info);
   if (info) el.innerHTML = `<span class="gps-arrow">${info.arrow}</span> ${info.text}`;
 }
@@ -571,6 +572,7 @@ const OBJ_TEXT = {
 
 function interact(o) {
   const S = game.scanner;
+  if (o.key === 'aerotrem' || o.key === 'estacao_aerotrem' || o.key === 'porta_plataforma') return openTram();
   if (game.caseId === 'eco') { const r = ecoInteract(o); if (r !== false) return r; }
   switch (o.key) {
     case 'corpo':
@@ -679,7 +681,7 @@ function interact(o) {
       if (o.needFlag && !game.flags[o.needFlag]) return message(o.name, o.lockedMsg);
       if (o.need === 'towel' && game.outfit !== 'towel') return message('Onsen', 'Hana avisou: do vestiário para dentro, só de toalha.\n\n(Troque de roupa nos armários do vestiário.)');
       if (o.need === 'clothes' && game.outfit === 'towel') return message('Vestiário', 'Sair só de toalha para a recepção? A Hana não ia gostar. Nem a chuva ácida lá fora.\n\n(Vista suas roupas nos armários.)');
-      return enterRoom(o.to, o.to === 'city' ? CITY.map(...o.at) : o.at);
+      return enterRoom(o.to, ROOMS[o.to] && ROOMS[o.to].city ? ROOMS[o.to].cityObj.map(...o.at) : o.at);
     case 'term_recepcao':
       if (!has('e_recepcao_log')) return message('Terminal da recepção', 'Registros de acesso e chaves mestras. Protegido por criptografia corporativa.', [
         { label: 'Invadir o terminal', fn: () => { closeModal(); openHack('TERMINAL DA RECEPÇÃO — REGISTROS ADM', () => { give('e_recepcao_log'); message('Registro da chave mestra', 'Credencial ADM-02 — titular: VICTOR ROSSI.\n\nÚltimo uso: 23:20 — LOCK SUITE_404 — origem: terminal T-03 (túneis de manutenção, subsolo).'); }); } },
@@ -966,15 +968,15 @@ function actOn(tg) {
 // objeto ou personagem sob o ponto da tela (unidades de jogo)
 function pickAt(x, y) {
   let best = null, bestDepth = -1e9;
-  const test = (tg, cx, cy, halfW, tall, depth) => {
-    const [sx, sy] = iso(cx, cy);
+  const test = (tg, cx, cy, halfW, tall, depth, z = floorZ(cx, cy)) => {
+    const [sx, sy] = iso(cx, cy, z);
     if (x >= sx - halfW && x <= sx + halfW && y >= sy - tall && y <= sy + 6 && depth > bestDepth) { best = tg; bestDepth = depth; }
   };
   for (const o of game.roomData.objects) {
     if (!o.key || o.kind === 'puddle' || (o.hidden && !game.scanner)) continue;
     const [x0, y0, x1, y1] = objBox(o), w = x1 - x0, d = y1 - y0;
     const tall = o.kind === 'exit' || o.kind === 'shopfront' ? 40 : o.solid ? 28 : 10;
-    test({ obj: o }, (x0 + x1) / 2, (y0 + y1) / 2, (w + d) * 8 * 0.6 + 2, tall, x1 + y1);
+    test({ obj: o }, (x0 + x1) / 2, (y0 + y1) / 2, (w + d) * 8 * 0.6 + 2, tall, x1 + y1, o.z || 0);
   }
   for (const n of npcsHere()) test({ npc: n }, n.fx + 0.5, n.fy + 0.5, 8, 32, n.fx + n.fy + 2.5);
   for (const w of game.roomData._walkers || []) test({ walker: w }, w.fx + 0.5, w.fy + 0.5, 7, 30, w.fx + w.fy + 2.4);
@@ -995,7 +997,9 @@ function handleTap(clientX, clientY) {
   if (game.player.seat) { standUp(); return; }
   const tg = pickAt(x, y);
   if (tg) return goTo(tg);
-  const [tx, ty] = screenToTile(x, y);
+  let [tx, ty] = screenToTile(x, y);
+  // toque no piso de um mezanino elevado: o tile está mais abaixo na grade do que parece na tela
+  for (let z = 4; z <= 48; z += 4) { const [ux, uy] = screenToTile(x, y + z); if (Math.abs(floorZ(ux + 0.5, uy + 0.5) - z) < 6 && floorZ(ux + 0.5, uy + 0.5) > 0) { [tx, ty] = [ux, uy]; break; } }
   if (!solidAt(game.roomData, tx, ty)) goTo({ tile: [tx, ty] });
 }
 
@@ -1265,6 +1269,14 @@ function seatFront(o) {
   }
 }
 
+// altura do chão neste ponto da sala (mezanino e escadaria das estações elevadas)
+function floorZ(fx, fy) { return typeof elevAt === 'function' ? elevAt(game.roomId, fx, fy) : 0; }
+function lifted(fx, fy, fn) {
+  const z = floorZ(fx, fy);
+  if (!z) return fn();
+  ctx.save(); ctx.translate(0, -z); fn(); ctx.restore();
+}
+
 function render() {
   const room = game.roomData, t = game.t, S = game.scanner;
   beginFrame();
@@ -1295,7 +1307,8 @@ function render() {
     if (city && !onScreen(b[0], b[1], b[2], b[3], o.kind === 'paifang' || o.kind === 'lantern_line' ? 50 : 40)) continue;
     let bb = b;
     if (o.kind === 'partition' || o.kind === 'paifang' || o.kind === 'lantern_line' || o.kind === 'tape') bb = o.axis === 'y' ? [o.x + 0.45, o.y, o.x + 0.55, o.y + (o.d || 1)] : [o.x, o.y + 0.45, o.x + (o.w || 1), o.y + 0.55];
-    ents.push({ b: bb, d: bb[2] + bb[3] - 1, draw: () => { drawObject(o, t, S); drawOccupants(o, t); } });
+    const lift = o.z || 0;   // objetos em cima de um mezanino elevado
+    ents.push({ b: bb, d: bb[2] + bb[3] - 1 - (o.kind === 'st_floor' || o.kind === 'st_step' ? 0.5 : 0), draw: () => { if (lift) { ctx.save(); ctx.translate(0, -lift); } drawObject(o, t, S); drawOccupants(o, t); if (lift) ctx.restore(); } });
   }
   if (city) {
     // prédios na frente de Vance ficam transparentes
@@ -1311,17 +1324,17 @@ function render() {
       ctx.save(); ctx.translate(0, -c.rise); drawHoverCar(c.x, c.y, Math.atan2(c.dy, c.dx), t + c.x, { livery: c.livery }); ctx.restore();
     } }); }
   }
-  npcsHere().forEach(n => ents.push({ b: [n.fx + 0.3, n.fy + 0.3, n.fx + 0.7, n.fy + 0.7], d: n.fx + n.fy + 1, draw: () => drawNpc(n, t) }));
+  npcsHere().forEach(n => ents.push({ b: [n.fx + 0.3, n.fy + 0.3, n.fx + 0.7, n.fy + 0.7], d: n.fx + n.fy + 1, draw: () => lifted(n.fx + 0.5, n.fy + 0.5, () => drawNpc(n, t)) }));
   for (const w of room._walkers || []) {
     if (w.seatObj || (city && !onScreen(w.fx, w.fy, w.fx + 1, w.fy + 1, 40))) continue;
-    ents.push({ b: [w.fx + 0.3, w.fy + 0.3, w.fx + 0.7, w.fy + 0.7], d: w.fx + w.fy + 1, draw: () => drawWalker(w, t) });
+    ents.push({ b: [w.fx + 0.3, w.fy + 0.3, w.fx + 0.7, w.fy + 0.7], d: w.fx + w.fy + 1, draw: () => lifted(w.fx + 0.5, w.fy + 0.5, () => drawWalker(w, t)) });
   }
   if (game.driving) {
     const c = game.car;
     const cb = carBox(c.x, c.y, c.ang);
     ents.push({ b: cb, d: cb[2] + cb[3] - 1, draw: () => drawHoverCar(c.x, c.y, c.ang, t, { livery: 'vance', alt: carAlt(c) }) });
   } else if (!p.seat) {
-    ents.push({ b: [p.px + 0.3, p.py + 0.3, p.px + 0.7, p.py + 0.7], d: p.px + p.py + 1.01, draw: () => drawPlayer(t) });
+    ents.push({ b: [p.px + 0.3, p.py + 0.3, p.px + 0.7, p.py + 0.7], d: p.px + p.py + 1.01, draw: () => lifted(p.px + 0.5, p.py + 0.5, () => drawPlayer(t)) });
   }
   if (C && C.enemy.alpha > 0) {
     const e = C.enemy;
@@ -1334,7 +1347,7 @@ function render() {
   }
   depthSort(ents).forEach(e => e.draw());
 
-  const ps = iso(p.px + 0.5, p.py + 0.5);
+  const ps = iso(p.px + 0.5, p.py + 0.5, floorZ(p.px + 0.5, p.py + 0.5));
   drawLighting(city ? { dark: room.dark, lights: cityLights() } : room, t, ps, game.flash);
 
   if (S) {
@@ -1370,7 +1383,7 @@ function render() {
 function cityLights() {
   const out = [];
   const near = (x, y) => { const [sx, sy] = iso(x, y); return sx > -80 && sx < VW + 80 && sy > -80 && sy < VH + 80; };
-  for (const o of ROOMS.city.objects) if (o.light) {
+  for (const o of game.roomData.objects) if (o.light) {
     const x = o.cx !== undefined ? o.cx : o.x + (o.w || 1) / 2, y = o.cy !== undefined ? o.cy : o.y + (o.d || 1) / 2;
     if (near(x, y)) out.push({ x, y, ...o.light });
   }
@@ -1621,6 +1634,11 @@ const GATHER_SPOTS = { victor: [6, 6], evelyn: [7, 5], helena: [9, 5], tomas: [1
 
 function askGather() {
   closeModal();
+  // o caso 2 não tem reunião no lobby do hotel: a acusação é feita direto
+  if (game.caseId === 'eco') return message('Acusação', 'Está pronto para fazer a acusação?', [
+    { label: 'Fazer a acusação', fn: () => { closeModal(); openAccuse(); } },
+    { label: 'Ainda não', fn: () => { closeModal(); openPalace(); } },
+  ]);
   message('Acusação', 'Reunir todos no lobby?', [
     { label: 'Sim, reunir todos', fn: gatherInLobby },
     { label: 'Ainda não', fn: () => { closeModal(); openPalace(); } },

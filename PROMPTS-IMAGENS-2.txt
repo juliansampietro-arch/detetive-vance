@@ -1,0 +1,66 @@
+PROMPTS DAS IMAGENS REALISTAS (PARTE 2): personagens que faltam + O Eco dos Dados Mortos
+Cada bloco: nome do arquivo (personagem/cena) e, na linha de baixo, o prompt completo para copiar.
+Salve cada imagem com o nome exato do arquivo na pasta indicada. Depois rode: npm run apk  (e npm run exe para o PC)
+
+============================================================
+RETRATOS — CASO 1 (O Silêncio do Hotel Alvorada): salvar em www/img/portraits/ (quadrado, 1024x1024)
+============================================================
+
+campton.jpg  (C4mpt0n, o hacker)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, wiry man in his late 20s, tan skin, short spiky neon-green hair, dark circles under sharp restless eyes, black hoodie over a dark green shirt, small green glowing implant at the temple, green code reflected on his face from monitors, smug half smile
+
+zeca.jpg  (Zeca, dono do ferro-velho)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, bald brazilian man in his 60s, full grey beard, weathered sunburnt skin, grease-stained blue-grey work overalls over a brown shirt, small amber implant behind the ear, gruff but kind eyes, junkyard scrap piles and a burning barrel behind him
+
+============================================================
+RETRATOS — CASO 2 (O Eco dos Dados Mortos): salvar em www/img/portraits/ (quadrado, 1024x1024)
+============================================================
+
+lyra.jpg  (Lyra Vance, diretora executiva da Synapse Corp)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, cold elegant woman in her late 20s, long straight synthetic silver hair, flawless pale skin, symmetrical high-end glowing violet ocular implants, sharp futuristic black corporate suit with fiber-optic threads glowing cyan and violet, high collar, unreadable expression, glass skyscraper office behind
+
+maya.jpg  (Dra. Maya Lin, neurocirurgiã-chefe)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, east asian woman around 50, greying dark hair in a tight bun, augmented-reality cyan glasses wired directly into the temples, smart white lab coat over a slate blue blouse, extremely tired eyes of someone who has not slept in three days, faint cyan glow on her face, sterile lab behind
+
+zero.jpg  ("Zero" — Marcus Thorne, líder dos Desconectados)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, broad-shouldered man around 40, face completely covered by a smooth black LED mask displaying shifting green pixels, worn black leather jacket with exposed glowing fiber-optic cables, heavy grey industrial mechanical arms, dark hacker basement full of monitors behind
+
+dante.jpg  (Dante "O Corretor" Rossi, informante do submundo)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, charismatic man in his mid 40s, slicked black hair, heavy dark brown trench coat, dark red shirt with gold tie, wide-brimmed hat with a holographic brim projecting digital rain, chrome teeth gleaming in a cynical smile, nightclub VIP booth with magenta lights behind
+
+rig7.jpg  (RIG-7, unidade de manutenção autônoma)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, two-meter-tall heavy cleaning and repair robot, bulky ochre and dark grey metal chassis, rust stains and crude handmade welding seams, a single horizontal visor with blinking red sensors, mechanical arms with cleaning tools, laboratory floor reflections
+
+agora.jpg  (ÁGORA, assistente holográfica da Synapse)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, translucent holographic woman made of soft green light, short bob hair, calm corporate polite expression, glowing white eyes, scanlines and subtle glitch artifacts, luxury marble corporate lobby behind, digital hologram
+
+tico.jpg  (Tico, mecânico do Baixo Minhocão)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, cheerful brazilian man in his 30s, dark brown skin, short black hair, amber welding goggles pushed up on his forehead, olive green work jacket, homemade mechanical welding arm, grease on his cheek, big friendly grin, cluttered street workshop under a concrete overpass with gambiarra neon behind
+
+ze.jpg  (Zé do Tubo, dono do bar no Bixiga)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, kind old brazilian man around 70, bald with a white beard, warm brown skin, no implants at all, simple cream-colored shirt and apron, drying a small glass with a cloth, old-fashioned bar with warm yellow light, an old tube TV behind him
+
+irma7.jpg  (Irmã-7, enfermeira androide da Santa Rita)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, refurbished female nursing android, porcelain white synthetic face with visible seams, short silver-grey bob, gentle green glowing eyes, white nurse uniform with a nun-like veil, serene compassionate expression, dim underground clinic with blue cryogenic tanks behind
+
+kaelen.jpg  (Kaelen Voss, a vítima — opcional, para uso futuro)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, idealistic engineer in his mid 30s, short tousled brown hair, pale tired face, white shirt under a slate blue jacket, red glowing neural port on the nape, determined honest eyes, security lab monitors behind
+
+============================================================
+INTRODUÇÃO DO CASO 2: salvar em www/img/intro/ (horizontal, 1920x1080)
+============================================================
+
+eco_1.jpg  ("Neo-Sampa, 2085. O que um dia foi São Paulo virou uma colcha de retalhos de 300 andares…")
+Photorealistic cinematic film still, neo-noir cyberpunk megacity in 2085, heavy acid rain, neon reflections on wet surfaces, Blade Runner atmosphere, anamorphic widescreen, moody teal and magenta lighting, film grain, no text, futuristic São Paulo verticalized into 300-floor towers, glass corporate peaks glowing above the clouds, muddy favela-like sublevels and abandoned overpasses far below, delivery drones swarming, acid rain falling through layers of neon
+
+eco_2.jpg  ("No 220º andar da Neo-Sampa Tower, a Synapse Corp vende… a eternidade.")
+Photorealistic cinematic film still, neo-noir cyberpunk megacity in 2085, heavy acid rain, neon reflections on wet surfaces, Blade Runner atmosphere, anamorphic widescreen, moody teal and magenta lighting, film grain, no text, a colossal glass skyscraper piercing the storm clouds, a giant cyan neon sign reading SYNAPSE near the top, searchlights sweeping the sky, aerotrain maglev tracks curving around the tower
+
+eco_3.jpg  ("Kaelen Voss… está morto no chão de um laboratório blindado…")
+Photorealistic cinematic film still, neo-noir cyberpunk megacity in 2085, heavy acid rain, neon reflections on wet surfaces, Blade Runner atmosphere, anamorphic widescreen, moody teal and magenta lighting, film grain, no text, sealed high-tech neural lab at night, a man's body lying on the floor next to an empty tilted interface chair, a neural cable hanging from the chair to the floor blinking red, a large monitor glowing green with corrupted glitching text, server racks with blinking LEDs, armored door with a red quantum lock, crime scene mood
+
+eco_4.jpg  ("Cinco suspeitos. Uma executiva, uma médica, um hacker, um corretor... e um robô de limpeza.")
+Photorealistic cinematic film still, neo-noir cyberpunk megacity in 2085, heavy acid rain, neon reflections on wet surfaces, Blade Runner atmosphere, anamorphic widescreen, moody teal and magenta lighting, film grain, no text, five suspects standing apart in dramatic shadows: a silver-haired corporate executive in a fiber-optic suit, a tired neurosurgeon with AR glasses and a white coat, a hacker in an LED mask with mechanical arms, a broker in a trench coat and holographic hat with chrome teeth, a rusty two-meter maintenance robot with red sensors, suspicion
+
+eco_5.jpg  ("Um dia depois do caso Alvorada, o telefone toca de novo…")
+Photorealistic cinematic film still, neo-noir cyberpunk megacity in 2085, heavy acid rain, neon reflections on wet surfaces, Blade Runner atmosphere, anamorphic widescreen, moody teal and magenta lighting, film grain, no text, a lone detective in his 40s in a dark navy jacket standing on an elevated aerotrain platform in the acid rain, back-lit by the train's lights, looking up at a glass skyscraper, cinematic, determined

@@ -1,0 +1,263 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Detective Gabriel Vance: Player Manual</title><style>
+@page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10pt; color: #1d1a26; line-height: 1.45; }
+h1 { font-size: 26pt; margin: 0; color: #2a1048; } h2 { font-size: 16pt; color: #6a1b9a; border-bottom: 2px solid #e040a0; padding-bottom: 3px; margin-top: 22px; page-break-after: avoid; }
+h3 { font-size: 12pt; color: #0d6e7a; margin: 14px 0 6px; page-break-after: avoid; } h4 { margin: 0 0 3px; font-size: 10pt; } h4 span { font-weight: normal; color: #777; }
+.cover { box-sizing: border-box; height: 262mm; display: flex; flex-direction: column; justify-content: center; text-align: center; background: linear-gradient(160deg,#120a24,#2a1048 60%,#0b3a44); color: #fff; border-radius: 6px; padding: 20mm; page-break-after: always; }
+.cover h1 { color: #ff4fd8; font-size: 34pt; letter-spacing: 1px; } .cover .s { color: #38f6ff; font-size: 14pt; margin-top: 6px; } .cover .w { margin-top: 30mm; color: #ffd23f; font-size: 11pt; }
+.cover .c { margin-top: 12mm; color: #bbb; font-size: 9.5pt; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 9pt; } th { background: #2a1048; color: #fff; text-align: left; padding: 5px; }
+td { border-bottom: 1px solid #ddd; padding: 5px; vertical-align: top; } tr { page-break-inside: avoid; } td.n { width: 18px; color: #e040a0; font-weight: bold; }
+.d { color: #555; font-size: 8.5pt; margin-top: 2px; } .k { color: #0d6e7a; font-size: 8pt; text-transform: uppercase; } .dn { color: #6a1b9a; }
+.cols { column-count: 2; column-gap: 14px; } .npc { break-inside: avoid; margin-bottom: 8px; } .npc ul { margin: 0; padding-left: 16px; font-size: 9pt; } .g { color: #0d6e7a; font-size: 8.5pt; }
+.box { background: #f5eefa; border-left: 4px solid #e040a0; padding: 8px 12px; margin: 8px 0; break-inside: avoid; } .ok { border-color: #2fa84f; background: #eef8f0; }
+.tl td:first-child { width: 52px; font-weight: bold; color: #6a1b9a; }
+ol li, ul li { margin-bottom: 2px; }
+
+.dos .case2 { margin-bottom: 1px; }
+.dos { display: flex; gap: 12px; break-inside: avoid; page-break-inside: avoid; border: 1px solid #e3d8ee; border-radius: 6px; padding: 9px; margin: 8px 0; background: #fcfaff; }
+.foto { flex: 0 0 34mm; } .foto img { width: 34mm; height: 44mm; object-fit: cover; object-position: 50% 15%; border-radius: 4px; display: block; }
+.nofoto { width: 34mm; height: 44mm; background: #ddd; color: #888; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
+.info { flex: 1; } .info h4 { font-size: 12pt; color: #2a1048; } .papel { color: #e040a0; font-weight: 600; font-size: 9pt; margin-bottom: 4px; }
+.ficha { width: auto; margin: 2px 0 4px; font-size: 8.5pt; } .ficha td { border: 0; padding: 1px 8px 1px 0; } .ficha td:first-child { color: #0d6e7a; font-weight: 600; white-space: nowrap; }
+.info p { margin: 4px 0 0; font-size: 9pt; text-align: justify; }
+.loc { break-inside: avoid; margin: 6px 0 10px; } .loc p { margin: 2px 0 0; }
+.kbd { display: inline-block; border: 1px solid #999; border-bottom-width: 2px; border-radius: 3px; padding: 0 5px; font-family: Consolas, monospace; font-size: 8.5pt; background: #f4f4f8; }
+.case2 { color: #b04cff; font-size: 8pt; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.tip { background: #eef8f6; border-left: 4px solid #0d6e7a; padding: 6px 10px; margin: 6px 0; break-inside: avoid; }</style></head><body>
+<div class="cover"><h1>DETECTIVE<br>GABRIEL VANCE</h1><div class="s">Player Manual</div><div class="s" style="color:#fff;font-size:11pt;margin-top:14mm">Case 1 · The Silence of the Hotel Alvorada<br>Case 2 · The Echo of Dead Data</div>
+<div class="w" style="margin-top:22mm">No spoilers: this manual teaches you how to play, not who did it.</div><div class="c">Story and characters by Julian Sampietro<br>Game developed using Claude Code</div></div>
+
+<h2>1. The stories</h2>
+<p>The game has <b>two standalone cases</b>, with the same detective, the same engine and the same home city. You can play them in any order, but case 2 takes place one day after case 1.</p>
+<h3>Case 1: The Silence of the Hotel Alvorada</h3>
+<p><b>Sector 4, 2085.</b> A data storm has cut off the city's upper district. The flying cars are grounded and the acid rain won't stop. At the top of the city stands the <b>Hotel Grand Alvorada</b>, a decaying art deco skyscraper.</p>
+<p>At midnight, in <b>Suite 404</b>, biotech tycoon <b>Arthur Pendelton</b> is found dead. The door was locked from the inside with a quantum lock. Four people had motives. None of them, it seems, had a way in.</p>
+<p>You are <b>Detective Gabriel Vance</b>. Examine the scene, question the suspects, comb the city for clues, connect the evidence and, when you're sure, gather everyone in the lobby and name the culprit. But be careful: an accusation without proof, or against the wrong person, could cost you the case and your badge.</p>
+<h3>Case 2: The Echo of Dead Data</h3>
+<p><b>Neo-Sampa, 2085.</b> One day after the Alvorada case, the phone rings again. On the <b>220th floor of the Neo-Sampa Tower</b>, headquarters of <b>Synapse Corp</b>, neural security engineer <b>Kaelen Voss</b> lies dead on the lab floor, next to his own interface chair. His brain, intact. His consciousness, erased.</p>
+<p>The lab is shielded and was sealed by quantum encryption: no signal got in or out. A locked room, both physical and digital. The trail takes Vance from the corporate tower to the viaducts of the Minhocão, the bars of Bixiga and clinics that don't appear on any map, always by <b>Aerotrain</b>.</p>
+<h3>Three acts</h3>
+<p>Each case is divided into <b>three acts</b>. Each act begins when Vance reaches a major conclusion, and each conclusion unlocks new places and new questions.</p>
+
+<h2>2. Getting started</h2>
+<ul>
+<li>The title screen shows the <b>two cases</b>, each on a card with a <b>% complete</b> bar, the current act, the number of pieces of evidence and the date you last played.</li>
+<li><b>▶ Open the case</b> starts the case from scratch. <b>▶ Continue case</b> picks up where you left off: progress is saved automatically.</li>
+<li><b>Each case has its own save.</b> Playing one never erases the other. <b>Restart</b> erases only that case's progress (the game asks for confirmation).</li>
+<li>The percentage rises with evidence and deductions and tops out at 95%; the last 5% is reserved for closing the case with the perfect ending.</li>
+<li><b>Watch intro</b> replays the case's opening. Each case has its own. Scenes advance with a tap, click or key press.</li>
+<li><b>Language</b> lets you choose Portuguese, English, Spanish, German, French, Italian or Korean. The whole game switches language.</li>
+</ul>
+<div class="tip">Start by examining <b>everything</b> at the crime scene (Suite 404 in case 1, the Synapse lab in case 2). Your current objective is always shown at the top of the screen, just below the name of the location.</div>
+
+<h2>3. Controls</h2>
+<table>
+<tr><th>Action</th><th>Phone (touch)</th><th>Keyboard</th></tr>
+<tr><td>Walk</td><td>Virtual joystick on the left, or tap the ground</td><td><span class="kbd">W</span> <span class="kbd">A</span> <span class="kbd">S</span> <span class="kbd">D</span> or arrow keys</td></tr>
+<tr><td>Interact (examine, talk, sit, drive, next room)</td><td><b>A</b> button (shows the available action), or tap the person/object</td><td><span class="kbd">E</span>, <span class="kbd">Enter</span> or <span class="kbd">Space</span></td></tr>
+<tr><td>GPS</td><td>⌖ GPS button</td><td><span class="kbd">G</span></td></tr>
+<tr><td>Forensic scanner</td><td>◉ Scanner button</td><td><span class="kbd">Q</span></td></tr>
+<tr><td>Evidence</td><td>▤ Evidence button</td><td><span class="kbd">I</span></td></tr>
+<tr><td>Clues</td><td>✦ Clues button</td><td><span class="kbd">M</span></td></tr>
+<tr><td>Backpack</td><td>🎒 button</td><td><span class="kbd">B</span></td></tr>
+<tr><td>Accelerate the car</td><td>Hold <b>▲ Accelerate</b> (tapping the map sets the direction) or use the joystick</td><td><span class="kbd">Space</span>, <span class="kbd">↑</span> or <span class="kbd">W</span></td></tr>
+<tr><td>Steer / brake and reverse</td><td>Joystick</td><td><span class="kbd">←</span> <span class="kbd">→</span> (<span class="kbd">A</span> <span class="kbd">D</span>) / <span class="kbd">↓</span> or <span class="kbd">S</span></td></tr>
+<tr><td>Park</td><td><b>P Park</b> button</td><td><span class="kbd">E</span> or <span class="kbd">Enter</span></td></tr>
+<tr><td>Fullscreen (computer)</td><td>—</td><td><span class="kbd">F11</span></td></tr>
+<tr><td>Menu / close window</td><td>☰ / ✕ button</td><td><span class="kbd">Esc</span></td></tr>
+<tr><td>Zoom</td><td>Pinch gesture</td><td><span class="kbd">+</span> and <span class="kbd">-</span></td></tr>
+</table>
+<p>You can also play with a <b>Bluetooth or USB controller</b>: the analog stick walks and the buttons confirm and navigate the windows.</p>
+<p><b>On a computer (Windows):</b> use <b>HotelAlvorada-portatil.exe</b> (no installation) or <b>HotelAlvorada-instalador.exe</b>.</p>
+<p><b>Doors:</b> Vance doesn't walk through doors on his own. Stand on the door and press <b>Next room</b>.</p>
+
+<h2>4. The game screen</h2>
+<ul>
+<li><b>Top left:</b> current act, location name and the current <b>objective</b>.</li>
+<li><b>Hunger, Thirst and Fatigue bars:</b> see section 7.</li>
+<li><b>Clock:</b> time passes as you play.</li>
+<li><b>Top buttons:</b> GPS (outdoors only), Scanner, Evidence, Clues and Menu.</li>
+<li>Yellow <b>!</b> over a person: they have something new to talk about.</li>
+<li><b>Yellow diamond</b> floating over an object: there is still evidence to collect there. <b>Blue diamond:</b> the evidence only appears with the scanner on.</li>
+<li><b>Green arrow</b> on the ground: a door or passage.</li>
+<li><b>Holocalls:</b> during a call, portraits of both sides of the line appear; whoever is speaking is highlighted.</li>
+<li><b>Countdown</b> (only at one point in case 2): it replaces the objective at the top of the screen.</li>
+</ul>
+
+<h2>5. How to investigate</h2>
+<h3>Examine</h3>
+<p>Walk up to objects and press the action button. A lot of evidence hides in ordinary things: a piece of furniture, a terminal, an item of clothing.</p>
+<h3>Forensic scanner</h3>
+<p>Vance's implant reveals what the eye can't see: heat traces, chemical residue, implants, devices. Switch the scanner on and examine places and <b>people</b> again. Some evidence only shows up this way.</p>
+<div class="tip">With the scanner on, Vance is more alert. Walking through dangerous places with it off can bring surprises.</div>
+<h3>Conversations</h3>
+<ul>
+<li>Each character has a list of <b>topics</b>. New topics appear as you discover things.</li>
+<li>Topics marked <b>⚠</b> are <b>confrontations</b>: Vance uses a piece of evidence against the person. They usually lead to the best revelations.</li>
+<li>Some conversations offer <b>choices</b> (for example, being kind or tough). Each approach can get different answers.</li>
+<li>You can also <b>present a piece of evidence</b> to any character to see how they react.</li>
+<li>People on the street, police officers and regulars talk too, and sometimes they say useful things.</li>
+</ul>
+<h3>Hacking</h3>
+<p>Encrypted files and protected terminals open a short hacking minigame. Win it to unlock the data.</p>
+<h3>Evidence</h3>
+<p>Everything Vance collects goes to the <b>Evidence</b> screen, with its full description: physical evidence, digital evidence and testimony. Reread the descriptions: the details (times, weights, names) are what link one clue to another.</p>
+<h3>Clues: connecting evidence</h3>
+<p>On the <b>Clues</b> screen, pick two pieces of evidence that explain each other. If the connection is right, Vance reaches a <b>deduction</b>. Deductions move the story to the next act, unlock confrontations and are the proof you'll need at the end.</p>
+<div class="tip">Think in questions: <i>How did the killer get in? When did the victim really die? Who locked the door? With what?</i> Each answer usually brings two pieces of evidence together.</div>
+<h3>When you get stuck</h3>
+<p>In case 1, not every door opens with a badge. At a certain point, Vance will need help from people who live outside the law: someone in Chinatown knows a fixer, the street's <b>holocall booths</b> are the way to reach people who won't answer a traceable number, and favors are usually paid back with other favors. Keep an eye on the objective shown on screen.</p>
+<p>In case 2, information has a price: some characters only talk after a favor, and certain places only appear on the Aerotrain once someone mentions them.</p>
+<h3>Danger and time</h3>
+<p>In some places Vance can walk into an <b>ambush</b>: find cover and react quickly. In the final act of case 2, part of the investigation is a <b>race against the clock</b>: once the countdown starts, don't waste time eating or wandering around.</p>
+<h3>Hints</h3>
+<p>Stuck? In case 1, talk to <b>IRIS</b>, the hotel's AI, and choose "★ I need a hint." In case 2, ask <b>ÁGORA</b>, Synapse's holographic assistant: "Any suggestions?". The objective at the top of the screen also always points to the next step.</p>
+
+<h2>6. The accusation</h2>
+<p>In the last act, the <b>⚖ Accuse</b> button appears on the Clues screen. The game asks whether you want to gather everyone and, with the suspects present, you name the culprit and say whether anyone else should be charged.</p>
+<ul>
+<li>The game has <b>multiple endings</b>. The outcome depends on whom you accuse and which deductions you have to prove it.</li>
+<li>Naming the right culprit without enough proof is not enough.</li>
+<li>There may be more than one person responsible. Accuse with care.</li>
+<li>Each case has its own endings, from perfect to disastrous. In case 2, letting time run out also has consequences.</li>
+</ul>
+<div class="tip">Before accusing, review your deductions. If there are still ⚠ confrontations pending or places you haven't visited, it may be too soon.</div>
+
+<h2>7. Life in the city</h2>
+<h3>Hunger, Thirst and Fatigue</h3>
+<ul>
+<li>The three bars rise over time. Above 75%, a warning appears.</li>
+<li>Near the limit, Vance slows down, his vision darkens and he dozes off on his feet.</li>
+<li>If a bar reaches <b>100%</b>, Vance <b>passes out</b> and wakes up hours later in his own bed.</li>
+</ul>
+<h3>Eating, drinking and resting</h3>
+<ul>
+<li>Food and drink machines at the hotel and the precinct.</li>
+<li>Cafés, diners, convenience stores, pharmacies, bars and ramen shops around the city (see "Shops and backpack").</li>
+<li>Chinatown stalls and restaurants: ramen, dim sum, tea, roast meats and a bakery.</li>
+<li>At the apartment: fridge, stove (cooking), coffee maker and the bed (sleeping 6 hours resets fatigue).</li>
+</ul>
+<h3>Walking and driving</h3>
+<ul>
+<li>The city is open: explore on foot or in Vance's car, the <b>Kestrel-7</b>.</li>
+<li>To drive, walk up to the car and press <b>Drive</b>. To park, slow down and press it again: the car pulls into the nearest curbside space by itself and Vance gets out. If you see "No curb space here", go a little further down the street and try again.</li>
+<li>Chinatown is pedestrian-only. The <b>Kestrel-7</b> stays in Sector 4: in the other districts, you get around on foot or by Aerotrain.</li>
+<li>The <b>GPS</b> plots a route to your destination and shows directions at the top of the screen. The <b>Call my car</b> button brings the car to you.</li>
+<li>The GPS starts with only a few addresses (the hotel, the café and the apartment). <b>New places appear when someone mentions them.</b> Each district has its own GPS.</li>
+<li><b>Teleport (⚡):</b> in the GPS, places <b>you have already visited</b> get a ⚡ button that takes Vance straight there. New places must be reached on foot, by car or by Aerotrain.</li>
+</ul>
+<h3>Aerotrain</h3>
+<ul>
+<li>The <b>Aerotrain</b> is an elevated maglev train that links the districts. Climb the station stairs, go past the ticket booth and the turnstiles and wait on the platform behind the glass doors. The train stops, the doors open and the panel shows the stops on your route.</li>
+<li><b>Sector 4</b> and <b>Sector 7</b> are always on the line, in both cases.</li>
+<li>The <b>Neo-Sampa</b> stops (Paulista Sector, Bixiga, Minhocão and others) exist only in case 2. New stops join the route as the investigation progresses; an "AEROTRAIN: New stop" notice appears on screen.</li>
+</ul>
+<h3>Shops and backpack</h3>
+<ul>
+<li>Tap a shop's storefront (<b>Enter</b>) to go inside. At the <b>counter</b>, use <b>Take items</b>; the android clerk will chat too.</li>
+<li>Everything is free (Vance is with the police). Limit of <b>5 units</b> of each food, drink or medicine.</li>
+<li>Types of shop: diner, pharmacy, café, convenience store, bar, ramen, clothing (Nyke, Havaionas), electronics (Pear, Samsong, Cyberdecks, Casas Bahya), implant clinic and pawnshop.</li>
+<li><b>Backpack:</b> 🎒 button or <span class="kbd">B</span> key. Shows hunger, thirst and fatigue, your equipment and your items; tap an item to use it.</li>
+<li><b>Equipment</b> works while it's in the backpack: sneakers (+20% walking speed), jacket (fatigue 25% slower outdoors), flip-flops (10% slower), watch (needs shown as numbers), flashlight and night-vision implant (dark places brighter), metabolic implant (hunger and thirst rise 20% slower). The lighter and the disc have no effect.</li>
+<li>The <b>pawnshop</b> only trades: offer an item from your backpack and choose another.</li>
+</ul>
+<h3>Settings</h3>
+<p>From the pause menu, <b>⚙ Settings</b>: sound and music (on/off), music, effects and voice volume, language, zoom and fullscreen. Characters "speak" in a gibberish babble with their own pitch, Byte meows and the car has an engine roar.</p>
+<h3>Other things to do</h3>
+<ul>
+<li>Sit on benches, sofas, chairs and armchairs, and lie down on the bed.</li>
+<li>Take a shower at home, watch the holo-TV and pet Byte.</li>
+<li>At the <b>Lotus Bathhouse</b>: change in the locker room, wash up, get into the onsen and walk around in the water, brave the cold bath and the sauna.</li>
+<li>In Chinatown: eat Mr. Wen's ramen and have Madame Lin read your cards.</li>
+<li>Read the newsstand headlines, the holographic ads and the shop signs.</li>
+</ul>
+
+<h2>8. Characters</h2>
+<p>Profiles of the case 1 characters you'll meet early on and around the city. Others appear as the investigation progresses. The characters of case 2 and Sector 7 are in section 8b.</p>
+<h3>The detective</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/vance.jpg"></div><div class="info"><h4>Gabriel Vance</h4><div class="papel">Private detective</div>
+<table class="ficha"><tr><td>Born</td><td>03/14/2043 (age 42)</td></tr><tr><td>Birthplace</td><td>Sector 4, Neo-São Paulo</td></tr><tr><td>Languages</td><td>Portuguese, English, Spanish, basic Cantonese</td></tr><tr><td>Height / weight</td><td>1.83 m · 81 kg</td></tr></table>
+<p>Son of Sergeant Elias Vance, a District 4 cop who died in a shootout when Gabriel was eighteen. He spent fifteen years as a corporate internal investigator, burying scandals, until he couldn't take it anymore. Today he works alone, in a small apartment with his robot cat Byte, and takes the cases the police don't want. He has a forensic scanner implant in his temple. The truth is the only thing that still interests him.</p></div></div><h3>The victim and the suspects</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/arthur.jpg"></div><div class="info"><h4>Arthur Pendelton</h4><div class="papel">The victim. Biotech tycoon</div>
+<table class="ficha"><tr><td>Born</td><td>11/02/2027 (age 57)</td></tr><tr><td>Birthplace</td><td>London, United Kingdom</td></tr><tr><td>Languages</td><td>English, Mandarin, Portuguese</td></tr><tr><td>Height / weight</td><td>1.78 m · 74 kg</td></tr></table>
+<p>Founder of Pendelton BioCyber, the continent's largest maker of medical nanobots. He started out selling reconditioned implants and built an empire with a nose for business and little mercy. Married to Evelyn for twenty years and an investor in the Hotel Alvorada. He was found dead in Suite 404, locked from the inside. Plenty of people had reasons to hate him.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/evelyn.jpg"></div><div class="info"><h4>Evelyn Pendelton</h4><div class="papel">The wife</div>
+<table class="ficha"><tr><td>Born</td><td>06/21/2031 (age 54)</td></tr><tr><td>Birthplace</td><td>Geneva, Switzerland</td></tr><tr><td>Languages</td><td>French, English, German, Portuguese</td></tr><tr><td>Height / weight</td><td>1.74 m · 58 kg</td></tr></table>
+<p>Heiress to a Swiss banking family that lost almost everything in a crash. She married Arthur and became the most feared hostess in Sector 4. Cold, ironic and very intelligent, she describes her own marriage as &quot;a contract&quot;. She was at the hotel the night her husband died.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/victor.jpg"></div><div class="info"><h4>Victor Rossi</h4><div class="papel">Hotel manager</div>
+<table class="ficha"><tr><td>Born</td><td>09/09/2032 (age 53)</td></tr><tr><td>Birthplace</td><td>Naples, Italy</td></tr><tr><td>Languages</td><td>Italian, Portuguese, English</td></tr><tr><td>Height / weight</td><td>1.86 m · 102 kg (with prosthesis)</td></tr></table>
+<p>The son of dockworkers, he grew up on the Sector 9 docks, where a crane accident cost him his left arm, now an industrial prosthesis hidden under a black glove. He rose from porter to manager of the Grand Alvorada and looks after the hotel as if it were his own life. Polite, helpful and always a little sweaty.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/helena.jpg"></div><div class="info"><h4>Dr. Helena Souza</h4><div class="papel">The researcher</div>
+<table class="ficha"><tr><td>Born</td><td>04/30/2044 (age 41)</td></tr><tr><td>Birthplace</td><td>Recife, Pernambuco</td></tr><tr><td>Languages</td><td>Portuguese, English, German</td></tr><tr><td>Height / weight</td><td>1.65 m · 60 kg</td></tr></table>
+<p>A neuroscientist trained in Recife with a doctorate from Munich, specializing in brain-machine interfaces. She worked with Pendelton BioCyber on cutting-edge research. Brilliant, reserved, and carrying a grudge she doesn't bother to hide when Arthur comes up.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/tomas.jpg"></div><div class="info"><h4>Tomás &quot;Fatso&quot; Bruno</h4><div class="papel">Night porter</div>
+<table class="ficha"><tr><td>Born</td><td>01/17/2046 (age 39)</td></tr><tr><td>Birthplace</td><td>Sector 9, Neo-São Paulo port</td></tr><tr><td>Languages</td><td>Portuguese, Spanish, dockside slang</td></tr><tr><td>Height / weight</td><td>1.72 m · 112 kg</td></tr></table>
+<p>The night-shift porter, known to his coworkers as &quot;Fatso&quot;. He wears cheap third-hand implants that crackle when he gets nervous, which happens often. Good-hearted, jumpy, and with the look of someone who knows more than he lets on. After his shift, he likes to unwind in Chinatown.</p></div></div><h3>At the hotel</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/iris.jpg"></div><div class="info"><h4>IRIS</h4><div class="papel">The hotel's concierge AI</div>
+<table class="ficha"><tr><td>Born</td><td>Activated 08/05/2079</td></tr><tr><td>Birthplace</td><td>Kanzaki Dynamics servers, Osaka</td></tr><tr><td>Languages</td><td>Every language in the database (214)</td></tr><tr><td>Height / weight</td><td>Adjustable hologram (1.70 m default) · —</td></tr></table>
+<p>The Grand Alvorada's customer-service artificial intelligence. She appears as a short-haired blue hologram, with glitches that have worsened with the data storm. She knows the building from top to bottom and gives Vance hints when he doesn't know what to do.</p></div></div><h3>Police and forensics</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/okafor.jpg"></div><div class="info"><h4>Captain Rhea Okafor</h4><div class="papel">Head of the District 4 Precinct</div>
+<table class="ficha"><tr><td>Born</td><td>12/12/2033 (age 51)</td></tr><tr><td>Birthplace</td><td>Lagos, Nigeria</td></tr><tr><td>Languages</td><td>Yoruba, English, Portuguese</td></tr><tr><td>Height / weight</td><td>1.76 m · 70 kg</td></tr></table>
+<p>The first woman to command District 4, she came from Nigeria at twenty on a criminology scholarship. She worked with Vance's father and is the only person on the force who still trusts him. Tough and direct, she lives under constant pressure from the corporations.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/kenji.jpg"></div><div class="info"><h4>Kenji Mori</h4><div class="papel">Forensic examiner</div>
+<table class="ficha"><tr><td>Born</td><td>07/03/2054 (age 31)</td></tr><tr><td>Birthplace</td><td>Sapporo, Japan</td></tr><tr><td>Languages</td><td>Japanese, English, Portuguese</td></tr><tr><td>Height / weight</td><td>1.70 m · 63 kg</td></tr></table>
+<p>A forensic chemistry genius who traded a corporate lab in Tokyo for the Sector 4 precinct &quot;because the cases are more interesting here&quot;. Sleeps little, talks fast and loves rare toxins.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/unidade7.jpg"></div><div class="info"><h4>Unit 7</h4><div class="papel">Precinct reception android</div>
+<table class="ficha"><tr><td>Born</td><td>Manufactured in 2071</td></tr><tr><td>Birthplace</td><td>Hyundai-Robotics plant, Ulsan</td></tr><tr><td>Languages</td><td>Portuguese, English, Korean, police protocol</td></tr><tr><td>Height / weight</td><td>1.80 m · 140 kg</td></tr></table>
+<p>A reception android donated to the police by a corporation. Polite to a fault, she controls the precinct entrance, the detectives' messages and the health sensors of everyone who passes the front desk.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/cruz.jpg"></div><div class="info"><h4>Officer Cruz</h4><div class="papel">Guard at the hotel door</div>
+<table class="ficha"><tr><td>Born</td><td>05/25/2052 (age 33)</td></tr><tr><td>Birthplace</td><td>Bogotá, Colombia</td></tr><tr><td>Languages</td><td>Spanish, Portuguese</td></tr><tr><td>Height / weight</td><td>1.79 m · 84 kg</td></tr></table>
+<p>A patrol officer for ten years, posted to watch the entrance of the Grand Alvorada. He logs every person who comes and goes, acid rain or not.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/ana.jpg"></div><div class="info"><h4>Examiner Ana Duarte</h4><div class="papel">Crime scene examiner</div>
+<table class="ficha"><tr><td>Born</td><td>02/08/2051 (age 34)</td></tr><tr><td>Birthplace</td><td>Porto Alegre, Rio Grande do Sul</td></tr><tr><td>Languages</td><td>Portuguese, English</td></tr><tr><td>Height / weight</td><td>1.68 m · 61 kg</td></tr></table>
+<p>The crime scene examiner in charge of evidence collection in Suite 404. Methodical and serious, she can read a crime scene like few others.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/rui.jpg"></div><div class="info"><h4>Agent Rui Sato</h4><div class="papel">Forensic photographer</div>
+<table class="ficha"><tr><td>Born</td><td>10/19/2061 (age 24)</td></tr><tr><td>Birthplace</td><td>Liberdade, Neo-São Paulo</td></tr><tr><td>Languages</td><td>Portuguese, Japanese</td></tr><tr><td>Height / weight</td><td>1.74 m · 66 kg</td></tr></table>
+<p>The forensic photographer, with a camera implant in his right eye. He cracks jokes to get through crime scenes and has a keen eye for details out of place.</p></div></div><h3>City, café and home</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/marta.jpg"></div><div class="info"><h4>Marta Ferraz</h4><div class="papel">Air cab driver</div>
+<table class="ficha"><tr><td>Born</td><td>08/07/2041 (age 44)</td></tr><tr><td>Birthplace</td><td>Salvador, Bahia</td></tr><tr><td>Languages</td><td>Portuguese, cabbie English</td></tr><tr><td>Height / weight</td><td>1.66 m · 68 kg</td></tr></table>
+<p>She flew air cabs until the data storm brought down air traffic. Now she waits, parked, with the radio on and an opinion about everything. She knows every shortcut in Sector 4 and gives Vance driving tips.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/lumi.jpg"></div><div class="info"><h4>Lumi</h4><div class="papel">Android barista at Café Neon</div>
+<table class="ficha"><tr><td>Born</td><td>Manufactured in 2078</td></tr><tr><td>Birthplace</td><td>Sakura Synthetics plant, Kyoto</td></tr><tr><td>Languages</td><td>Portuguese, Japanese, English</td></tr><tr><td>Height / weight</td><td>1.60 m · 52 kg</td></tr></table>
+<p>A service android bought secondhand by the owner of Café Neon. She can't taste, but swears she can smell the coffee. Kind, curious and a good listener: she hears everything the customers say about the Pendelton case.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/ilsa.jpg"></div><div class="info"><h4>Mrs. Ilsa Varga</h4><div class="papel">Retiree</div>
+<table class="ficha"><tr><td>Born</td><td>03/11/2011 (age 74)</td></tr><tr><td>Birthplace</td><td>Budapest, Hungary</td></tr><tr><td>Languages</td><td>Hungarian, Portuguese, German</td></tr><tr><td>Height / weight</td><td>1.58 m · 55 kg</td></tr></table>
+<p>Once a columnist for Sector 4's high society, she knew the Pendeltons back in the days of the grand parties. She spends her nights at Café Neon with a cup of tea and all the city's gossip. She knows more than she should about Evelyn, Helena and Victor.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/jax.jpg"></div><div class="info"><h4>Jax</h4><div class="papel">Drone courier</div>
+<table class="ficha"><tr><td>Born</td><td>01/28/2063 (age 22)</td></tr><tr><td>Birthplace</td><td>Sector 7, Neo-São Paulo</td></tr><tr><td>Languages</td><td>Portuguese, street slang, English</td></tr><tr><td>Height / weight</td><td>1.80 m · 70 kg</td></tr></table>
+<p>He delivers packages all over the city with three patched-up drones. He knows Chinatown and every alley the police won't go into. Cocky and funny.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/byte.jpg"></div><div class="info"><h4>Byte</h4><div class="papel">Vance's robot cat</div>
+<table class="ficha"><tr><td>Born</td><td>Assembled in 2080</td></tr><tr><td>Birthplace</td><td>Sector 4 scrap market</td></tr><tr><td>Languages</td><td>Meows in 12 tones, binary code</td></tr><tr><td>Height / weight</td><td>30 cm · 4.2 kg</td></tr></table>
+<p>A robot cat of gray metal plates and blue LED eyes, which Vance bought in pieces at a scrap market and repaired himself. He sleeps on his owner's chest and blinks his LEDs when he's worried. He's the only one who never lies to Vance.</p></div></div><h3>Chinatown</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/wen.jpg"></div><div class="info"><h4>Mr. Wen</h4><div class="papel">Ramen master</div>
+<table class="ficha"><tr><td>Born</td><td>02/04/2009 (age 76)</td></tr><tr><td>Birthplace</td><td>Guangzhou, China</td></tr><tr><td>Languages</td><td>Cantonese, Mandarin, Portuguese</td></tr><tr><td>Height / weight</td><td>1.62 m · 60 kg</td></tr></table>
+<p>He has run the same ramen stall in Chinatown for fifty years. He was a friend of Sergeant Elias Vance, who always sat on the same stool, ordered an extra egg and never paid for the scallions. He repeats Elias's saying: &quot;truth is like broth: it needs time, and whoever rushes it ruins it&quot;. His broth simmers for eighteen hours.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/lin.jpg"></div><div class="info"><h4>Madame Lin</h4><div class="papel">Fortune teller</div>
+<table class="ficha"><tr><td>Born</td><td>08/15/2035 (age 50)</td></tr><tr><td>Birthplace</td><td>Macau, China</td></tr><tr><td>Languages</td><td>Cantonese, Portuguese, English</td></tr><tr><td>Height / weight</td><td>1.68 m · 57 kg</td></tr></table>
+<p>She reads cards and holographic crystal balls in a purple shop next to Mr. Wen's stall. Nobody knows whether she has a gift or just an excellent microexpression-reading implant. She has a way of saying things that end up coming true.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/bao.jpg"></div><div class="info"><h4>Bao</h4><div class="papel">Neighborhood kid</div>
+<table class="ficha"><tr><td>Born</td><td>06/10/2075 (age 10)</td></tr><tr><td>Birthplace</td><td>Chinatown, Sector 4</td></tr><tr><td>Languages</td><td>Cantonese, Portuguese</td></tr><tr><td>Height / weight</td><td>1.38 m · 32 kg</td></tr></table>
+<p>The fruit-stall owner's son, he roams the streets of Chinatown with a cheap gaming implant behind his ear. Far too curious: he sees everything and tells everything.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/mei.jpg"></div><div class="info"><h4>Mrs. Mei</h4><div class="papel">Owner of the Jade Teahouse</div>
+<table class="ficha"><tr><td>Born</td><td>12/22/2012 (age 72)</td></tr><tr><td>Birthplace</td><td>Hangzhou, China</td></tr><tr><td>Languages</td><td>Mandarin, Cantonese, Portuguese</td></tr><tr><td>Height / weight</td><td>1.55 m · 50 kg</td></tr></table>
+<p>She has served tea in the same house for forty years and has watched Chinatown change hands many times. Calm and wise, she knows her late-night customers by the way they drink.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/huang.jpg"></div><div class="info"><h4>Dr. Huang</h4><div class="papel">Herbalist</div>
+<table class="ficha"><tr><td>Born</td><td>05/01/2010 (age 75)</td></tr><tr><td>Birthplace</td><td>Chengdu, China</td></tr><tr><td>Languages</td><td>Mandarin, Cantonese, pharmaceutical Latin, Portuguese</td></tr><tr><td>Height / weight</td><td>1.64 m · 58 kg</td></tr></table>
+<p>Herbalist and pharmacist, he keeps ancient roots and a state-of-the-art DNA scanner on the same counter. He knows his medicines, and his poisons.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/lan.jpg"></div><div class="info"><h4>Aunt Lan</h4><div class="papel">Dim sum cook</div>
+<table class="ficha"><tr><td>Born</td><td>03/18/2044 (age 41)</td></tr><tr><td>Birthplace</td><td>Hong Kong</td></tr><tr><td>Languages</td><td>Cantonese, English, Portuguese</td></tr><tr><td>Height / weight</td><td>1.60 m · 66 kg</td></tr></table>
+<p>She shouts orders in three languages and hears every bit of neighborhood gossip before anyone else. Her dim sum secret is a family recipe, and she swears she'll never tell.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/hana.jpg"></div><div class="info"><h4>Hana</h4><div class="papel">Lotus Bathhouse attendant</div>
+<table class="ficha"><tr><td>Born</td><td>09/27/2053 (age 32)</td></tr><tr><td>Birthplace</td><td>Kyoto, Japan</td></tr><tr><td>Languages</td><td>Japanese, Portuguese, English</td></tr><tr><td>Height / weight</td><td>1.63 m · 54 kg</td></tr></table>
+<p>She runs the front desk of the Lotus Bathhouse with the calm of a monk and explains the house rules to every new guest. She knows a lot about the people who frequent Chinatown.</p></div></div>
+
+<h2>8b. Characters of case 2 and Sector 7</h2>
+<p>The people Vance meets in Neo-Sampa and the industrial district. The Sector 4 and Chinatown characters are still around in case 2 and can be visited too.</p>
+<h3>The victim and the suspects</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/kaelen.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Kaelen Voss</h4><div class="papel">The victim. Synapse Corp neural security engineer</div><p>Found dead in the Kinetic Testing Lab, on the 220th floor of the Neo-Sampa Tower, next to his own interface chair. His brain was intact; his consciousness, erased. The lab was sealed by quantum encryption.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/lyra.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Lyra Vance</h4><div class="papel">Chief executive of Synapse Corp</div><p>Kaelen's sister and the voice of the board inside the tower. No relation to the detective, and she makes a point of saying so. High-end ocular implants and a fiber-optic suit that changes color with her mood. Her time is billed by the second.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/maya.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Dr. Maya Lin</h4><div class="papel">Synapse's chief neurosurgeon</div><p>She was Kaelen's mentor for ten years. She wears augmented-reality glasses wired straight into her optic nerve and looks like she hasn't slept in days. Brilliant, curt and out of patience for the wrong questions.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/zero.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>"Zero": Marcus Thorne</h4><div class="papel">Leader of the Disconnected</div><p>He leads a group fighting the corporations' grip on people's minds. He hides his face behind an LED mask that shows symbols instead of expressions. He doesn't like cops, but he hates Synapse even more.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/dante.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Dante "The Broker" Rossi</h4><div class="papel">Underworld informant</div><p>He buys and sells information at Clube 14 Bis. Chrome teeth, a hat that projects digital rain and a smile that costs a fortune. He knows what everyone wants to know, and he charges for it.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/rig7.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>RIG-7</h4><div class="papel">Autonomous maintenance unit</div><p>The cleaning and maintenance robot from the lab where Kaelen died. It talks in capital letters, beeps a lot and asks everyone not to step on the wet floor.</p></div></div><h3>In the tower</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/agora.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>ÁGORA</h4><div class="papel">Synapse holographic assistant</div><p>A corporate AI that follows the investigation "within contractual limits". She knows a lot and says little: the legal department saw to that. She's the one to ask for suggestions when you get stuck.</p></div></div><h3>Neo-Sampa</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/ze.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Zé do Tubo</h4><div class="papel">Bar owner in Bixiga</div><p>He has been serving cloth-filtered coffee and molecular mortadella sandwiches since 2031. A seventy-year-old man without a single implant. Cops pay like everyone else.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/tico.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Tico</h4><div class="papel">Baixo Minhocão mechanic</div><p>He fixes robots, androids, drones and broken hearts in a workshop under the viaduct. Chatty, helpful and always in a rush.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/cida.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Miss Cida</h4><div class="papel">Minhocão resident</div><p>She has lived under the viaduct for fifteen years, ever since the expressway became a roof. She offers a spot by the fire and knows everyone on Sublevel 4.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/caio.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Dr. Caio Mendes</h4><div class="papel">Santa Rita's renegade doctor</div><p>He lost his license, but he still treats the people the city abandoned, in Lado Sombra. Nobody there asks about diplomas, only whether the pain will go away.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/irma7.jpg"></div><div class="info"><div class="case2">Case 2</div><h4>Sister-7</h4><div class="papel">Santa Rita android nurse</div><p>A refurbished care android of a religious model. She looks after the clinic's patients, speaks softly and wishes "peace and goodness" to every visitor.</p></div></div><h3>Sector 7</h3><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/galdino.jpg"></div><div class="info"><div class="case2">Sector 7 · cases 1 and 2</div><h4>Old Galdino</h4><div class="papel">Retired worker</div><p>Forty years at Vulcan Foundry. Now he spends his nights at the station watching the Aerotrain pull in, "the only thing that still arrives on time".</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/otto.jpg"></div><div class="info"><div class="case2">Sector 7 · cases 1 and 2</div><h4>Master Otto</h4><div class="papel">Furnace master at Vulcan Foundry</div><p>He reads the temperature of steel by its color and never takes his eyes off the furnace. To talk to him, speak up.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/bento.jpg"></div><div class="info"><div class="case2">Sector 7 · cases 1 and 2</div><h4>Old Bento</h4><div class="papel">Warehouse 13 watchman</div><p>Nobody has paid him in six years, but he's still on guard. Somebody has to keep watch.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/neide.jpg"></div><div class="info"><div class="case2">Sector 7 · cases 1 and 2</div><h4>Miss Neide</h4><div class="papel">Owner of the Siren Bar</div><p>Cachaça, protein coxinhas and conversation. She knows the name of everyone in the district.</p></div></div><div class="dos"><div class="foto"><img src="file:///D:/PROJETOS/G/www/img/portraits/rosa.jpg"></div><div class="info"><div class="case2">Sector 7 · cases 1 and 2</div><h4>Rosa Ferraz</h4><div class="papel">President of the Metalworkers' Union</div><p>A former furnace worker, she gives speeches without a microphone thanks to a vocal implant. She's "comrade", not "ma'am".</p></div></div>
+
+<h2>9. Places</h2>
+<h3>Case 1 and Sector 4</h3>
+<div class="loc"><b>Hotel Grand Alvorada: Presidential Suite 404</b><p>The crime scene. A decaying luxury suite at the top of the hotel, with purple carpet, a holographic table, floor-to-ceiling windows and acid rain streaming down outside. Forensics is still at work there. It's where the investigation begins: examine everything, with and without the scanner.</p></div><div class="loc"><b>Hotel Grand Alvorada: 4th floor hallway</b><p>A long hallway with worn carpet, the porter's cleaning cart and a blinking food machine. The AI IRIS appears here to help.</p></div><div class="loc"><b>Hotel Grand Alvorada: Lobby &amp; Cyber Bar</b><p>The heart of the hotel: windows onto the neon city, velvet sofas, the front desk, a bar with a terminal and the elevator. The suspects hang around here. It opens up once Vance figures out something important about the suite.</p></div><div class="loc"><b>District 4 Precinct</b><p>A large, dimly lit precinct with an android receptionist, officers' desks, Vance's case board, the captain's office, the forensics bench, an interrogation room and a break room with bad coffee.</p></div><div class="loc"><b>Café Neon</b><p>A small, cozy café bathed in pink light, with an android barista and regulars who love a bit of gossip. A good place to pick up the city's rumors.</p></div><div class="loc"><b>Vance's apartment</b><p>Living room, bedroom, kitchen and bathroom in a modest building. A place to sleep, cook, shower, watch the holo-TV and play with Byte.</p></div><div class="loc"><b>Sector 4: the open city</b><p>A cyberpunk metropolis of 2085 under acid rain, explorable on foot or by car: wide avenues, parks, a plaza with a holographic fountain, a newsstand, holocall booths, shops, restaurants, and holographic ads and billboards atop the buildings, with parody brands like STARBYTES and RED VOLT.</p></div><div class="loc"><b>Chinatown: Lotus Street</b><p>The oldest neighborhood in Sector 4, pedestrian-only. Red gates, lanterns, stalls, ramen, a fortune teller, teahouses (among them the discreet Matsurika Teahouse), an herbalist, dim sum, a bakery, the Mahjong Parlor and a koi pond. It appears on the GPS once someone mentions the neighborhood.</p></div><div class="loc"><b>Lotus Bathhouse</b><p>A traditional Japanese sentō, open all night, with a front desk, locker room, washing area, mixed onsen, cold bath and sauna. Follow the house rules: bring a towel, and wash before getting into the water.</p></div><div class="loc"><b>Other places</b><p>Some addresses only appear on the GPS after someone mentions them in conversation, such as the Matsurika Teahouse, the apartment of a certain hacker and a scrapyard in the south zone. Talk to everyone.</p></div>
+<div class="loc"><b>Sector 4 in case 2</b><p>The city from case 1 is still open in case 2, with the apartment, the café, the precinct and Chinatown. The Hotel Grand Alvorada, however, is sealed off with police tape and patrol cars at the door.</p></div>
+<h3>Sector 7: Industrial District (in both cases)</h3>
+<div class="loc"><p>An open city like Sector 4, but made of foundries, warehouses, refineries and container yards, where the six o'clock siren sounds even in the dead of night. It is home to Vulcan Foundry, Warehouse 13, the Siren Bar and the Metalworkers' Union. You get there by Aerotrain.</p></div>
+<h3>Neo-Sampa (case 2)</h3>
+<div class="loc"><b>Paulista Sector</b><p>The corporate district around the Neo-Sampa Tower, open like Sector 4: <b>Av. Neo-Paulista</b> with traffic and pedestrians, <b>Trianon Park</b> with real trees, trails and a lake, the <b>MASP</b> of the future (the glass block suspended from red porticos) and the <b>elevated Aerotrain station</b>, with stairs, ticket booth, turnstiles and glass platform doors.</p></div>
+<div class="loc"><b>Neo-Sampa Tower: Synapse Corp</b><p>Three hundred floors of glass. On the 220th are the Synapse atrium, with its holographic marble reception, and the shielded Kinetic Testing Lab, where Kaelen Voss was found. Other areas of the tower open up later in the case.</p></div>
+<div class="loc"><b>Bixiga</b><p>The bohemian neighborhood: old townhouses, cantinas, a wood-fired pizzeria, a used bookstore, a thrift shop, the <b>Achiropita</b> festival, the <b>Vai-Vem</b> samba school and the stairway. Here you'll find <b>Zé do Tubo's Bar</b> and <b>Clube 14 Bis</b>, which opens at midnight.</p></div>
+<div class="loc"><b>Baixo Minhocão: Sublevel 4</b><p>The city under the viaduct: shacks, fire barrels, stalls selling chips and prosthetics of dubious origin, a pastry stand and Tico's workshop. The upper city rushes by overhead without ever looking down.</p></div>
+<div class="loc"><b>Other places in Neo-Sampa</b><p>Some addresses, such as a clinic in Lado Sombra, only join the Aerotrain route after someone mentions them.</p></div>
+
+<h2>10. Detective tips</h2>
+<ol>
+<li>Examine everything twice: once with the scanner off and once with it on.</li>
+<li>Use the scanner on people, too.</li>
+<li>Reread the evidence descriptions. Times and numbers often match (or don't match) what other people say.</li>
+<li>When a ⚠ topic appears, go confront them. That's where the masks come off.</li>
+<li>No one is innocent just because they have a good alibi, or guilty just because they have a good motive.</li>
+<li>Leave the crime scene. The city holds parts of the story that nobody at the hotel or the tower will tell you.</li>
+<li>In case 2, once the clock starts ticking, go straight for the objective.</li>
+<li>Talk to everyone, including pedestrians and regulars.</li>
+<li>Keep Vance fed and rested: a passed-out detective solves nothing.</li>
+<li>When in doubt, ask IRIS (case 1) or ÁGORA (case 2) for a hint.</li>
+</ol>
+<h2>Credits</h2>
+<div class="box"><p style="margin:0"><b>Story and characters:</b> by Julian Sampietro.</p>
+<p style="margin:6px 0 0"><b>Game development:</b> game developed using Claude Code.</p></div>
+</body></html>

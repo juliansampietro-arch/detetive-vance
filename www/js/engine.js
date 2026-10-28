@@ -641,6 +641,78 @@ function getSprite(lookKey, pose) {
   return spriteCache[key];
 }
 
+// robôs: 'heavy' = chassi de máquina (pernas de pistão, garras, visor e antena);
+// 'android' = corpo esguio, mas com emendas, juntas à mostra, cabeça lisa e olhos de LED
+function robotBody(L, pose, p) {
+  const base = pose.startsWith('u') && pose !== 'u' ? (pose === 'ustand' ? 'stand' : pose.slice(1)) : pose;
+  const heavy = L.robot === 'heavy';
+  const plate = L.coat, plateL = shade(L.coat, 1.3), plateD = L.coatDark, metal = L.skin, metalD = shade(L.skin, 0.7), glow = L.implant, visor = L.goggles || L.implant;
+  const seated = base === 'seated' || base === 'slumped' || base === 'kneel' || base === 'seiza';
+  const oy = seated ? 6 : 0, a = base === 'walk1' ? -1 : base === 'walk2' ? 1 : 0;
+  // pernas: pistões com joelho e pés em bloco
+  if (seated) {
+    p(5, 40, 4, 5, metal); p(11, 40, 4, 5, metal); p(4, 45, 6, 2, plateD); p(10, 45, 6, 2, plateD);
+  } else if (heavy) {
+    for (const [x, s] of [[5 + a, -1], [11 - a, 1]]) {
+      p(x, 32, 4, 6, plate); p(x, 32, 1, 6, plateL); p(x + 3, 32, 1, 6, plateD);
+      p(x + 1, 38, 2, 2, glow);                                    // junta do joelho
+      p(x + 1, 40, 2, 5, metal); p(x + 1, 40, 1, 5, shade(metal, 1.25));   // pistão
+      p(x - 1, 45 + (s * a < 0 ? -1 : 0), 6, 2, plateD); p(x - 1, 45 + (s * a < 0 ? -1 : 0), 6, 1, plate);
+    }
+  } else {
+    for (const [x, s] of [[6 + a, -1], [11 - a, 1]]) {
+      p(x, 33, 3, 6, plate); p(x, 33, 1, 6, plateL);
+      p(x, 39, 3, 1, metalD); p(x + 1, 39, 1, 1, glow);           // joelho com luz
+      p(x, 40, 3, 5, plate); p(x + 2, 40, 1, 5, plateD);
+      p(x - 1, 45 + (s * a < 0 ? -1 : 0), 4, 2, metalD);
+    }
+  }
+  // tronco: chassi com painéis, núcleo luminoso no peito e cintura articulada
+  const tx = heavy ? 3 : 5, tw = heavy ? 14 : 10, ty = (heavy ? 18 : 20) + oy, tb = (heavy ? 32 : 33) + oy - (seated ? 2 : 0);
+  p(tx, ty, tw, tb - ty, plate);
+  p(tx, ty, 2, tb - ty, plateL); p(tx + tw - 2, ty, 2, tb - ty, plateD);
+  p(tx + 2, ty + 5, tw - 4, 1, plateD); p(10, ty, 1, tb - ty, plateD);                 // emendas
+  p(tx + 3, ty + 2, 4, 2, metalD); p(tx + tw - 7, ty + 2, 4, 2, metalD);             // grades de ventilação
+  p(9, ty + 7, 3, 3, metalD); p(10, ty + 8, 1, 1, glow); p(9, ty + 8, 1, 1, shade(glow, 0.7)); p(11, ty + 8, 1, 1, shade(glow, 0.7));
+  if (heavy) { p(tx + 1, ty + 11, tw - 2, 2, '#ffd23f'); for (let k = tx + 1; k < tx + tw - 1; k += 2) p(k, ty + 11, 1, 2, '#1a1a1a'); }   // faixa de advertência
+  p(7, tb, 7, 1, metalD); p(8, tb - 1, 5, 1, metal);                                  // cintura
+  // braços: ombro em esfera, segmentos e garra
+  const shoulderY = ty + 1, armTop = ty + 3, armLen = heavy ? 12 : 10;
+  for (const [x, s] of [[tx - (heavy ? 3 : 2), 1], [tx + tw, -1]]) {
+    const sw = a * s;
+    p(x, shoulderY, heavy ? 3 : 2, 3, plate); p(x, shoulderY, 1, 3, plateL);
+    p(x + (heavy ? 1 : 0), armTop + 1 + sw, 2, armLen / 2, metal);
+    p(x + (heavy ? 1 : 0), armTop + 1 + sw + armLen / 2 - 1, 2, 1, glow);              // cotovelo
+    p(x + (heavy ? 1 : 0), armTop + sw + armLen / 2 + 1, 2, armLen / 2 - 1, plate);
+    const hy2 = armTop + sw + armLen;
+    if (heavy) { p(x, hy2, 1, 2, metalD); p(x + 2, hy2, 1, 2, metalD); p(x + 1, hy2, 1, 1, metal); }   // garra
+    else p(x, hy2, 2, 2, metal);
+  }
+  // pescoço e cabeça
+  const hx2 = base === 'slumped' ? 2 : 0, hy = (base === 'slumped' ? 3 : 0) + oy;
+  p(9 + hx2, ty - 2 + hy, 2, 2, metalD); p(9 + hx2, ty - 2 + hy, 1, 2, metal);
+  if (heavy) {
+    const X = 5 + hx2, Y = ty - 9 + hy;
+    p(X, Y, 10, 7, plate); p(X, Y, 10, 1, plateL); p(X, Y, 1, 7, plateL); p(X + 9, Y, 1, 7, plateD);
+    p(X + 1, Y + 3, 8, 2, '#0a0a0e'); p(X + 2, Y + 3, 6, 1, visor);                     // visor
+    p(X + 3, Y + 4, 2, 1, shade(visor, 0.6));
+    p(X + 1, Y + 6, 8, 1, plateD); p(X + 3, Y + 6, 1, 1, metal); p(X + 6, Y + 6, 1, 1, metal);   // grade da "boca"
+    p(X + 8, Y - 3, 1, 3, metalD); p(X + 8, Y - 4, 1, 1, glow);                          // antena
+    p(X - 1, Y + 2, 1, 3, metalD); p(X + 10, Y + 2, 1, 3, metalD);                      // parafusos laterais
+  } else {
+    const X = 6 + hx2, Y = ty - 10 + hy;
+    p(X + 1, Y, 6, 1, plate); p(X, Y + 1, 8, 7, plate); p(X + 1, Y + 8, 6, 1, plate);    // cabeça lisa, sem cabelo
+    p(X, Y + 1, 1, 7, plateL); p(X + 7, Y + 1, 1, 7, plateD);
+    p(X + 1, Y + 1, 6, 1, plateL);
+    p(X + 4, Y, 1, 4, plateD);                                                         // emenda do crânio
+    p(X + 2, Y + 4, 1, 1, visor); p(X + 5, Y + 4, 1, 1, visor);                        // olhos de LED
+    p(X + 1, Y + 4, 1, 1, shade(visor, 0.5)); p(X + 6, Y + 4, 1, 1, shade(visor, 0.5));
+    p(X + 3, Y + 6, 2, 1, metalD);                                                     // boca: alto-falante
+    p(X - 1, Y + 3, 1, 3, metal); p(X + 8, Y + 3, 1, 3, metal);                        // receptores laterais
+    if (L.veil) { p(X - 1, Y - 1, 10, 3, L.veil); p(X - 1, Y + 2, 2, 7, L.veil); p(X + 7, Y + 2, 2, 7, L.veil); }   // touca (Irmã-7)
+  }
+}
+
 function makeSprite(L, pose) {
   const cv = document.createElement('canvas');
   cv.width = SPR_W; cv.height = SPR_H;
@@ -655,6 +727,7 @@ function makeSprite(L, pose) {
     p(4, 40, 11, 1, shade(L.coat, 1.3));
     return outlineSprite(c, cv, L);
   }
+  if (L.robot) { robotBody(L, pose, p); return outlineSprite(c, cv, L); }
   // poses: stand / walk1 / walk2 / seated / slumped / kneel / sleep; com prefixo 'u' = segurando guarda-chuva
   const umb = pose[0] === 'u';
   const base = umb ? (pose === 'ustand' ? 'stand' : pose.slice(1)) : pose;

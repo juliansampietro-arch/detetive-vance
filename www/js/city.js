@@ -8,7 +8,7 @@
 // (ruas de 2 tiles a cada 10, calçada de 1) e convertido para a grade real por map().
 // ============================================================
 
-const CITY = (() => {
+function buildCity(def) {
   const tr = (...a) => window.T(...a);   // tradução (o nome T aqui é o tipo de tile)
   const T = { ROAD: 1, CROSS: 2, WALK: 3, PLAZA: 4, GRASS: 5, CTWALK: 6, CTSTREET: 7, BLD: 8 };
   const S = 2;                                     // largura das calçadas
@@ -41,11 +41,11 @@ const CITY = (() => {
   const setR = (x, y, v) => { if (inside(x, y)) grid[y * N + x] = v; };
   // Chinatown: quarteirões 3 e 4 nos dois eixos, com as calçadas em volta
   const CT = { x0: intStart[3] - S, y0: intStart[3] - S, x1: intStart[4] + 6 + S - 1, y1: intStart[4] + 6 + S - 1 };
-  const inCT = (x, y) => x >= CT.x0 && x <= CT.x1 && y >= CT.y0 && y <= CT.y1;
-  const V_NAMES = ['Rua Neon', 'Rua Kowloon', 'Av. Alvorada Norte', 'Rua Halcyon', 'Rua Lótus', 'Rua do Ferro', 'Rua Aurora'];
-  const H_NAMES = ['Av. Chuva Ácida', 'Av. Distrito 4', 'Av. Alvorada', 'Av. do Dragão', 'Av. dos Drones', 'Av. Corporativa', 'Av. Porto'];
+  const inCT = def.ct ? (x, y) => x >= CT.x0 && x <= CT.x1 && y >= CT.y0 && y <= CT.y1 : () => false;
+  const V_NAMES = def.vNames || ['Rua Neon', 'Rua Kowloon', 'Av. Alvorada Norte', 'Rua Halcyon', 'Rua Lótus', 'Rua do Ferro', 'Rua Aurora'];
+  const H_NAMES = def.hNames || ['Av. Chuva Ácida', 'Av. Distrito 4', 'Av. Alvorada', 'Av. do Dragão', 'Av. dos Drones', 'Av. Corporativa', 'Av. Porto'];
 
-  let seed = 4242;
+  let seed = def.seed || 4242;
   const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
   const pick = a => a[Math.floor(rnd() * a.length)];
 
@@ -139,6 +139,8 @@ const CITY = (() => {
     ['PENDELTON', 'o futuro dentro de você', '#ff4fd8', 'helix', '生命'],
   ];
 
+  if (def.build) def.build({ B, O, set, setR, shop, door, car, pushNpc, T, rnd, pick, m1, map, span, tile, inside, GENERIC_SHOPS, HOLO_ADS, buildings, objects });
+  else {
   const blockType = (bi, bj) => {
     if (bi === 1 && bj === 1) return 'hotel';
     if (bi === 3 && bj === 1) return 'police';
@@ -190,6 +192,7 @@ const CITY = (() => {
       O({ kind: 'planter', x: 13, y: 16, solid: true, key: 'canteiro', name: 'Canteiro', info: 'Flores sintéticas com o logo do hotel bordado nas pétalas.' });
       O({ kind: 'planter', x: 18, y: 16, solid: true, key: 'canteiro', name: 'Canteiro', info: 'Flores sintéticas. Uma delas está pisoteada: alguém saiu com pressa.' });
       O({ kind: 'cone', x: 14, y: 19 }); O({ kind: 'cone', x: 17, y: 19 });
+      O({ kind: 'tram_stop', x: 18, y: 17, solid: true, key: 'estacao_aerotrem', name: 'Estação do aerotrem — Sector 4' });
       O({ kind: 'vending_drink', x: 19, y: 13, solid: true, key: 'maq_bebida', name: 'Máquina de bebidas HydroPop' });
       O({ kind: 'vending_food', x: 19, y: 14, solid: true, key: 'maq_comida', name: 'Máquina de comida NutriMat' });
       O({ kind: 'bench', x: 12, y: 14, solid: true, key: 'banco', name: 'Banco da calçada', seat: true });
@@ -302,6 +305,7 @@ const CITY = (() => {
     { id: 'huang', x: 38, y: 39 },
     { id: 'lan', x: 45, y: 39, wander: { area: [43, 39, 48, 39] } },
   );
+  }
 
   // ---------- rua: postes, lixeiras, hidrantes e bueiros ----------
   for (let bj = 0; bj < 6; bj++) for (let bi = 0; bi < 6; bi++) {
@@ -343,12 +347,12 @@ const CITY = (() => {
   const walkers = [];
   const spots = [];
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (crowdOK(x, y) && tile(x, y) !== T.CROSS) spots.push([x, y]);
-  for (let k = 0; k < 60; k++) {
+  for (let k = 0; k < (def.walkers || 60); k++) {
     const [x, y] = spots[Math.floor(rnd() * spots.length)];
     const ctz = inCT(x, y);
     walkers.push({
-      look: ctz && rnd() < 0.5 ? pick(['ped5', 'ped7', 'ped8']) : pick(LOOKS_CROWD), name: pick(CROWD_NAMES),
-      lines: ctz ? LINES.chinatown : LINES.city, umbrella: rnd() < 0.75 ? pick(UMB) : null,
+      look: ctz && rnd() < 0.5 ? pick(['ped5', 'ped7', 'ped8']) : pick(def.looks || LOOKS_CROWD), name: pick(def.names || CROWD_NAMES),
+      lines: ctz ? LINES.chinatown : def.lines || LINES.city, umbrella: rnd() < 0.75 ? pick(UMB) : null,
       x, y, speed: 0.9 + rnd() * 0.5, tiles: 'crowd', range: 9,
     });
   }
@@ -370,16 +374,16 @@ const CITY = (() => {
     return st + (plus ? w * 0.72 : w * 0.28);
   };
   const outsideCT = (x, y) => !inCT(Math.floor(x), Math.floor(y));
-  for (let k = 0; k < 26; k++) {
+  for (let k = 0; k < (def.cars || 26); k++) {
     // as avenidas do hotel (índice 2) ganham mais carros
     const vertical = k % 2 === 0, dir = k % 4 < 2 ? 1 : -1, lane = k < 10 ? 2 : (k * 3) % 7;
     const sub = (k >> 1) % 2;
     let along = 3 + ((k * 13) % (N - 6));
     const dx = vertical ? 0 : dir, dy = vertical ? dir : 0;
     let x = vertical ? laneCoord(0, dy, lane, sub) : along, y = vertical ? along : laneCoord(dx, 0, lane, sub);
-    for (let t = 0; t < 40 && !outsideCT(x, y); t++) { along = (along + 7) % (N - 4) + 2; if (vertical) y = along; else x = along; }
+    for (let t = 0; t < 40 && (!outsideCT(x, y) || !carOK(Math.floor(x), Math.floor(y))); t++) { along = (along + 7) % (N - 4) + 2; if (vertical) y = along; else x = along; }
     for (let t = 0; t < 20 && traffic.some(o => Math.hypot(o.x - x, o.y - y) < 2.5); t++) { along = (along + 3) % (N - 4) + 2; if (vertical) y = along; else x = along; }   // não nasce em cima de outro carro
-    traffic.push({ x, y, dx, dy, sub, speed: 3 + (k % 3) * 0.8, v: 0, livery: LIVERIES[k % LIVERIES.length], lastCross: null, plan: null, rise: 0, wait: 0 });
+    traffic.push({ x, y, dx, dy, sub, speed: 3 + (k % 3) * 0.8, v: 0, livery: (def.liveries || LIVERIES)[k % (def.liveries || LIVERIES).length], lastCross: null, plan: null, rise: 0, wait: 0 });
   }
 
   // ---------- semáforos (todos sincronizados) ----------
@@ -406,8 +410,8 @@ const CITY = (() => {
     const fx = c.x + c.dx * ahead, fy = c.y + c.dy * ahead;
     if (game.car && game.driving && Math.hypot(game.car.x - fx, game.car.y - fy) < 1.1) return true;
     const p = game.player;
-    if (!game.driving && game.roomId === 'city' && Math.hypot(p.px + 0.5 - fx, p.py + 0.5 - fy) < 0.9) return true;
-    for (const w of ROOMS.city._walkers || []) if (Math.hypot(w.fx + 0.5 - fx, w.fy + 0.5 - fy) < 0.7) return true;
+    if (!game.driving && game.roomId === def.roomId && Math.hypot(p.px + 0.5 - fx, p.py + 0.5 - fy) < 0.9) return true;
+    for (const w of ROOMS[def.roomId]._walkers || []) if (Math.hypot(w.fx + 0.5 - fx, w.fy + 0.5 - fy) < 0.7) return true;
     if (c.hop > 0) return false;                                  // passando por cima de um carro enroscado
     if (c.wait > 4 && !c.queued) { c.hop = 1.6; return false; }   // enroscado: sobe e passa por cima (nunca fura a fila do semáforo)
     for (const o of traffic) if (o !== c && Math.hypot(o.x - fx, o.y - fy) < 1.2 && (o.dx * c.dx + o.dy * c.dy) > -0.5) {
@@ -483,7 +487,7 @@ const CITY = (() => {
       }
     }
   }
-  const parked = () => ROOMS.city ? ROOMS.city.objects.filter(o => o.cx !== undefined) : [];
+  const parked = () => ROOMS[def.roomId] ? ROOMS[def.roomId].objects.filter(o => o.cx !== undefined) : [];
 
   // ---------- desenho do chão ----------
   // os losangos são agrupados por cor (um preenchimento por cor em vez de um por tile);
@@ -566,7 +570,7 @@ const CITY = (() => {
     }
     if (b.style === 'temple') return cv;
     // fachada: vidro escuro refletindo o céu (torres) ou reboco com placas (baixas), lajes e pilares
-    const low = b.style === 'low', H = cv.height;
+    const low = b.style === 'low' || b.style === 'factory', H = cv.height;
     const gr = g.createLinearGradient(0, 0, 0, H);
     if (low) { gr.addColorStop(0, shade(base, side ? 1.05 : 0.85)); gr.addColorStop(1, shade(base, side ? 0.8 : 0.6)); }
     else { gr.addColorStop(0, shade(base, side ? 1.5 : 1.15)); gr.addColorStop(0.35, shade(base, side ? 0.95 : 0.7)); gr.addColorStop(1, shade(base, side ? 0.7 : 0.5)); }
@@ -795,6 +799,26 @@ const CITY = (() => {
           ctx.globalAlpha = 1;
         }
         if (sd % 5 === 2) { const [ax, ay] = iso(b.x + 0.5, b.y + 0.5, H); line([[ax, ay], [ax, ay - 14]], '#4a4a52', 0.4); if (Math.sin(t * 2.5 + sd) > 0.3) { ctx.fillStyle = '#ff3355'; ctx.fillRect(ax - 0.6, ay - 15, 1.2, 1.2); } }
+        if (b.sign) faceText(b, 0, b.w / 2, Math.min(b.h - 4, 18), b.sign, 3.8, b.signCol || '#ffb347');
+        break;
+      }
+      case 'factory': {
+        // galpão: telhado em dente de serra com claraboias, chaminé fumegando e letreiro na fachada
+        const n = Math.max(2, Math.round(b.w / 1.4));
+        for (let k = 0; k < n; k++) {
+          const x0 = b.x + k * b.w / n, x1 = x0 + b.w / n;
+          poly(ctx, [iso(x0, b.y + 0.1, H), iso(x0, b.y + b.d - 0.1, H), iso(x0, b.y + b.d - 0.1, H + 5), iso(x0, b.y + 0.1, H + 5)], rgba('#ffcf8a', 0.25 + 0.1 * ((b.seed + k) % 3)));
+          poly(ctx, [iso(x0, b.y + 0.1, H + 5), iso(x0, b.y + b.d - 0.1, H + 5), iso(x1, b.y + b.d - 0.1, H), iso(x1, b.y + 0.1, H)], shade(b.col, 1.3));
+        }
+        if (b.seed % 3 !== 1) {
+          const cx2 = b.x + b.w - 0.75, cy2 = b.y + 0.35;
+          box(cx2, cy2, 0.45, 0.45, 26, '#4a3a32', H, '#2a201c');
+          for (const z of [8, 18]) box(cx2 - 0.02, cy2 - 0.02, 0.49, 0.49, 1, '#c8202a', H + z);
+          const [sx2, sy2] = iso(cx2 + 0.22, cy2 + 0.22, H + 27);
+          for (let k = 0; k < 5; k++) { const up = (t * 6 + k * 6 + b.seed) % 30; ctx.fillStyle = `rgba(150,140,140,${0.22 * (1 - up / 30)})`; ctx.beginPath(); ctx.ellipse(sx2 + Math.sin(t * 0.7 + k) * 3 + up * 0.4, sy2 - up, 3 + up * 0.35, 2 + up * 0.15, 0, 0, Math.PI * 2); ctx.fill(); }
+          if (Math.sin(t * 2 + b.seed) > 0.2) { ctx.fillStyle = '#ff3355'; ctx.fillRect(sx2 - 0.7, sy2 - 1, 1.4, 1.4); }
+        }
+        if (b.sign) faceText(b, 0, b.w / 2, Math.min(b.h - 6, 30), b.sign, 4.6, b.signCol || '#ffb347');
         break;
       }
       case 'tower':
@@ -827,6 +851,23 @@ const CITY = (() => {
         const g = ctx.createLinearGradient(0, ty - 140, 0, ty);
         g.addColorStop(0, 'rgba(255,79,216,0)'); g.addColorStop(1, 'rgba(255,79,216,0.3)');
         ctx.fillStyle = g; ctx.fillRect(tx - 3, ty - 140, 6, 140);
+        break;
+      }
+      case 'corp': {
+        // sede corporativa: letreiro vertical na quina, portaria de vidro, faixas de luz e feixe no topo
+        const acc = b.signCol || '#38f6ff';
+        faceText(b, 1, b.d / 2, b.h - 30, b.sign, 8, acc, { vertical: true });
+        onFace(b, 0, () => {
+          wallRect(b.w / 2 - 1.2, 0, b.w / 2 + 1.2, 22, '#0a0e16');
+          wallRect(b.w / 2 - 1.1, 0, b.w / 2 + 1.1, 21, rgba('#cfe8ff', 0.35 + 0.05 * Math.sin(t * 2)));
+          wallRect(b.w / 2 - 0.02, 0, b.w / 2 + 0.02, 21, '#141c2a');
+          for (let v = 40; v < b.h - 10; v += 46) wallRect(0, v, b.w, v + 1.2, rgba(acc, 0.55));
+        });
+        faceText(b, 0, b.w / 2, 30, b.label || b.sign, 4.4, acc);
+        const g = ctx.createLinearGradient(0, ty - 220, 0, ty);
+        g.addColorStop(0, rgba(acc, 0)); g.addColorStop(1, rgba(acc, 0.28));
+        ctx.fillStyle = g; ctx.fillRect(tx - 4, ty - 220, 8, 220);
+        if (Math.sin(t * 3) > 0) { ctx.fillStyle = '#ff3355'; ctx.fillRect(tx - 1, ty - 4, 2, 2); }
         break;
       }
       case 'police': {
@@ -927,7 +968,7 @@ const CITY = (() => {
     if (inCT(x, y)) return tr(roadIdx[x] === 4 ? 'Chinatown — Rua Lótus' : roadIdx[y] === 4 ? 'Chinatown — Travessa do Dragão' : 'Chinatown');
     // vale o nome da rua mais próxima (vertical ou horizontal)
     const dist = (v) => { for (let d = 0; d < N; d++) if (roadIdx[v - d] >= 0 || roadIdx[v + d] >= 0) return d; return N; };
-    return 'Sector 4 — ' + tr(streetName(x, y, dist(y) <= dist(x) ? 1 : 0));
+    return (def.label || 'Sector 4') + ' — ' + tr(streetName(x, y, dist(y) <= dist(x) ? 1 : 0));
   }
 
   // vaga de meio-fio mais perto de (x, y): centro do tile da faixa encostada na calçada, com o carro
@@ -953,12 +994,16 @@ const CITY = (() => {
     return best;
   }
 
-  return { N, T, map, tile, inCT, light, pedSignal, pedOK, zoneAt, carOK, crowdOK, curbSpot, buildings, objects, shops, npcs, walkers, traffic, updateTraffic, drawGround, drawBuilding, route, instructions, streetName, placeName };
-})();
+  return { def, N, T, map, tile, inCT, light, pedSignal, pedOK, zoneAt, carOK, crowdOK, curbSpot, buildings, objects, shops, npcs, walkers, traffic, updateTraffic, drawGround, drawBuilding, route, instructions, streetName, placeName };
+}
+
+// cidade ativa: o Setor 4 ao começar; enterRoom troca para a cidade em que Vance está (activateCity)
+let CITY = buildCity({ id: 'city', roomId: 'city', seed: 4242, ct: true, label: 'Sector 4' });
+const CITIES = { city: CITY };
 
 // a cidade é uma sala como as outras, só que enorme e ao ar livre
 ROOMS.city = {
-  name: 'Sector 4', w: CITY.N, h: CITY.N, city: true, outdoor: true, dark: 0.5, neon: '#38f6ff', floor: 'city',
+  name: 'Sector 4', w: CITY.N, h: CITY.N, city: true, cityObj: CITY, outdoor: true, dark: 0.5, neon: '#38f6ff', floor: 'city',
   lights: [], objects: CITY.objects, npcs: CITY.npcs, walkers: CITY.walkers,
 };
 // o carro de Vance começa estacionado na frente do hotel
@@ -971,22 +1016,24 @@ const POLICE_TALK = ['cruz', 'ana', 'rui', 'okafor', 'kenji', 'unidade7'];
 function gpsKnown(id) { return GPS_ALWAYS.includes(id) || !!(game && game.flags['gps_' + id]); }
 function unlockGps(ids) {
   for (const id of [].concat(ids)) {
-    if (gpsKnown(id) || !DESTINATIONS[id]) continue;
+    const d = destAny(id);
+    if (gpsKnown(id) || !d) continue;
     game.flags['gps_' + id] = true;
-    toast(`<span class="k">GPS</span> ${T('Novo local: {0}', DESTINATIONS[id].name)}`, 'ev');
+    toast(`<span class="k">GPS</span> ${T('Novo local: {0}', d.name)}`, 'ev');
   }
   saveGame();
 }
 // teletransporte só para onde Vance já esteve: o hotel (onde o jogo começa) e a casa dele contam desde o início
-function gpsVisited(id) { return id === 'hotel' || id === 'casa' || !!(game && game.flags['visit_' + id]); }
+function gpsVisited(id) { return GPS_HOME.includes(id) || !!(game && game.flags['visit_' + id]); }
+const GPS_HOME = ['hotel', 'casa'];
 function markVisited() {
   if (!game) return;
   const p = game.driving && game.car ? { x: game.car.x, y: game.car.y } : { x: game.player.px, y: game.player.py };
   for (const id in DESTINATIONS) {
     if (gpsVisited(id)) continue;
     const d = DESTINATIONS[id];
-    const ex = ROOMS.city.objects.find(o => o.kind === 'exit' && o.to && o.x === d.door[0] && o.y === d.door[1]);
-    if (game.roomId === 'city' ? Math.hypot(p.x - d.door[0], p.y - d.door[1]) <= 3 : ex && ex.to === game.roomId) game.flags['visit_' + id] = true;
+    const ex = cityRoom().objects.find(o => o.kind === 'exit' && o.to && o.x === d.door[0] && o.y === d.door[1]);
+    if (game.roomId === CITY.def.roomId ? Math.hypot(p.x - d.door[0], p.y - d.door[1]) <= 3 : ex && ex.to === game.roomId) game.flags['visit_' + id] = true;
   }
 }
 const DESTINATIONS = {
@@ -1000,6 +1047,18 @@ const DESTINATIONS = {
   ferrovelho:{ name: 'Ferro-velho do Zeca', short: 'Ferro-velho', door: CITY.map(5, 46), color: '#ffb347', icon: '⚙' },
   bordel:    { name: 'Casa de Chá Matsurika (茉莉花)', short: 'Matsurika', door: CITY.map(49, 37), color: '#f0e0a0', icon: '茶' },
 };
+// cada cidade tem os seus destinos; DESTINATIONS mostra os da cidade ativa
+const CITY_DESTS = { city: { ...DESTINATIONS } };
+function destAny(id) { for (const c in CITY_DESTS) if (CITY_DESTS[c][id]) return CITY_DESTS[c][id]; return null; }
+function cityRoom() { return ROOMS[CITY.def.roomId]; }
+function inCity() { return !!(game && game.roomData && game.roomData.city); }
+function activateCity(roomId) {
+  if (!CITIES[roomId] || CITY === CITIES[roomId]) return;
+  CITY = CITIES[roomId];
+  for (const k of Object.keys(DESTINATIONS)) delete DESTINATIONS[k];
+  Object.assign(DESTINATIONS, CITY_DESTS[roomId] || {});
+  if (game && game.gps && !DESTINATIONS[game.gps.dest]) game.gps = null;
+}
 
 // ============================================================
 // Carro: entrar, dirigir com a mesma câmera de quando anda a pé, estacionar em qualquer lugar
@@ -1200,13 +1259,13 @@ function setGps(id) {
 
 function updateGps(dt) {
   const g = game.gps;
-  if (!g || game.roomId !== 'city') return;
+  if (!g || !inCity()) return;
   const p = game.player, fx = p.px + 0.5, fy = p.py + 0.5;
   const d = DESTINATIONS[g.dest];
   g.timer -= dt;
   if (g.timer <= 0) {
     g.timer = 0.35;
-    const ok = game.driving ? (x, y) => CITY.carOK(x, y) && !solidAt(ROOMS.city, x, y) : (x, y) => !solidAt(ROOMS.city, x, y);
+    const ok = game.driving ? (x, y) => CITY.carOK(x, y) && !solidAt(cityRoom(), x, y) : (x, y) => !solidAt(cityRoom(), x, y);
     g.path = CITY.route(Math.floor(fx), Math.floor(fy), d.door, ok);
   }
   const vx = game.driving ? game.car.vx : p.dir[0], vy = game.driving ? game.car.vy : p.dir[1];
@@ -1219,12 +1278,12 @@ function updateGps(dt) {
 }
 
 function openGps() {
-  if (!game || game.modal || game.roomId !== 'city') return;
+  if (!game || game.modal || !inCity()) return;
   game.modal = 'gps';
   show('gps');
   const list = $('gps-list');
   list.innerHTML = '';
-  list.appendChild(button('🚗 Chamar meu carro', () => { closeModal(); callCar(); }, 'gps-call'));
+  if (game.roomId === 'city') list.appendChild(button('🚗 Chamar meu carro', () => { closeModal(); callCar(); }, 'gps-call'));
   const p = game.player;
   for (const id in DESTINATIONS) {
     if (!gpsKnown(id)) continue;
@@ -1246,14 +1305,14 @@ function openGps() {
 function fastTravel(id) {
   const d = DESTINATIONS[id];
   if (game.driving) { const c = game.car; resetCar({ x: c.x, y: c.y, ang: c.ang }); game.car = null; game.driving = false; Sound.engine(false); }
-  const ex = ROOMS.city.objects.find(o => o.kind === 'exit' && o.to && o.x === d.door[0] && o.y === d.door[1]);
+  const ex = cityRoom().objects.find(o => o.kind === 'exit' && o.to && o.x === d.door[0] && o.y === d.door[1]);
   if (ex && ex.key !== 'hotel_fechado') enterRoom(ex.to, ex.at, true);
   else {
     let at = null;
     for (let r = 0; r < 8 && !at; r++)
       for (let dy = -r; dy <= r && !at; dy++) for (let dx = -r; dx <= r && !at; dx++)
-        if (!solidAt(ROOMS.city, d.door[0] + dx, d.door[1] + dy)) at = [d.door[0] + dx, d.door[1] + dy];
-    enterRoom('city', at || d.door, true);
+        if (!solidAt(cityRoom(), d.door[0] + dx, d.door[1] + dy)) at = [d.door[0] + dx, d.door[1] + dy];
+    enterRoom(CITY.def.roomId, at || d.door, true);
   }
   game.gps = null;
   game.teleFx = game.t;
@@ -1264,7 +1323,8 @@ function fastTravel(id) {
 
 // o Kestrel-7 vem sozinho até o lugar mais próximo de Vance onde caiba
 function callCar() {
-  if (game.roomId !== 'city') { toast(T('O carro só pode ser chamado na rua.')); return; }
+  if (!inCity()) { toast(T('O carro só pode ser chamado na rua.')); return; }
+  if (game.roomId !== 'city') { toast(T('O Kestrel-7 ficou estacionado no Setor 4. Aqui, só a pé ou de aerotrem.')); return; }
   if (game.driving) { toast(T('Você já está dirigindo.')); return; }
   const p = game.player, px0 = p.x, py0 = p.y;
   const old = playerCar();
@@ -1313,7 +1373,7 @@ function drawMinimap() {
 
 // toque no mapa do GPS escolhe o destino mais próximo do toque
 function minimapClick(ev) {
-  if (!game || game.roomId !== 'city') return;
+  if (!game || !inCity()) return;
   const cv = $('minimap'), r = cv.getBoundingClientRect();
   const mx = (ev.clientX - r.left) * cv.width / r.width, my = (ev.clientY - r.top) * cv.height / r.height;
   const N = CITY.N, s = cv.width / (N * 2.1);

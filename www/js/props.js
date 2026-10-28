@@ -933,6 +933,6 @@ function drawProp(o, t, S) {
       return;
     }
     default:
-      ecoProp(o, t, w, d, cx, cy);   // objetos do caso 2 (eco.js)
+      ecoProp(o, t, w, d, cx, cy) || s7Prop(o, t, w, d, cx, cy) || paulistaProp(o, t, w, d, cx, cy);   // objetos do caso 2 (eco.js) e do Sector 7 (sector7.js)
   }
 }

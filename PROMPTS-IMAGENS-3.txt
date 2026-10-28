@@ -1,0 +1,32 @@
+PROMPTS DAS IMAGENS REALISTAS (PARTE 3): personagens do Sector 7, do Minhocão e da Clínica Santa Rita
+Cada bloco: nome do arquivo (personagem) e, na linha de baixo, o prompt completo para copiar.
+Salve cada imagem com o nome exato do arquivo (só uma vez ".jpg") na pasta indicada. Depois rode: npm run apk  (e npm run exe para o PC)
+
+============================================================
+RETRATOS — SECTOR 7 (distrito industrial): salvar em www/img/portraits/ (quadrado, 1024x1024)
+============================================================
+
+galdino.jpg  (Seu Galdino, operário aposentado que fica na estação do aerotrem)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, elderly brazilian man in his late 70s, bald with a short white beard, warm brown weathered skin, kind tired eyes, worn olive-grey work jacket over a faded brown shirt, small old green hearing implant behind the ear, industrial train platform with smokestacks and orange haze behind
+
+otto.jpg  (Mestre Otto, mestre de forno da Fundição Vulcano)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, burly man in his late 50s, bald head with a thick grey beard, sweat and soot on his face, orange-tinted protective goggles pushed up on his forehead, heavy brown leather foundry apron, heat-resistant mechanical arm, old burn scars on his neck, glowing molten steel furnace lighting his face from the side
+
+bento.jpg  (Seu Bento, vigia do Armazém 13)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, thin black brazilian man in his late 60s, short white hair under a dark security guard cap, faded navy watchman uniform with a yellow shirt underneath, old first-generation night-vision implant over one eye glowing yellow, loyal stubborn expression, dim warehouse with stacked shipping containers behind
+
+neide.jpg  (Dona Neide, dona do Boteco da Sirene)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, warm brazilian woman in her early 60s, reddish-brown hair in a bun, light tan skin, cream blouse under a dark red apron, no visible implants, motherly but tough smile, holding a small glass of cachaça, old neighborhood bar with bottles and warm amber light behind
+
+rosa.jpg  (Rosa Ferraz, presidente do Sindicato dos Metalúrgicos)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, fierce brazilian woman around 30, long straight black hair, brown skin, determined defiant eyes, dark red work jacket over a red union t-shirt, old burn scar on her forearm, small red glowing vocal implant on the throat, union hall with a hand-painted "GREVE" banner behind
+
+============================================================
+RETRATOS — CASO 2, MINHOCÃO E CLÍNICA: salvar em www/img/portraits/ (quadrado, 1024x1024)
+============================================================
+
+cida.jpg  (Dona Cida, moradora do Minhocão)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, resilient black brazilian woman in her 60s, grey hair tied in a bun, layered worn clothes with a mustard yellow shawl over a rusty red coat, an old faded hospital bracelet on her wrist, warm wise eyes lit by a burning barrel fire, concrete viaduct pillars with graffiti and homeless tents behind
+
+caio.jpg  (Dr. Caio Mendes, médico renegado da Clínica Santa Rita)
+Photorealistic cinematic portrait, head and shoulders, facing camera, neo-noir cyberpunk 2085, dark rainy night, neon rim light (magenta and cyan), shallow depth of field, 85mm lens, film grain, Blade Runner mood, dark background, brazilian man in his mid 40s, slicked-back dark hair, short beard, tired sleepless eyes behind green military-grade diagnostic glasses, worn grey-white doctor's coat over a dark green shirt, stethoscope, dim underground clinic with blue cryogenic tanks and patient beds behind

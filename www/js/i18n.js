@@ -57,9 +57,10 @@ const I18N = (() => {
   // os dados são const globais (não ficam em window): lidos pelo nome, na hora da chamada
   const dataRoots = () => {
     const get = name => { try { return Function('return typeof ' + name + " !== 'undefined' ? " + name + ' : null')(); } catch (e) { return null; } };
-    const city = get('CITY');
+    const cities = get('CITIES') || {};
     return [get('NPCS'), get('EVIDENCE'), get('DEDUCTIONS'), get('ACTS'), get('ENDINGS'), get('ROOMS'), get('CONSUMABLES'), get('VENDORS'),
-      get('EXTRA_LINES'), get('DESTINATIONS'), get('ECO'), get('CASES'), get('OBJ_TEXT'), city && { bld: city.buildings, shp: city.shops, wlk: city.walkers }].filter(Boolean);
+      get('EXTRA_LINES'), get('DESTINATIONS'), get('CITY_DESTS'), get('ECO'), get('CASES'), get('OBJ_TEXT'),
+      ...Object.values(cities).map(city => ({ bld: city.buildings, shp: city.shops, wlk: city.walkers }))].filter(Boolean);
   };
 
   // nós de texto da página (botões e títulos fixos do HTML)

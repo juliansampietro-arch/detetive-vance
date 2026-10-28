@@ -283,7 +283,7 @@ NPCS.atendente = NPCS.at_lanchonete;   // saves antigos
 function enterShop(o) {
   const s = shopOf(o), room = ROOMS['loja_' + s.type];
   const p = game.player;
-  game.shopCtx = { sign: o.sign, name: o.name, col: o.col, back: [p.x, p.y] };
+  game.shopCtx = { sign: o.sign, name: o.name, col: o.col, back: [p.x, p.y], city: game.roomId };
   applyShopCtx();
   enterRoom('loja_' + s.type, [1, 1]);
   if (!game.flags['loja_' + o.sign]) {
@@ -300,9 +300,9 @@ function applyShopCtx() {
   return true;
 }
 function leaveShop() {
-  const back = game.shopCtx ? game.shopCtx.back : CITY.map(15, 17);
+  const back = game.shopCtx ? game.shopCtx.back : CITY.map(15, 17), city = (game.shopCtx && game.shopCtx.city) || 'city';
   game.shopCtx = null;
-  enterRoom('city', back);
+  enterRoom(city, back);
 }
 
 // ---------- balcão ----------
@@ -381,7 +381,7 @@ function hasGear(id) { return !!(game && game.bag && game.bag[id]); }
 function gearSpeed() { return hasGear('tenis') && !game.driving ? 1.2 : 1; }
 function gearNeed(k) {
   let m = 1;
-  if (k === 'cansaco' && hasGear('jaqueta') && game.roomId === 'city') m *= 0.75;
+  if (k === 'cansaco' && hasGear('jaqueta') && inCity()) m *= 0.75;
   if (k === 'cansaco' && hasGear('chinelos')) m *= 0.9;
   if ((k === 'fome' || k === 'sede') && hasGear('metab')) m *= 0.8;
   return m;
