@@ -623,9 +623,12 @@ const SPR_W = 20, SPR_H = 48;
 const spriteCache = {};
 
 // sprites desenhados à mão (opcional): img/sprites/<look>_<pose>.png ou img/sprites/<look>.png,
-// 20x48 pixels, substituem o desenho por código quando existem
+// 20x48 pixels, substituem o desenho por código. Só são pedidos os nomes desta lista (sem 404 à toa):
+// ao pôr um PNG na pasta, acrescente o nome aqui, ex.: 'banhista_f', 'banhista_f_walk1'
+const CUSTOM_SPRITE_FILES = new Set([]);
 const customSprites = {};
 function customSprite(file) {
+  if (!CUSTOM_SPRITE_FILES.has(file)) return null;
   if (!(file in customSprites)) {
     customSprites[file] = null;
     const im = new Image();

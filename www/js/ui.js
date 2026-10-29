@@ -190,7 +190,7 @@ function setSpeaker(id, who) {
   const el = $('dlg-speaker');
   talkVoice = who === 'I' ? null : who === 'V' ? (I18N.gender === 'f' ? 200 : 105) : id === 'byte' ? 'cat' : voiceFor(id);
   if (who === 'V') { el.textContent = T('GABRIEL VANCE'); el.className = 'vance'; }
-  else if (who === 'I') { el.textContent = 'PENSAMENTO DE VANCE'; el.className = 'inner'; }
+  else if (who === 'I') { el.textContent = T('PENSAMENTO DE VANCE'); el.className = 'inner'; }
   else { el.textContent = NPCS[id].name.toUpperCase(); el.className = ''; }
   $('dlg-text').classList.toggle('inner', who === 'I');
 }
@@ -370,7 +370,7 @@ function renderPalace() {
 function palaceInfo(id, extra = '') {
   const el = $('palace-info');
   if (!id) {
-    el.innerHTML = `<h3>Interface Neural</h3><p>Toque em duas evidências para conectá-las. Conexões corretas geram <b>deduções</b>: teorias que avançam a investigação e liberam confrontos com os suspeitos.</p>${extra}`;
+    el.innerHTML = `<h3>${T('Interface Neural')}</h3><p>${T('Toque em duas evidências para conectá-las. Conexões corretas geram <b>deduções</b>: teorias que avançam a investigação e liberam confrontos com os suspeitos.')}</p>${extra}`;
     return;
   }
   const isEv = !!EVIDENCE[id];
@@ -604,22 +604,96 @@ function showCard(title, sub, then) {
   el.onclick = () => { hide('card'); game.modal = null; if (then) then(); };
 }
 
+// ---------- finais ----------
+// cada final tem a sua tela: cena de fundo, cor, carimbo e o quadro de veredito (retrato + destino de cada um)
+const ENDING_SCENES = {
+  alvorada: {
+    victim: 'arthur', victimName: 'Arthur Pendelton', solvedBg: 'img/intro/2.jpg',
+    perfeito:     { bg: 'img/intro/2.jpg', tone: 'green',  stamp: 'CASO SOLUCIONADO', people: [['victor', 'CONDENADO'], ['helena', 'CONDENADA']] },
+    quase:        { bg: 'img/intro/2.jpg', tone: 'cyan',   stamp: 'CASO ENCERRADO',   people: [['victor', 'CONDENADO'], ['helena', 'IMPUNE']] },
+    fraco:        { bg: 'img/intro/5.jpg', tone: 'yellow', stamp: 'CASO ARQUIVADO',   people: [['victor', 'ABSOLVIDO']] },
+    incompleto:   { bg: 'img/intro/3.jpg', tone: 'orange', stamp: 'MEIA VERDADE',     people: [['helena', 'CONDENADA'], ['victor', 'IMPUNE']] },
+    errado:       { bg: 'img/intro/5.jpg', tone: 'red',    stamp: 'LICENÇA CASSADA',  people: [['evelyn', 'INOCENTE'], ['victor', 'IMPUNE']] },
+    errado_tomas: { bg: 'img/intro/4.jpg', tone: 'red',    stamp: 'ACUSAÇÃO ERRADA',  people: [['tomas', 'INOCENTE'], ['victor', 'IMPUNE']] },
+  },
+  eco: {
+    victim: 'kaelen', victimName: 'Kaelen Voss', solvedBg: 'img/intro/eco_1.jpg',
+    perfeito:     { bg: 'img/intro/eco_1.jpg', tone: 'green',  stamp: 'CASO SOLUCIONADO', people: [['maya', 'CONDENADA'], ['lyra', 'CONDENADA']] },
+    quase:        { bg: 'img/intro/eco_1.jpg', tone: 'cyan',   stamp: 'CASO ENCERRADO',   people: [['maya', 'CONDENADA'], ['lyra', 'IMPUNE']] },
+    fraco:        { bg: 'img/intro/eco_5.jpg', tone: 'yellow', stamp: 'CASO ARQUIVADO',   people: [['maya', 'ABSOLVIDA']] },
+    incompleto:   { bg: 'img/intro/eco_4.jpg', tone: 'orange', stamp: 'MEIA VERDADE',     people: [['zero', 'INOCENTE'], ['maya', 'IMPUNE']] },
+    errado_lyra:  { bg: 'img/intro/eco_4.jpg', tone: 'red',    stamp: 'ACUSAÇÃO ERRADA',  people: [['lyra', 'ABSOLVIDA'], ['maya', 'IMPUNE']] },
+    errado_rig:   { bg: 'img/intro/eco_3.jpg', tone: 'red',    stamp: 'ACUSAÇÃO ERRADA',  people: [['rig7', 'INOCENTE'], ['maya', 'IMPUNE']] },
+    errado_dante: { bg: 'img/intro/eco_2.jpg', tone: 'red',    stamp: 'ACUSAÇÃO ERRADA',  people: [['dante', 'ABSOLVIDO'], ['maya', 'IMPUNE']] },
+    critico:      { bg: 'img/intro/eco_3.jpg', tone: 'crit',   stamp: 'PROVAS APAGADAS',  people: [['maya', 'IMPUNE'], ['lyra', 'IMPUNE']] },
+  },
+};
+// destino de cada pessoa no quadro: cor do carimbo sobre o retrato
+const VERDICT_CLASS = { CONDENADO: 'v-guilty', CONDENADA: 'v-guilty', IMPUNE: 'v-free', ABSOLVIDO: 'v-free', ABSOLVIDA: 'v-free', INOCENTE: 'v-innocent' };
+
+function endingCard(look, name, tag, cls) {
+  return `<figure class="end-person ${cls}"><canvas width="132" height="168" data-look="${look}"></canvas><span class="end-tag">${T(tag)}</span><figcaption>${name}</figcaption></figure>`;
+}
+function endingPortraits(el) { el.querySelectorAll('canvas[data-look]').forEach(cv => drawPortrait(cv, cv.dataset.look)); }
+
 function showEnding(key, extra = '') {
   const e = ENDINGS[key];
+  const scenes = ENDING_SCENES[game.caseId] || ENDING_SCENES.alvorada;
+  const sc = scenes[key] || { bg: '', tone: e.good ? 'green' : 'red', stamp: '', people: [] };
   const el = $('ending');
-  el.className = 'screen ' + (e.good ? 'good' : 'bad');
-  el.innerHTML = `<div class="end-in">
-    <div class="end-title">${e.title}</div>
-    <div class="end-sub">${e.sub}</div>
-    <div class="end-text">${e.text.replace('{extra}', extra).split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>
-    <div class="end-stats">Evidências: ${game.evidence.length}/${EV_KEYS.length} · Deduções: ${game.deductions.length}/${DEDUCTIONS.length}</div>
-    <button id="btn-restart">Novo caso</button>
-  </div>`;
+  const stats = T('Evidências {0}/{1} · Deduções {2}/{3}', game.evidence.length, EV_KEYS.length, game.deductions.length, DEDUCTIONS.length);
+  const pct = Math.round(100 * (game.evidence.length + game.deductions.length) / Math.max(1, EV_KEYS.length + DEDUCTIONS.length));
+  const bg = src => src ? `<div class="end-bg" style="background-image:url('${src}')"></div>` : '';
   closeModal();
   clearSave();
   if (key === 'perfeito') setCaseProgress(game.caseId, 100);
   game.modal = 'ending';
   Sound.play(e.good ? 'deduction' : 'wrong');
   Sound.setMusic(e.good ? 'good' : 'bad');
-  $('btn-restart').onclick = () => { el.classList.add('hidden'); newGame(true, game.caseId); };
+
+  // tela do final: carimbo, veredito e o desfecho
+  const finale = () => {
+    el.className = `screen end-final tone-${sc.tone}`;
+    el.innerHTML = `${bg(sc.bg)}<div class="end-in">
+      <header class="end-head">
+        ${sc.stamp ? `<div class="end-stamp">${T(sc.stamp)}</div>` : ''}
+        <div class="end-title">${e.title}</div>
+        <div class="end-sub">${e.sub}</div>
+      </header>
+      <div class="end-body">
+        ${sc.people.length ? `<div class="end-board">${sc.people.map(([id, tag]) => endingCard(NPCS[id] ? NPCS[id].look : id, NPCS[id] ? NPCS[id].name : id, tag, VERDICT_CLASS[tag] || '')).join('')}</div>` : ''}
+        <div class="end-text">${e.text.replace('{extra}', extra).split('\n\n').map(p => `<p>${p}</p>`).join('')}</div>
+      </div>
+      <div class="end-stats">${stats}</div>
+      <button id="btn-restart" data-continue>${T('Novo caso')}</button>
+    </div>`;
+    el.scrollTop = 0;
+    endingPortraits(el);
+    $('btn-restart').onclick = () => { el.classList.add('hidden'); newGame(true, game.caseId); };
+  };
+
+  // caso solucionado (o assassino foi condenado): antes do desfecho, a tela de êxito do caso
+  if (!e.good) return finale();
+  const c = CASES[game.caseId] || {};
+  const stars = key === 'perfeito' ? 3 : 2;
+  el.className = `screen end-solved tone-${sc.tone}`;
+  el.innerHTML = `${bg(scenes.solvedBg)}<div class="end-in">
+    <div class="solved-tag">${c.tag || ''}</div>
+    <div class="solved-case">${c.title || ''}</div>
+    <div class="solved-stamp">${T('CASO SOLUCIONADO')}</div>
+    <div class="solved-row">
+      ${endingCard(scenes.victim, scenes.victimName, 'VÍTIMA', 'v-victim')}
+      <div class="solved-score">
+        <div class="solved-stars">${'<b>★</b>'.repeat(stars)}${'<i>★</i>'.repeat(3 - stars)}</div>
+        <div class="solved-rank">${e.sub}</div>
+        <div class="solved-bar"><i style="width:${pct}%"></i></div>
+        <div class="solved-pct">${T('Investigação {0}%', pct)}</div>
+        <div class="end-stats">${stats}</div>
+      </div>
+    </div>
+    <button id="btn-epilogue" data-continue>${T('Ver desfecho')}</button>
+  </div>`;
+  el.scrollTop = 0;
+  endingPortraits(el);
+  $('btn-epilogue').onclick = finale;
 }

@@ -1077,7 +1077,7 @@ window.addEventListener('resize', () => { if (game) { resizeView(game.zoom); upd
 
 // navegação por botões nas janelas (teclado / gamepad)
 function activePanel() {
-  return ['accuse', 'hack', 'palace', 'evidence', 'menu', 'gps', 'lang', 'dialogue', 'msg', 'call'].map($).find(el => !el.classList.contains('hidden')) || (titleOn() ? $('title') : null);
+  return ['accuse', 'hack', 'palace', 'evidence', 'menu', 'gps', 'lang', 'dialogue', 'msg', 'call', 'ending'].map($).find(el => !el.classList.contains('hidden')) || (titleOn() ? $('title') : null);
 }
 // tela de título (escolha do caso) aberta, sem a introdução por cima
 function titleOn() { return !$('title').classList.contains('hidden') && !Intro.isRunning(); }

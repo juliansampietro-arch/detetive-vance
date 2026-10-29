@@ -430,15 +430,96 @@ h1 span { color: var(--pink); text-shadow: 0 0 22px rgba(255,79,216,.8), 0 0 2px
 .card-hint { margin-top: 2.5em; color: var(--muted); animation: blink 1.4s infinite; font-size: .9em; }
 @keyframes blink { 50% { opacity: .3; } }
 
-#ending { animation: fadein 1.2s; overflow-y: auto; align-items: flex-start; }
-.end-in { max-width: 68%; padding: 2em 0; margin: auto; }
-.end-title { font-family: var(--display); font-weight: 700; font-size: 2.2em; letter-spacing: .2em; }
-#ending.good .end-title { color: var(--green); text-shadow: 0 0 16px rgba(125,255,107,.7); }
-#ending.bad .end-title { color: var(--red); text-shadow: 0 0 16px rgba(255,51,85,.7); }
+/* ---------- finais: tela de caso solucionado e uma tela por final ---------- */
+#ending { animation: fadein 1.2s; overflow-y: auto; align-items: flex-start; --tone: var(--green); --tone-rgb: 125, 255, 107; }
+#ending.tone-green  { --tone: var(--green);  --tone-rgb: 125, 255, 107; }
+#ending.tone-cyan   { --tone: var(--cyan);   --tone-rgb: 56, 246, 255; }
+#ending.tone-yellow { --tone: var(--yellow); --tone-rgb: 255, 210, 63; }
+#ending.tone-orange { --tone: #ff8a3d;       --tone-rgb: 255, 138, 61; }
+#ending.tone-red    { --tone: var(--red);    --tone-rgb: 255, 51, 85; }
+#ending.tone-crit   { --tone: var(--red);    --tone-rgb: 255, 51, 85; }
+/* cena de fundo escurecida, tingida com a cor do final */
+.end-bg { position: fixed; inset: 0; background-size: cover; background-position: center; filter: saturate(.75) brightness(.32); animation: end-zoom 30s ease-out forwards; }
+.end-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(var(--tone-rgb), .14), rgba(5, 3, 12, .85) 75%); }
+.tone-red .end-bg, .tone-crit .end-bg { filter: grayscale(.7) brightness(.28); }
+.tone-crit .end-bg { animation: end-zoom 30s ease-out forwards, end-glitch 3.2s steps(1) infinite; }
+@keyframes end-zoom { from { transform: scale(1.08); } }
+@keyframes end-glitch { 0%, 100% { transform: none; } 91% { transform: translateX(-8px) scale(1.02); filter: grayscale(.4) brightness(.4) hue-rotate(-30deg); } 94% { transform: translateX(6px); } }
+.end-in { position: relative; max-width: min(68%, 60em); padding: 2em 0; margin: auto; }
+.end-title { font-family: var(--display); font-weight: 700; font-size: 2.2em; letter-spacing: .2em; color: var(--tone); text-shadow: 0 0 16px rgba(var(--tone-rgb), .7); }
 .end-sub { font-family: var(--display); font-size: 1.4em; color: var(--yellow); margin: .3em 0 1em; }
 .end-text { font-size: 1.05em; line-height: 1.6; text-align: left; }
 .end-stats { margin: 1.2em 0; color: var(--muted); }
-#btn-restart { font-size: 1.1em; border-color: var(--cyan); color: var(--cyan); }
+#btn-restart, #btn-epilogue { font-size: 1.1em; border-color: var(--tone); color: var(--tone); box-shadow: 0 0 14px rgba(var(--tone-rgb), .25); }
+
+/* carimbo de borracha que "bate" na tela */
+.end-stamp, .solved-stamp {
+  display: inline-block; font-family: var(--display); font-weight: 700; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--tone); border: 3px double var(--tone); border-radius: 6px; padding: .15em .7em;
+  transform: rotate(-6deg); text-shadow: 0 0 10px rgba(var(--tone-rgb), .6); box-shadow: 0 0 18px rgba(var(--tone-rgb), .3), inset 0 0 12px rgba(var(--tone-rgb), .2);
+  animation: stamp .5s cubic-bezier(.3, 1.6, .5, 1) .5s both;
+}
+.end-stamp { font-size: 1.05em; margin-bottom: .8em; }
+@keyframes stamp { from { opacity: 0; transform: rotate(-14deg) scale(2.4); } }
+
+/* quadro de veredito: retrato de cada envolvido com o destino carimbado */
+.end-body { display: flex; gap: 1.6em; align-items: flex-start; }
+.end-board { display: flex; flex-direction: column; gap: .8em; flex: none; }
+.end-person { position: relative; margin: 0; width: 7.5em; animation: fadein .8s 1s both; }
+.end-person + .end-person { animation-delay: 1.4s; }
+.end-person canvas { display: block; width: 100%; aspect-ratio: 132 / 168; border: 1px solid rgba(255, 255, 255, .18); border-radius: 6px; background: #0c0818; }
+.end-person figcaption { margin-top: .3em; font-size: .78em; color: var(--muted); line-height: 1.25; }
+.end-tag {
+  position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%) rotate(-10deg);
+  font-family: var(--display); font-weight: 700; font-size: .78em; letter-spacing: .12em; white-space: nowrap;
+  padding: .1em .45em; border: 2px solid currentColor; border-radius: 4px; background: rgba(5, 3, 12, .72);
+}
+.v-guilty .end-tag { color: var(--green); }
+.v-guilty canvas { border-color: rgba(125, 255, 107, .5); }
+.v-free .end-tag { color: var(--red); }
+.v-free canvas { border-color: rgba(255, 51, 85, .5); }
+.v-innocent .end-tag { color: var(--yellow); }
+.v-innocent canvas, .v-victim canvas { filter: grayscale(1) brightness(.85); }
+.v-victim .end-tag { color: #e6e2f6; }
+
+/* tela de êxito: caso solucionado */
+.end-solved .end-in { text-align: center; }
+.solved-tag { font-family: var(--display); font-weight: 500; color: var(--cyan); letter-spacing: .4em; font-size: .85em; text-transform: uppercase; }
+.solved-case { font-family: var(--display); font-weight: 700; font-size: 1.9em; color: #f0eaff; text-shadow: 0 0 18px rgba(176, 76, 255, .7); margin: .3em 0 .7em; }
+.solved-stamp { font-size: 2.3em; padding: .2em .8em; }
+.solved-row { display: flex; gap: 2em; align-items: center; justify-content: center; margin: 1.6em 0 1.2em; }
+.solved-score { min-width: 15em; text-align: left; }
+.solved-stars { font-size: 2.4em; letter-spacing: .1em; line-height: 1; }
+.solved-stars b { color: var(--yellow); text-shadow: 0 0 14px rgba(255, 210, 63, .8); animation: fadein .4s both; }
+.solved-stars b:nth-child(1) { animation-delay: 1.1s; } .solved-stars b:nth-child(2) { animation-delay: 1.35s; } .solved-stars b:nth-child(3) { animation-delay: 1.6s; }
+.solved-stars i { font-style: normal; color: rgba(255, 255, 255, .15); }
+.solved-rank { font-family: var(--display); font-size: 1.3em; color: var(--tone); margin: .3em 0 .7em; }
+.solved-bar { height: 8px; background: rgba(255, 255, 255, .08); border-radius: 4px; overflow: hidden; }
+.solved-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--tone), var(--cyan)); box-shadow: 0 0 8px var(--tone); animation: bar-grow 1.2s ease-out 1s both; }
+@keyframes bar-grow { from { width: 0; } }
+.solved-pct { margin-top: .35em; font-size: .9em; color: var(--text); }
+.end-solved .end-stats { margin: .3em 0 0; font-size: .85em; }
+
+/* telas baixas (celular deitado, 720p): tudo menor, veredito ao lado do texto */
+@media (max-height: 760px) {
+  .end-in { max-width: min(88%, 60em); padding: 1em 0; }
+  .end-title { font-size: 1.6em; }
+  .end-sub { font-size: 1.1em; margin-bottom: .6em; }
+  .end-text { font-size: .95em; line-height: 1.5; }
+  .end-person { width: 5.6em; }
+  .end-board { gap: .5em; }
+  .solved-case { font-size: 1.4em; margin: .2em 0 .4em; }
+  .solved-stamp { font-size: 1.6em; }
+  .solved-row { margin: .9em 0 .7em; }
+  .solved-stars { font-size: 1.8em; }
+  .end-stats { margin: .7em 0; }
+}
+@media (max-width: 560px) {
+  .end-body { flex-direction: column; align-items: center; }
+  .end-board { flex-direction: row; }
+  .solved-row { flex-direction: column; gap: 1em; }
+  .solved-score { text-align: center; }
+}
 
 /* introdução animada */
 #intro { background: #000; cursor: pointer; z-index: 20; }
