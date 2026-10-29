@@ -829,6 +829,7 @@ function doAction() {
     if (game.modal === 'card') { $('card').click(); return; }
     if (typing) { finishTyping(); return; }
     if (game.modal === 'hack' && hackState && !hackState.solved) { hackRotate(); return; }
+    if (game.modal === 'palace' && palaceCur && document.activeElement !== $('btn-accuse')) { palaceClick(palaceCur); return; }
     const panel = activePanel();
     if (!panel) return;
     const f = document.activeElement;
@@ -1080,6 +1081,12 @@ function activePanel() {
 }
 // tela de título (escolha do caso) aberta, sem a introdução por cima
 function titleOn() { return !$('title').classList.contains('hidden') && !Intro.isRunning(); }
+function padFocus(n) {
+  document.querySelectorAll('.pad-focus').forEach(b => b.classList.remove('pad-focus'));
+  n.classList.add('pad-focus');
+  n.focus({ focusVisible: true });
+  n.scrollIntoView({ block: 'nearest' });
+}
 function focusMove(delta) {
   const panel = activePanel();
   if (!panel) return;
@@ -1103,9 +1110,29 @@ function nudgeRange(el, dir) {
 // direção do teclado / controle numa janela: invasão move o cursor, volume ajusta, o resto percorre os botões
 function modalNav(dx, dy) {
   if (game && game.modal === 'hack') { hackMove(dx, dy); return; }
+  if (game && game.modal === 'palace') { palaceMove(dx, dy); return; }
   const r = rangeFocused();
   if (r && dx) { nudgeRange(r, dx); return; }
-  focusMove(dx + dy < 0 ? -1 : 1);
+  focusDir(dx, dy);
+}
+// foco espacial: vai para o botão mais próximo na direção apertada (grades de duas colunas)
+function focusDir(dx, dy) {
+  const panel = activePanel();
+  if (!panel) return;
+  const bs = [...panel.querySelectorAll('button, input[type=range]')].filter(b => b.offsetParent);
+  const cur = document.activeElement;
+  if (!bs.includes(cur)) { focusMove(dx + dy < 0 ? -1 : 1); return; }
+  const c = cur.getBoundingClientRect(), cx = c.left + c.width / 2, cy = c.top + c.height / 2;
+  let best = null, bsc = Infinity;
+  for (const b of bs) {
+    if (b === cur) continue;
+    const r = b.getBoundingClientRect(), vx = r.left + r.width / 2 - cx, vy = r.top + r.height / 2 - cy;
+    const along = vx * dx + vy * dy, perp = Math.abs(vx * dy - vy * dx);
+    if (along <= 2) continue;
+    const sc = along + perp * 2.5;
+    if (sc < bsc) { bsc = sc; best = b; }
+  }
+  if (best) padFocus(best); else focusMove(dx + dy < 0 ? -1 : 1);
 }
 
 function toggleScanner() {
@@ -1895,7 +1922,13 @@ function openMenu() {
   show('menu');
   menuView('main');
   renderMenu();
+  // atalhos rápidos (controle: B abre a pausa, direcional escolhe, A confirma)
+  $('mq-gps').classList.toggle('hidden', game.roomId !== 'city');
+  $('mq-scan').textContent = (game.scanner ? '◉ ' : '○ ') + T(game.scanner ? 'Desligar Scanner' : 'Ligar Scanner');
+  if (pad.labels || (navigator.getGamepads && [...navigator.getGamepads()].some(g => g))) padFocus($('mq-scan'));
 }
+for (const [id, fn] of [['mq-scan', toggleScanner], ['mq-palace', () => openPalace()], ['mq-ev', () => openEvidence()], ['mq-bag', () => openBag()], ['mq-gps', () => openGps()]])
+  $(id).addEventListener('click', () => { closeModal(); fn(); });
 // a pausa tem duas telas: a principal e as Configurações
 function menuView(v) {
   $('menu-main').classList.toggle('hidden', v !== 'main');

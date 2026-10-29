@@ -3592,5 +3592,14 @@
  "3590": "Executivo apressado",
  "3591": "Está pronto para fazer a acusação?",
  "3592": "button, input[type=range]",
- "3593": "Controle ou teclado: direcional move, A ou Enter gira."
+ "3593": "Controle ou teclado: direcional move, A ou Enter gira.",
+ "3594": "◉ Scanner",
+ "3595": "✦ Pistas",
+ "3596": "▤ Evidências",
+ "3597": "⌖ GPS",
+ "3598": "View",
+ "3599": "Desligar Scanner",
+ "3600": "Ligar Scanner",
+ "3601": "Primeira escolhida. Mova o cursor até outra evidência e confirme (A / Enter) para conectar.",
+ "3602": "Toque em outra evidência para tentar uma conexão."
 }

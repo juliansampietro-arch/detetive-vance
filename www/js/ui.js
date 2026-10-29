@@ -313,6 +313,7 @@ function kindClass(k) { return k === 'física' ? 'fis' : k === 'digital' ? 'dig'
 
 // ---------- Palácio da Memória ----------
 let palaceSel = null;
+let palaceCur = null;   // nó sob o cursor do teclado / controle
 function nodePos(id) {
   let i = EV_KEYS.indexOf(id);
   if (i >= 0) {
@@ -327,6 +328,7 @@ function nodePos(id) {
 function openPalace() {
   game.modal = 'palace';
   palaceSel = null;
+  palaceCur = game.evidence[0] || null;
   show('palace');
   renderPalace();
   palaceInfo(null);
@@ -349,15 +351,15 @@ function renderPalace() {
   for (const id of game.evidence) {
     const [x, y] = nodePos(id);
     const e = EVIDENCE[id];
-    const sel = palaceSel === id ? ' sel' : '';
-    // círculo invisível maior para facilitar o toque
-    h += `<g class="node ev kind-${kindClass(e.kind)}${sel}" data-id="${id}"><circle cx="${x}" cy="${y}" r="30" class="hit"/><circle cx="${x}" cy="${y}" r="16"/><text x="${x}" y="${y + 34}">${e.short}</text></g>`;
+    const sel = (palaceSel === id ? ' sel' : '') + (palaceCur === id ? ' cur' : '');
+    // círculo invisível maior para facilitar o toque; anel do cursor e selo "1ª" da primeira escolhida
+    h += `<g class="node ev kind-${kindClass(e.kind)}${sel}" data-id="${id}"><circle cx="${x}" cy="${y}" r="30" class="hit"/>${palaceCur === id ? `<circle cx="${x}" cy="${y}" r="25" class="cur-ring"/>` : ''}<circle cx="${x}" cy="${y}" r="16"/><text x="${x}" y="${y + 34}">${e.short}</text>${palaceSel === id ? `<text x="${x}" y="${y - 26}" class="sel-badge">1ª</text>` : ''}</g>`;
   }
   for (const d of DEDUCTIONS) {
     if (!has(d.id)) continue;
     const [x, y] = nodePos(d.id);
-    const sel = palaceSel === d.id ? ' sel' : '';
-    h += `<g class="node ded${sel}" data-id="${d.id}"><circle cx="${x}" cy="${y}" r="28" class="hit"/><rect x="${x - 13}" y="${y - 13}" width="26" height="26" transform="rotate(45 ${x} ${y})"/><text x="${x}" y="${y + 36}">${d.name}</text></g>`;
+    const sel = (palaceSel === d.id ? ' sel' : '') + (palaceCur === d.id ? ' cur' : '');
+    h += `<g class="node ded${sel}" data-id="${d.id}"><circle cx="${x}" cy="${y}" r="28" class="hit"/>${palaceCur === d.id ? `<circle cx="${x}" cy="${y}" r="27" class="cur-ring"/>` : ''}<rect x="${x - 13}" y="${y - 13}" width="26" height="26" transform="rotate(45 ${x} ${y})"/><text x="${x}" y="${y + 36}">${d.name}</text></g>`;
   }
   svg.innerHTML = h;
   svg.querySelectorAll('.node').forEach(n => n.onclick = () => palaceClick(n.dataset.id));
@@ -373,10 +375,38 @@ function palaceInfo(id, extra = '') {
   }
   const isEv = !!EVIDENCE[id];
   const item = isEv ? EVIDENCE[id] : DEDUCTIONS.find(d => d.id === id);
-  el.innerHTML = `<h3>${item.name}</h3><div class="tag ${isEv ? 'kind-' + kindClass(item.kind) : 'ded'}">${T(isEv ? item.kind : 'dedução')}</div><p>${item.desc}</p>${extra}${isEv && palaceSel ? '<p class="hint">Toque em outra evidência para tentar uma conexão.</p>' : ''}`;
+  el.innerHTML = `<h3>${item.name}</h3><div class="tag ${isEv ? 'kind-' + kindClass(item.kind) : 'ded'}">${T(isEv ? item.kind : 'dedução')}</div><p>${item.desc}</p>${extra}${isEv && palaceSel ? `<p class="hint">${T(palaceSel === id ? 'Primeira escolhida. Mova o cursor até outra evidência e confirme (A / Enter) para conectar.' : 'Toque em outra evidência para tentar uma conexão.')}</p>` : ''}`;
+}
+
+// direcional: salta para o nó mais próximo na direção apertada; embaixo de tudo, o botão de acusar
+function palaceMove(dx, dy) {
+  const ids = game.evidence.concat(game.deductions);
+  if (!ids.length) return;
+  const acc = $('btn-accuse'), onAcc = document.activeElement === acc;
+  if (onAcc) { if (dy < 0) { acc.classList.remove('pad-focus'); acc.blur(); renderPalace(); } return; }
+  if (!palaceCur || !ids.includes(palaceCur)) { palaceCur = ids[0]; renderPalace(); palaceInfo(palaceCur); return; }
+  const [px, py] = nodePos(palaceCur);
+  let best = null, bs = Infinity;
+  for (const id of ids) {
+    if (id === palaceCur) continue;
+    const [qx, qy] = nodePos(id), vx = qx - px, vy = qy - py;
+    const along = vx * dx + vy * dy, perp = Math.abs(vx * dy - vy * dx);
+    if (along <= 4) continue;
+    const sc = along + perp * 2;
+    if (sc < bs) { bs = sc; best = id; }
+  }
+  if (!best) {
+    if (dy > 0 && !acc.classList.contains('hidden')) { padFocus(acc); renderPalace(); }
+    return;
+  }
+  palaceCur = best;
+  Sound.play('click');
+  renderPalace();
+  palaceInfo(palaceCur);
 }
 
 function palaceClick(id) {
+  palaceCur = id;
   Sound.play('click');
   if (!EVIDENCE[id]) { palaceSel = null; renderPalace(); palaceInfo(id); return; }
   if (!palaceSel || palaceSel === id || !EVIDENCE[palaceSel]) {

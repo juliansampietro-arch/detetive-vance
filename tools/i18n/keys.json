@@ -3592,5 +3592,14 @@
  "Executivo apressado",
  "Está pronto para fazer a acusação?",
  "button, input[type=range]",
- "Controle ou teclado: direcional move, A ou Enter gira."
+ "Controle ou teclado: direcional move, A ou Enter gira.",
+ "◉ Scanner",
+ "✦ Pistas",
+ "▤ Evidências",
+ "⌖ GPS",
+ "View",
+ "Desligar Scanner",
+ "Ligar Scanner",
+ "Primeira escolhida. Mova o cursor até outra evidência e confirme (A / Enter) para conectar.",
+ "Toque em outra evidência para tentar uma conexão."
 ]
