@@ -1,5 +1,5 @@
 // Service worker: deixa o jogo disponível offline depois da primeira visita
-const CACHE = 'alvorada-v28';
+const CACHE = 'alvorada-v29';
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css',
   'js/i18n.js', 'i18n/keys.js', 'i18n/en.js', 'i18n/es.js', 'i18n/de.js', 'i18n/fr.js', 'i18n/it.js', 'i18n/ko.js',
