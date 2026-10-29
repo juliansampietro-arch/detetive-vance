@@ -415,7 +415,7 @@ function openHack(title, onSolve) {
   game.modal = 'hack';
   show('hack');
   $('hack-title').textContent = title;
-  $('hack-status').textContent = T('Toque nos nós para girá-los e conectar a entrada (IN) à saída (OUT).');
+  $('hack-status').textContent = T('Toque nos nós para girá-los e conectar a entrada (IN) à saída (OUT).') + ' ' + T('Controle ou teclado: direcional move, A ou Enter gira.');
   const grid = Array.from({ length: HN }, () => Array(HN).fill(0));
   let r = Math.floor(Math.random() * HN);
   const sr = r, path = [];
@@ -433,7 +433,7 @@ function openHack(title, onSolve) {
   });
   const fillers = [5, 3, 7, 3, 5];
   for (let y = 0; y < HN; y++) for (let x = 0; x < HN; x++) if (!grid[y][x]) grid[y][x] = fillers[Math.floor(Math.random() * fillers.length)];
-  hackState = { grid, sr, tr, onSolve, solved: false };
+  hackState = { grid, sr, tr, onSolve, solved: false, cur: [0, sr] };
   do {
     for (let y = 0; y < HN; y++) for (let x = 0; x < HN; x++) {
       const n = Math.floor(Math.random() * 4);
@@ -479,6 +479,11 @@ function drawHack() {
     c.fillStyle = col; c.fillRect(cx - 6, cy - 6, 12, 12);
     c.shadowBlur = 0;
   }
+  // cursor de teclado / controle
+  if (hackState.cur && !solved) {
+    const [qx, qy] = hackState.cur, pulse = 0.6 + 0.4 * Math.sin(performance.now() / 160);
+    c.strokeStyle = `rgba(255,210,63,${pulse})`; c.lineWidth = 4; c.strokeRect(M + qx * S + 3, M + qy * S + 3, S - 6, S - 6);
+  }
   c.fillStyle = '#38f6ff';
   c.fillRect(0, M + sr * S + S / 2 - 4, M, 8);
   c.fillStyle = solved ? '#7dff6b' : '#ff3355';
@@ -495,6 +500,20 @@ function hackClick(ev) {
   const x = (ev.clientX - r.left) * cv.width / r.width, y = (ev.clientY - r.top) * cv.height / r.height;
   const gx = Math.floor((x - 40) / 64), gy = Math.floor((y - 40) / 64);
   if (gx < 0 || gy < 0 || gx >= HN || gy >= HN) return;
+  hackState.cur = [gx, gy];
+  hackRotate();
+}
+// setas / direcional movem o cursor; Enter / A giram o nó sob ele
+function hackMove(dx, dy) {
+  if (!hackState || hackState.solved) return;
+  const [x, y] = hackState.cur;
+  hackState.cur = [Math.max(0, Math.min(HN - 1, x + dx)), Math.max(0, Math.min(HN - 1, y + dy))];
+  Sound.play('click');
+  drawHack();
+}
+function hackRotate() {
+  if (!hackState || hackState.solved) return;
+  const [gx, gy] = hackState.cur;
   hackState.grid[gy][gx] = rot(hackState.grid[gy][gx]);
   Sound.play('rotate');
   drawHack();

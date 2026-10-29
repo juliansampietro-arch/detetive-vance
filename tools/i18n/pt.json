@@ -3590,5 +3590,7 @@
  "3588": "Passageiro",
  "3589": "Passageira",
  "3590": "Executivo apressado",
- "3591": "Está pronto para fazer a acusação?"
+ "3591": "Está pronto para fazer a acusação?",
+ "3592": "button, input[type=range]",
+ "3593": "Controle ou teclado: direcional move, A ou Enter gira."
 }

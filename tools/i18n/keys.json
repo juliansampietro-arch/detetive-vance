@@ -3590,5 +3590,7 @@
  "Passageiro",
  "Passageira",
  "Executivo apressado",
- "Está pronto para fazer a acusação?"
+ "Está pronto para fazer a acusação?",
+ "button, input[type=range]",
+ "Controle ou teclado: direcional move, A ou Enter gira."
 ]

@@ -815,6 +815,7 @@ function updatePrompt() {
 // botão de ação: interage com o alvo ou avança o texto da janela aberta
 let engineOn = false;
 function doAction() {
+  if (Intro.isRunning()) { if (k === 'escape') Intro.skip(); else if (k === 'enter' || k === ' ' || k === 'e') Intro.next(); return; }
   if (!game) {
     // tela de título: A abre o botão destacado; na introdução, avança
     if (Intro.isRunning()) { Intro.next(); return; }
@@ -827,6 +828,7 @@ function doAction() {
     if (game.modal === 'intro') { Intro.next(); return; }
     if (game.modal === 'card') { $('card').click(); return; }
     if (typing) { finishTyping(); return; }
+    if (game.modal === 'hack' && hackState && !hackState.solved) { hackRotate(); return; }
     const panel = activePanel();
     if (!panel) return;
     const f = document.activeElement;
@@ -1081,7 +1083,7 @@ function titleOn() { return !$('title').classList.contains('hidden') && !Intro.i
 function focusMove(delta) {
   const panel = activePanel();
   if (!panel) return;
-  const bs = [...panel.querySelectorAll('button')].filter(b => b.offsetParent);
+  const bs = [...panel.querySelectorAll('button, input[type=range]')].filter(b => b.offsetParent);
   if (!bs.length) return;
   const i = bs.indexOf(document.activeElement);
   const n = bs[(i < 0 ? (delta > 0 ? 0 : bs.length - 1) : (i + delta + bs.length) % bs.length)];
@@ -1089,6 +1091,21 @@ function focusMove(delta) {
   n.classList.add('pad-focus');   // destaque visível também com controle (o :focus-visible só aparece com teclado)
   n.focus({ focusVisible: true });
   n.scrollIntoView({ block: 'nearest' });
+}
+
+// controle deslizante com foco: ←/→ mudam o valor (5% por toque)
+function rangeFocused() { const f = document.activeElement; return f && f.tagName === 'INPUT' && f.type === 'range' ? f : null; }
+function nudgeRange(el, dir) {
+  const step = (+el.max - +el.min) / 20;
+  el.value = Math.max(+el.min, Math.min(+el.max, +el.value + dir * step));
+  el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true }));
+}
+// direção do teclado / controle numa janela: invasão move o cursor, volume ajusta, o resto percorre os botões
+function modalNav(dx, dy) {
+  if (game && game.modal === 'hack') { hackMove(dx, dy); return; }
+  const r = rangeFocused();
+  if (r && dx) { nudgeRange(r, dx); return; }
+  focusMove(dx + dy < 0 ? -1 : 1);
 }
 
 function toggleScanner() {
@@ -1111,23 +1128,41 @@ function pollGamepad() {
   let ax = Math.abs(gp.axes[0]) > 0.2 ? gp.axes[0] : 0, ay = Math.abs(gp.axes[1]) > 0.2 ? gp.axes[1] : 0;
   if (b(14)) ax = -1; if (b(15)) ax = 1; if (b(12)) ay = -1; if (b(13)) ay = 1;
   // a tecla emulada pelo Edge do Xbox chegou primeiro: este aperto já foi tratado por ela
-  if (performance.now() - (pad.lastKey || -1e9) < 250) { for (let i = 0; i < gp.buttons.length; i++) pad.prev[i] = b(i); pad.prev.up = pad.prev.down = true; pad.x = pad.y = 0; return; }
+  if (performance.now() - (pad.lastKey || -1e9) < 250) { for (let i = 0; i < gp.buttons.length; i++) pad.prev[i] = b(i); pad.prev.up = pad.prev.down = pad.prev.left = pad.prev.right = true; pad.x = pad.y = 0; return; }
   if ((game && game.modal) || titleOn()) {
     pad.x = pad.y = 0;
-    const up = (b(12) || b(14) || gp.axes[1] < -0.6 || gp.axes[0] < -0.6), down = (b(13) || b(15) || gp.axes[1] > 0.6 || gp.axes[0] > 0.6);
-    if (up && !pad.prev.up) focusMove(-1);
-    if (down && !pad.prev.down) focusMove(1);
-    pad.prev.up = up; pad.prev.down = down;
+    const dir = { up: b(12) || gp.axes[1] < -0.6, down: b(13) || gp.axes[1] > 0.6, left: b(14) || gp.axes[0] < -0.6, right: b(15) || gp.axes[0] > 0.6 };
+    const V = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+    for (const k in dir) { if (dir[k] && !pad.prev[k]) modalNav(...V[k]); pad.prev[k] = dir[k]; }
   } else { pad.x = ax; pad.y = ay; }
   if (pressed(0)) doAction();
   if (pressed(1)) goBack();
   if (pressed(2)) toggleScanner();
   if (pressed(3) && game && !game.modal) openPalace();
   if (pressed(8) && game && !game.modal) openEvidence();
+  // gatilhos e bumpers: LB scanner, RB pistas, LT mochila, RT GPS
+  if (pressed(4)) toggleScanner();
+  if (pressed(5) && game && !game.modal) openPalace();
+  if (pressed(6) && game && !game.modal) openBag();
+  if (pressed(7) && game && !game.modal) openGps();
+  if (!pad.labels && gp.buttons.some(x => x.pressed)) padLabels(true);
   if (pressed(9) && game) game.modal === 'menu' ? closeModal() : openMenu();
   if (gp.buttons.some(x => x.pressed) || Math.abs(gp.axes[0]) > 0.6 || Math.abs(gp.axes[1]) > 0.6) pad.lastPress = performance.now();
   for (let i = 0; i < gp.buttons.length; i++) pad.prev[i] = b(i);
 }
+
+// no HUD, as teclas viram os botões do controle enquanto ele estiver em uso
+const PAD_KEYS = { 'btn-scan': 'LB', 'btn-palace': 'RB', 'btn-bag': 'LT', 'btn-gps': 'RT', 'btn-ev': 'View' };
+function padLabels(on) {
+  pad.labels = on;
+  for (const [id, lbl] of Object.entries(PAD_KEYS)) {
+    const k = document.querySelector('#' + id + ' kbd');
+    if (!k) continue;
+    if (!k.dataset.key) k.dataset.key = k.textContent;
+    k.textContent = on ? lbl : k.dataset.key;
+  }
+}
+document.addEventListener('keydown', ev => { if (pad.labels && ev.isTrusted && performance.now() - (pad.lastPress || -1e9) > 1000) padLabels(false); });
 
 // ---------- loop ----------
 let last = performance.now();
@@ -1888,11 +1923,15 @@ function goBack() {
 
 document.addEventListener('keydown', ev => {
   const k = ev.key.toLowerCase();
-  if (Intro.isRunning()) { if (k === 'escape') Intro.skip(); else if (k === 'enter' || k === ' ' || k === 'e') Intro.next(); return; }
-  if (!game) return;
   // o Edge do Xbox também transforma o controle em teclas (setas, Enter, Esc): ignora o eco para não contar duas vezes
   if (performance.now() - (pad.lastPress || -1e9) < 250 && ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter', 'escape', ' ', 'gamepada', 'gamepadb'].includes(k)) { ev.preventDefault(); return; }
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'enter', 'escape', ' '].includes(k)) pad.lastKey = performance.now();
+  if (!game) {
+    // tela de título: setas percorrem os casos (e ajustam o volume), Enter abre
+    const V = { arrowup: [0, -1], arrowdown: [0, 1], arrowleft: [-1, 0], arrowright: [1, 0] };
+    if (titleOn() && V[k]) { ev.preventDefault(); modalNav(...V[k]); }
+    return;
+  }
   if (k === 'escape') { goBack(); return; }
   // dirigindo, o Espaço é o acelerador (tratado em city.js), não a tecla de ação
   if (k === ' ' && game.driving && !game.modal) { ev.preventDefault(); return; }
@@ -1902,8 +1941,9 @@ document.addEventListener('keydown', ev => {
     return;
   }
   if (game.modal) {
-    if (k === 'arrowup' || k === 'arrowleft') { ev.preventDefault(); focusMove(-1); }
-    else if (k === 'arrowdown' || k === 'arrowright' || k === 'tab') { ev.preventDefault(); focusMove(1); }
+    const V = { arrowup: [0, -1], arrowdown: [0, 1], arrowleft: [-1, 0], arrowright: [1, 0] };
+    if (V[k]) { ev.preventDefault(); modalNav(...V[k]); }
+    else if (k === 'tab') { ev.preventDefault(); focusMove(ev.shiftKey ? -1 : 1); }
     if (game.modal !== 'evidence' && game.modal !== 'palace') return;
   }
   if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd'].includes(k)) { ev.preventDefault(); keys.add(k); return; }
