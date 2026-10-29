@@ -499,3 +499,8 @@ button.ghost:hover { color: var(--cyan); box-shadow: none; border-color: transpa
 
 /* seleção pelo controle: bem visível na TV */
 button.pad-focus { border-color: #fff !important; color: #fff; box-shadow: 0 0 0 2px var(--cyan), 0 0 22px rgba(56, 246, 255, .6) !important; transform: scale(1.04); }
+
+/* fala já vista continua apagada mesmo com foco do controle ou cursor em cima (só a borda acende) */
+.options button.seen, .options button.seen:hover, .options button.seen:focus-visible, .options button.seen.pad-focus { color: var(--muted) !important; }
+.options button.confront.seen:hover, .options button.confront.seen:focus-visible, .options button.confront.seen.pad-focus { color: #a88a7a !important; }
+.options button.seen:not(:hover):not(.pad-focus):not(:focus-visible) { opacity: .75; }
