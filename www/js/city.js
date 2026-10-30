@@ -233,7 +233,7 @@ function buildCity(def) {
       O({ kind: 'fence', x: 3, y: 46, w: 2, axis: 'x' });
       O({ kind: 'fence', x: 7, y: 46, w: 2, axis: 'x' });
       O({ kind: 'junk_gate', x: 5, y: 46, w: 2, axis: 'x', text: 'FERRO-VELHO DO ZECA' });
-      door(5, 46, 'ferrovelho', [2, 1], 'Ferro-velho do Zeca'); door(6, 46, 'ferrovelho', [3, 1], 'Ferro-velho do Zeca');
+      door(5, 46, 'ferrovelho', [1, 6], 'Ferro-velho do Zeca'); door(6, 46, 'ferrovelho', [1, 7], 'Ferro-velho do Zeca');
       O({ kind: 'scrap', x: 7, y: 47, w: 2, d: 2, solid: true, key: 'sucata_rua', name: 'Sucata na calçada', info: 'Peças que não couberam lá dentro: um braço robótico, rodas, um letreiro de neon apagado.' });
     } else if (type === 'home') {
       B(43, 3, 6, 4, 140, 'home', { col: '#1e3028', sign: 'RESIDENCIAL KOWLOON', signCol: '#7dff6b' });

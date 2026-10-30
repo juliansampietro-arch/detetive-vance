@@ -581,6 +581,19 @@ function drawWallTile(edge, i, f, base, room, t) {
         }
         break;
       }
+      case 'g': { // portão aberto do ferro-velho: a rua molhada lá fora e as folhas do portão abertas para os lados
+        wallRect(u0, 0, u1, WH, '#07080c');
+        wallRect(u0, 0, u1, 5, '#14161c'); wallRect(u0, 5, u1, 5.4, '#2a2c34');                  // calçada
+        for (let k = 0; k < 4; k++) wallRect(u0 + k * 0.25 + 0.05, 1.5, u0 + k * 0.25 + 0.2, 2, 'rgba(255,210,63,0.25)');
+        wallRect(u0, 6, u1, 26, '#0c0e16');                                                       // prédios do outro lado
+        for (let k = 0; k < 3; k++) wallRect(u0 + 0.1 + k * 0.3, 12 + (k + i) % 3 * 4, u0 + 0.22 + k * 0.3, 14 + (k + i) % 3 * 4, (k + i) % 2 ? 'rgba(255,180,90,0.5)' : 'rgba(56,246,255,0.35)');
+        for (let k = 0; k < 5; k++) { const y = (t * 40 + k * 9 + i * 5) % WH; wallRect(u0 + k * 0.2 + 0.05, WH - y, u0 + k * 0.2 + 0.06, WH - y + 2, 'rgba(160,190,255,0.35)'); }
+        const g0 = room.wallW.indexOf('g') === i || room.wallN.indexOf('g') === i, g1 = (edge === 'W' ? room.wallW : room.wallN)[i + 1] !== 'g';
+        if (g0) { wallRect(u0, 0, u0 + 0.1, 38, '#5a5a62'); wallRect(u0 + 0.1, 0, u0 + 0.35, 34, 'rgba(110,110,120,0.5)'); }   // folha aberta
+        if (g1) { wallRect(u1 - 0.1, 0, u1, 38, '#5a5a62'); wallRect(u1 - 0.35, 0, u1 - 0.1, 34, 'rgba(110,110,120,0.5)'); }
+        wallRect(u0, 36, u1, 38, '#3a3a40');                                                      // trave do portão
+        break;
+      }
       case 'f': { // cerca de arame do ferro-velho, com postes e arame farpado
         wallRect(u0, 0, u1, WH, 'rgba(0,0,0,0)');
         wallRect(u0, 0, u0 + 0.06, 34, '#4a4a50'); wallRect(u1 - 0.06, 0, u1, 34, '#4a4a50');
