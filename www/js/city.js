@@ -322,6 +322,14 @@ function buildCity(def) {
     if (rnd() < 0.6) O({ kind: 'hydrant', x: x9, y: y9, solid: true, key: 'hidrante', name: 'Hidrante', info: 'Um hidrante amarelo e vermelho. Alguém pichou um olho nele.' });
   }
 
+  // nada alto na frente do ferro-velho: as torres que o cobririam viram sobrados
+  if (!def.build) {
+    const [jx, jy] = map(6, 45);
+    for (const b of buildings) {
+      const cx = b.x + b.w / 2, cy = b.y + b.d / 2, ahead = (cx + cy) - (jx + jy);
+      if (ahead > 0 && ahead < 40 && Math.abs((cx - cy) - (jx - jy)) < 9 && b.h > 30) { b.h = 26; b.style = 'low'; b.holo = null; }
+    }
+  }
   // ---------- quarteirões de borda (silhuetas fora do mapa) ----------
   const border = [];
   for (let k = -8; k < N + 8; k += 4) {
@@ -1295,6 +1303,16 @@ function openGps() {
     b.innerHTML = `<span class="gps-ico" style="background:${d.color}">${d.icon}</span><span><b>${d.name}</b><small>${T('{0} m em linha reta', dist)}</small></span>`;
     row.appendChild(b);
     if (gpsVisited(id)) row.appendChild(button('⚡', () => { closeModal(); fastTravel(id); }, 'gps-warp'));
+    list.appendChild(row);
+  }
+  // em outras cidades (Caso 2), o apartamento de Vance continua no GPS, só por teletransporte
+  if (!DESTINATIONS.casa) {
+    const d = CITY_DESTS.city.casa, row = document.createElement('div');
+    row.className = 'gps-row';
+    const go = () => { closeModal(); if (game.driving) { const c = game.car; resetCar({ x: c.x, y: c.y, ang: c.ang }); game.car = null; game.driving = false; Sound.engine(false); } enterRoom('home', [5, 4], true); game.gps = null; game.teleFx = game.t; Sound.play('hackOk'); toast(`<span class="k">⚡</span> ${T('Teletransporte: {0}', d.name)}`, 'room'); };
+    const b = button('', go, 'gps-item');
+    b.innerHTML = `<span class="gps-ico" style="background:${d.color}">${d.icon}</span><span><b>${T(d.name)}</b><small>${T('Sector 4')}</small></span>`;
+    row.appendChild(b); row.appendChild(button('⚡', go, 'gps-warp'));
     list.appendChild(row);
   }
   if (game.gps) list.appendChild(button('Cancelar rota', () => { game.gps = null; closeModal(); }, 'end'));

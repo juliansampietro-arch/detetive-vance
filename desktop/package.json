@@ -15,8 +15,8 @@
     "directories": { "output": "dist" },
     "files": ["main.js", "www/**/*"],
     "win": { "icon": "www/icons/icon-512.png" },
-    "portable": { "artifactName": "HotelAlvorada-portatil.exe" },
-    "nsis": { "artifactName": "HotelAlvorada-instalador.exe", "oneClick": false, "allowToChangeInstallationDirectory": true }
+    "portable": { "artifactName": "DetetiveVance-portatil.exe" },
+    "nsis": { "artifactName": "DetetiveVance-instalador.exe", "oneClick": false, "allowToChangeInstallationDirectory": true }
   },
   "devDependencies": {
     "electron": "^33.2.1",

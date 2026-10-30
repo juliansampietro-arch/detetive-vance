@@ -609,6 +609,18 @@ ROOMS.ferrovelho = {
     { kind: 'barrel', x: 8, y: 0, solid: true, key: 'tambor2', name: 'Tambor de óleo', info: 'Óleo velho de repulsor. Cheira a ozônio e arrependimento.' },
     { kind: 'barrel', x: 13, y: 7, solid: true, col: '#2a4a6a', key: 'tambor2', name: 'Tambor de óleo', info: 'Óleo velho de repulsor. Cheira a ozônio e arrependimento.' },
     { kind: 'barrel', x: 13, y: 8, solid: true, fire: true, key: 'tambor', name: 'Tambor com fogo', info: 'Fogo num tambor velho, para espantar o frio e a chuva.' },
+    // pilhas de carros prensados e mais entulho espalhado
+    { kind: 'car_stack', x: 12, y: 0, w: 1, d: 2, n: 5, solid: true, key: 'pilha_carros', name: 'Pilha de carros prensados', info: 'Cinco carros voadores esmagados em blocos, um em cima do outro. O de baixo ainda tem um adesivo: "MEU OUTRO CARRO É UM DRONE".' },
+    { kind: 'car_stack', x: 0, y: 1, w: 2, d: 1, n: 4, solid: true, key: 'pilha_carros', name: 'Pilha de carros prensados', info: 'Sedãs prensados como sanduíche. O Zeca vende por quilo.' },
+    { kind: 'car_stack', x: 15, y: 3, w: 1, d: 2, n: 6, solid: true, key: 'pilha_carros', name: 'Torre de carros prensados', info: 'Seis carcaças empilhadas até acima da cerca. Rangem quando venta.' },
+    { kind: 'scrap', x: 4, y: 3, w: 1, d: 1, solid: true, key: 'entulho', name: 'Entulho', info: 'Um torso de androide abraçado a uma máquina de lavar.' },
+    { kind: 'scrap', x: 9, y: 9, w: 1, d: 2, solid: true, key: 'entulho', name: 'Entulho', info: 'Grades de ventilação, um assento de ônibus e fios por todo lado.' },
+    { kind: 'scrap', x: 13, y: 4, w: 1, d: 2, solid: true, key: 'entulho', name: 'Entulho', info: 'Chapas de blindagem com buracos de bala. Melhor não perguntar.' },
+    { kind: 'scrap', x: 6, y: 5, w: 1, d: 1, solid: true, key: 'entulho', name: 'Entulho', info: 'Placas de circuito e um teclado com só a tecla ESC.' },
+    { kind: 'scrap', x: 0, y: 11, w: 1, d: 1, solid: true, key: 'entulho', name: 'Entulho', info: 'Canos de cobre, já roubados pela metade.' },
+    { kind: 'scrap', x: 7, y: 11, w: 2, d: 1, solid: true, key: 'entulho', name: 'Entulho', info: 'Portas de carro empilhadas, todas de modelos diferentes.' },
+    { kind: 'tires', x: 1, y: 6, solid: true, n: 4, key: 'pneus', name: 'Pilha de pneus', info: 'Pneus de carros que pararam de voar há muito tempo.' },
+    { kind: 'tires', x: 10, y: 11, solid: true, n: 6, key: 'pneus', name: 'Pilha de pneus', info: 'Pneus de carros que pararam de voar há muito tempo.' },
   ],
   npcs: [{ id: 'zeca', x: 3, y: 2 }],
 };

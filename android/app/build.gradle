@@ -4,6 +4,7 @@ android {
     namespace "br.ind.we.hotelalvorada"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
+        setProperty("archivesBaseName", "DetetiveVance")
         applicationId "br.ind.we.hotelalvorada"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion

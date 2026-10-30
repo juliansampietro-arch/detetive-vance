@@ -1641,7 +1641,7 @@ function faint(k) {
   game.player.seat = null; game.busy = null; game.outfit = null;
   enterRoom('home', [5, 4], true);
   lieDown(ROOMS.home.objects.find(o => o.key === 'cama_casa'));
-  n.fome = Math.min(n.fome, 45); n.sede = Math.min(n.sede, 45); n.cansaco = k === 'cansaco' ? 0 : Math.min(n.cansaco, 30);
+  n.fome = 0; n.sede = 0; n.cansaco = 0;
   for (const j in game.needWarn) game.needWarn[j] = false;
   game.clock += 8 * 60 * 6;
   updateNeedsHud();
@@ -1689,8 +1689,8 @@ function sleep() {
   show('card');
   Sound.setMusic('home');
   game.needs.cansaco = 0;
-  game.needs.fome = Math.min(100, game.needs.fome + 15);
-  game.needs.sede = Math.min(100, game.needs.sede + 20);
+  game.needs.fome = 0; game.needs.sede = 0;
+  for (const j in game.needWarn) game.needWarn[j] = false;
   game.clock += 6 * 60 * 6;
   updateNeedsHud();
   saveGame();

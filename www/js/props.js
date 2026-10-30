@@ -370,6 +370,19 @@ function drawProp(o, t, S) {
       const blink = Math.sin(t * 3) > 0.6; if (blink) { glow(...arm, 6, '#ff3355', 0.6); }
       return;
     }
+    case 'car_stack': {      // pilha de carros prensados: blocos achatados, cada um de uma cor, desalinhados
+      const CC = ['#5a2020', '#2a4a6a', '#6a6a30', '#3a3026', '#2a5a4a', '#7a5a3a', '#4a3a5a', '#8a8a90'];
+      const n = o.n || 4, hh = 6;
+      for (let k = 0; k < n; k++) {
+        const r = Math.sin((o.x * 7 + o.y * 3 + k) * 12.9898) * 0.5, col = CC[(o.x + o.y * 3 + k * 5) % CC.length];
+        const ox = r * 0.25, oy = -r * 0.2, z = k * hh;
+        box(o.x + 0.08 + ox, o.y + 0.1 + oy, w - 0.25, d - 0.25, hh - 0.6, col, z, shade(col, 1.3));
+        box(o.x + 0.3 + ox, o.y + 0.35 + oy, w - 0.7, d - 0.75, 0.8, '#1a2026', z + hh - 0.6, '#2a3a44');   // vidros esmagados
+        const [px, py] = iso(o.x + w - 0.2 + ox, o.y + 0.4 + oy, z + 2);
+        ctx.fillStyle = k % 2 ? 'rgba(255,220,150,0.25)' : '#111'; ctx.fillRect(px - 1, py - 1, 2, 1.2);              // farol quebrado
+      }
+      return;
+    }
     case 'scrap': {          // monte de sucata: chapas, peças de robô, pneus e fios
       const rng = k => (Math.sin((o.x * 13 + o.y * 7 + k) * 12.9898) * 43758.5453) % 1;
       // monte em degraus que afunila para cima, coberto de peças; quanto maior a base, mais alto

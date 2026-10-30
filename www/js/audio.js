@@ -113,7 +113,7 @@ const Sound = (() => {
 
   let pendingRoom = null;
   // a chuva fica sempre bem baixa, só como fundo (os jogadores acharam alta demais)
-  const RAIN_LEVEL = 0.2;
+  const RAIN_LEVEL = 0.1;
   // salas que dividem o clima e a trilha de outra
   const ROOM_ALIAS = { home_kitchen: 'home', home_bath: 'home', locker: 'bathhouse', onsen: 'bathhouse', sauna: 'bathhouse' };
   function setRoom(id) {
